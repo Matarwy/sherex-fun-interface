@@ -238,7 +238,7 @@ export default function SelectWalletModal({ wallets, isOpen, onSelectWallet, onC
                   <Switch checked={canShowUninstalledWallets} onChange={() => setCanShowUninstalledWallets((b) => !b)} />
                 </Flex>
               )}
-              <Box
+              {/* <Box
                 bg={isMobile ? colors.backgroundLight : 'transparent'}
                 position={isMobile ? 'fixed' : 'unset'}
                 bottom={isMobile ? '0' : 'unset'}
@@ -267,7 +267,7 @@ export default function SelectWalletModal({ wallets, isOpen, onSelectWallet, onC
                     </HStack>
                   </Link>
                 </Flex>
-                {/* <Flex justifyContent="center" alignItems="center" color={colors.lightPurple} pt={isMobile ? 0 : 4} mb={isMobile ? 6 : 0}>
+                <Flex justifyContent="center" alignItems="center" color={colors.lightPurple} pt={isMobile ? 0 : 4} mb={isMobile ? 6 : 0}>
                   <Text fontSize="xs">{t('wallet_connect_panel.buy_crypto_with_fiat')}</Text>
                   <MoonpayBuy>
                     <HStack gap={0}>
@@ -275,8 +275,8 @@ export default function SelectWalletModal({ wallets, isOpen, onSelectWallet, onC
                       <ChevronRightIcon width={'16px'} height={'16px'} />
                     </HStack>
                   </MoonpayBuy>
-                </Flex> */}
-              </Box>
+                </Flex>
+              </Box> */}
             </Box>
           </ModalBody>
         )}
@@ -314,7 +314,7 @@ function WalletItem({
     >
       <Image src={wallet.adapter.icon} w={8} h={8} ml={1} />
       <Text fontWeight={700}>{wallet.adapter.name}</Text>
-      {wallet.adapter.name === 'Phantom' && (
+      {/* {wallet.adapter.name === 'Phantom' && (
         <HStack gap={1} backgroundColor={colors.selectInactive} px={2} py={1} borderRadius="8px">
           <Text fontSize="12px" color={colors.textPurple}>
             Auto Confirm
@@ -328,15 +328,15 @@ function WalletItem({
             iconProps={{ color: colors.textPurple }}
           />
         </HStack>
-      )}
-      {wallet.adapter.name === 'Solflare' && (
+      )} */}
+      {/* {wallet.adapter.name === 'Solflare' && (
         <HStack gap={1} backgroundColor={colors.selectInactive} px={2} py={1} borderRadius="8px">
           <Text fontSize="12px" color={colors.textPurple}>
             Auto Approve
           </Text>
           <QuestionToolTip label="Auto-approve is now available for all transactions on Raydium." iconProps={{ color: colors.textPurple }} />
         </HStack>
-      )}
+      )} */}
     </Flex>
   )
 }
