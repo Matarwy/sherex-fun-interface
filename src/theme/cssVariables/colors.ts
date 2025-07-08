@@ -147,9 +147,9 @@ export const lightColors: Partial<typeof darkColors> = {
   secondary10: 'rgba(34, 209, 248, 0.1)',
 
   // component color
-  backgroundDark: '#EDEDFF',
-  backgroundDark50: '#EDEDFF80',
-  backgroundMedium: '#EDEDFF',
+  backgroundDark: '#fffaed',
+  backgroundDark50: '#fffaed80',
+  backgroundMedium: '#fffaed',
   backgroundLight: '#F5F8FF',
   backgroundLight50: '#F5F8FF88',
   backgroundLight30: '#F5F8FF4d',
@@ -159,8 +159,8 @@ export const lightColors: Partial<typeof darkColors> = {
 
   // text
   textPrimary: '#0B1022',
-  textSecondary: '#474ABB',
-  textTertiary: '#474ABB99',
+  textSecondary: '#bb7f47',
+  textTertiary: '#bb7f4799',
   textRevertPrimary: '#ECF5FF',
 
   textLink: '#22D1F8',
@@ -252,7 +252,7 @@ export const lightColors: Partial<typeof darkColors> = {
   // customize (by V3 frontend coder)
   backgroundApp: '#fff',
 
-  solidButtonBg: 'linear-gradient(272deg, #4F53F3 2.63%, #aaef6e 95.31%)',
+  solidButtonBg: 'linear-gradient(272deg,rgb(243, 186, 79) 2.63%,rgb(215, 239, 110) 95.31%)',
   outlineButtonBg: 'linear-gradient(270deg, #8C6EEF1a 0%, #4F53F31a 100%)',
   filledProgressBg: 'linear-gradient(270deg, #aaef6e 0%, #4F53F3 100%)',
   transparentContainerBg: '#F5F8FF',
@@ -262,14 +262,14 @@ export const lightColors: Partial<typeof darkColors> = {
   warnButtonBg: '#FED33A33',
   warnButtonLightBg: '#FED33A1A',
   buttonBg01: '#ABC4FF1F',
-  lightPurple: '#474ABB',
+  lightPurple: '#bb7f47',
   background01: '#EDEDFF',
   background02: '#ABC4FF33',
   background03: '#FF4EA31A',
   cardBorder01: '#8C6EEF80',
   text01: '#D6CC56',
   text02: '#000',
-  text03: '#474ABB',
+  text03: '#bb7f47',
   /** it's designer's variable name in Figma */
   brandGradient: 'linear-gradient(244deg, #7748FC 8.17%, #39D0D8 101.65%)',
   dividerDashGradient: 'repeating-linear-gradient(to right, currentColor 0 5px, transparent 5px 10px)',

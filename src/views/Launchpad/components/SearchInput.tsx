@@ -49,7 +49,7 @@ export const SearchInput = forwardRef(({ includeNsfw, onSearchResultChange }: Pr
   return (
     <InputGroup width="100%" maxWidth={['100%', '11.5625rem', '16.25rem']}>
       <InputLeftElement pointerEvents="none" height={['34px', '2.5rem']}>
-        <SearchIcon color={isLight ? '#474ABB' : '#C4D6FF80'} />
+        <SearchIcon color={isLight ? '#bb7f47' : '#C4D6FF80'} />
       </InputLeftElement>
       <Input
         width="100%"
@@ -65,7 +65,7 @@ export const SearchInput = forwardRef(({ includeNsfw, onSearchResultChange }: Pr
         aria-label="Search all"
         background="#ABC4FF1F"
         borderRadius="26px"
-        color={isLight ? '#474ABB' : '#C4D6FF80'}
+        color={isLight ? '#bb7f47' : '#C4D6FF80'}
         fontSize="sm"
         fontWeight="medium"
         enterKeyHint="search"

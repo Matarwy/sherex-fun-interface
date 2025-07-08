@@ -489,7 +489,7 @@ export default function TradeBox({
         <Button
           size="xs"
           variant="outline"
-          color={isLight ? '#474ABB' : '#fff3bf'}
+          color={isLight ? '#bb7f47' : '#fff3bf'}
           opacity={0.5}
           background="#ABC4FF1F"
           borderRadius="4px"
@@ -501,7 +501,7 @@ export default function TradeBox({
         <Button
           size="xs"
           variant="outline"
-          color={isLight ? '#474ABB' : '#fff3bf'}
+          color={isLight ? '#bb7f47' : '#fff3bf'}
           opacity={0.5}
           background="#ABC4FF1F"
           borderRadius="4px"
@@ -513,7 +513,7 @@ export default function TradeBox({
         <Button
           size="xs"
           variant="outline"
-          color={isLight ? '#474ABB' : '#fff3bf'}
+          color={isLight ? '#bb7f47' : '#fff3bf'}
           opacity={0.5}
           background="#ABC4FF1F"
           borderRadius="4px"
@@ -525,7 +525,7 @@ export default function TradeBox({
         <Button
           size="xs"
           variant="outline"
-          color={isLight ? '#474ABB' : '#fff3bf'}
+          color={isLight ? '#bb7f47' : '#fff3bf'}
           opacity={0.5}
           background="#ABC4FF1F"
           borderRadius="4px"
@@ -555,17 +555,17 @@ export default function TradeBox({
       ) : null}
       <Box my={5} color={isLight ? '#000248' : colors.lightPurple}>
         <Text>
-          <Text as="span" color={isLight ? '#474ABB' : '#BFD2FF80'} pr={1}>
+          <Text as="span" color={isLight ? '#bb7f47' : '#BFD2FF80'} pr={1}>
             You receive:
           </Text>
           {amount.amountOut || '--'} {isBuy ? symbolA : symbolB}
         </Text>
         <Text>
-          <Text as="span" color={isLight ? '#474ABB' : '#BFD2FF80'} pr={1}>
+          <Text as="span" color={isLight ? '#bb7f47' : '#BFD2FF80'} pr={1}>
             (Minimum received:
           </Text>
           {amount.minAmountOut || '--'} {isBuy ? symbolA : symbolB}
-          <Text as="span" color={isLight ? '#474ABB' : '#BFD2FF80'} pr={1}>
+          <Text as="span" color={isLight ? '#bb7f47' : '#BFD2FF80'} pr={1}>
             )
           </Text>
         </Text>

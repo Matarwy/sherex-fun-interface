@@ -39,7 +39,7 @@ const DarkThemeBase: () => ThemeColorBase = () => ({
 
 const LightThemeBase: () => ThemeColorBase = () => ({
   layer0: '#F5F8FF',
-  layer1: '#EDEDFF',
+  layer1: '#fffaed',
   textPrimary: '#0B1022',
   accent: '#7774FF',
   positive: '#4CDCC1',

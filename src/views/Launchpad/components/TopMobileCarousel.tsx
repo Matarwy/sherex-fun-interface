@@ -181,7 +181,7 @@ const TopCarouselCard = memo(
                 sx={
                   isLight
                     ? {
-                        color: '#474ABB'
+                        color: '#bb7f47'
                       }
                     : {
                         bgGradient: 'linear-gradient(245.22deg, #FF2FC8 7.97%, #FFB12B 49.17%, #D3D839 92.1%)',
