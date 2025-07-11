@@ -46,6 +46,7 @@ export interface LaunchpadState {
   commentHost: string
   historyHost: string
   mintHost: string
+  backendHost: string
   slippage: number
 
   refreshPoolMint?: string
@@ -159,6 +160,7 @@ const initialState = {
   commentHost: process.env.NEXT_PUBLIC_LAUNCH_COMMENT_HOST || 'https://launch-forum-v1.raydium.io',
   historyHost: process.env.NEXT_PUBLIC_LAUNCH_HISTORY_HOST || 'https://launch-history-v1.raydium.io',
   mintHost: process.env.NEXT_PUBLIC_LAUNCH_MINT_HOST || 'https://launch-mint-v1.raydium.io',
+  backendHost: process.env.NEXT_PUBLIC_BACKEND_HOST || 'http://localhost:5052',
   slippage: 0.025,
   configInfo: new Map()
 }

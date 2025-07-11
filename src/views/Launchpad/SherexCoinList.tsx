@@ -1,14 +1,15 @@
 import React, { RefObject, useImperativeHandle, useRef, useState } from 'react'
 import TokenListCard from './components/TokenListCard'
-import useMintList, { MintSortField } from '@/hooks/launchpad/useMintList'
+import SherexTokenListCard from './components/SherexTokenListCard'
+import useSherexMintList, { MintSortField } from '@/hooks/launchpad/useSherexMintList'
 import useMintInfo from '@/hooks/launchpad/useMintInfo'
 import { getMintWatchList } from './utils'
-import { MintInfo } from './type'
+import { MintInfo, SherexMintInfo } from './type'
 
 export interface SearchProps {
   isSearch: boolean
   isLoading: boolean
-  data: MintInfo[]
+  data: SherexMintInfo[]
   hasMore: boolean
   onLoadMore: () => void
 }
@@ -27,18 +28,18 @@ interface Props {
   actionRef?: RefObject<CoinListActionRef>
 }
 
-export const CoinList = ({ sort, meta, platformId, showAnimations, includeNsfw, actionRef }: Props) => {
+export const SherexCoinList = ({ sort, meta, platformId, showAnimations, includeNsfw, actionRef }: Props) => {
   const [searchResult, setSearchResult] = useState<{
     isSearch: boolean
     isLoading: boolean
-    data: MintInfo[]
+    data: SherexMintInfo[]
     hasMore: boolean
     onLoadMore: () => void
   }>({ isSearch: false, isLoading: false, data: [], hasMore: false, onLoadMore: () => {} })
   const timeRef = useRef(Date.now())
 
   const isWatchList = meta === 'watch_list'
-  const { data, isLoading, loadMore, hasMore, mutate } = useMintList({
+  const { data, isLoading, loadMore, hasMore, mutate } = useSherexMintList({
     sort,
     notRefresh: !showAnimations,
     includeNsfw,
@@ -72,12 +73,28 @@ export const CoinList = ({ sort, meta, platformId, showAnimations, includeNsfw, 
 
   return (
     <>
-      <TokenListCard
+      {/* <TokenListCard
         tokens={searchResult.isSearch ? searchResult.data : isWatchList ? watchMintData : data}
         isLoading={searchResult.isSearch ? searchResult.isLoading : isWatchList ? isWatchLoading : isLoading}
         hasMore={isWatchList ? false : hasMore}
         onLoadMore={loadMore}
-      />
+      /> */}
+      {searchResult.isSearch ? <SherexTokenListCard
+        tokens={searchResult.data}
+        isLoading={searchResult.isLoading}
+        hasMore={isWatchList ? false : hasMore}
+        onLoadMore={loadMore}
+      /> : isWatchList ? <TokenListCard
+        tokens={watchMintData}
+        isLoading={isWatchLoading}
+        hasMore={false}
+        onLoadMore={loadMore}
+      /> : <SherexTokenListCard
+        tokens={data}
+        isLoading={isLoading}
+        hasMore={hasMore}
+        onLoadMore={loadMore}
+      />}
     </>
   )
 }

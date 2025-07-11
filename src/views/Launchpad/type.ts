@@ -75,3 +75,21 @@ export interface MintInfo {
 
   migrateType: 'cpmm' | 'amm'
 }
+
+export interface SherexMintInfo {
+  mintId: string
+  poolId: string
+  name: string
+  symbol: string
+  creator: string
+  metadataUrl: string
+  imgUrl: string
+  telegram?: string
+  website?: string
+  twitter?: string
+  marketCap: string
+  finishingRate: string
+  createAt: number
+  lastTradeAt: number
+  graduated: boolean
+}

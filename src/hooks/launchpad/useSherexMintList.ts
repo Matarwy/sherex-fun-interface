@@ -1,6 +1,6 @@
 import { useLaunchpadStore } from '@/store'
 import axios from '@/api/axios'
-import { MintInfo } from '@/views/Launchpad/type'
+import { SherexMintInfo } from '@/views/Launchpad/type'
 import useSWRInfinite from 'swr/infinite'
 import { useEffect, useMemo, useRef } from 'react'
 import { useEvent } from '../useEvent'
@@ -8,9 +8,7 @@ import { useEvent } from '../useEvent'
 export enum MintSortField {
   MarketCap = 'marketCap',
   New = 'new',
-  LastTrade = 'lastTrade',
-  Featured = 'featured',
-  FinishRate = 'finishingRate'
+  LastTrade = 'lastTrade'
 }
 
 const fetcher = ([url]: [string]): Promise<{
@@ -18,13 +16,13 @@ const fetcher = ([url]: [string]): Promise<{
   success: boolean
   msg?: string
   data: {
-    rows: MintInfo[]
+    rows: SherexMintInfo[]
     nextPageId?: string
   }
 }> => axios.get(url, { skipError: true })
 
 export const validTypeValue = ['default', 'heating', 'graduated']
-export default function useMintList({
+export default function useSherexMintList({
   shouldFetch = true,
   sort = MintSortField.MarketCap,
   platformId,
@@ -104,8 +102,8 @@ export default function useMintList({
         ?.map((d) => d.data.rows)
         .flat()
         .filter((d) => {
-          if (mintSet.has(d.mint)) return false
-          mintSet.add(d.mint)
+          if (mintSet.has(d.mintId)) return false
+          mintSet.add(d.mintId)
           return true
         }) || []
     )
