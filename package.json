@@ -75,8 +75,6 @@
     "@types/react-datepicker": "^4.8.0",
     "@types/uuid": "^9.0.6",
     "@typescript-eslint/eslint-plugin": "^5.36.2",
-    "@vercel/analytics": "^1.5.0",
-    "@vercel/speed-insights": "^1.2.0",
     "@walletconnect/solana-adapter": "^0.0.5",
     "@wormhole-foundation/wormhole-connect": "^0.3.21",
     "axios": "^1.2.6",

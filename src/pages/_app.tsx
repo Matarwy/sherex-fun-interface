@@ -1,11 +1,11 @@
 import type { AppProps } from 'next/app'
+import Script from 'next/script';
 import Head from 'next/head'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { useMemo } from 'react'
 import Decimal from 'decimal.js'
-import { SpeedInsights } from '@vercel/speed-insights/next';
-import { Analytics } from '@vercel/analytics/next';
+
 
 import '@/components/Toast/toast.css'
 // import '@/components/LandingPage/components/tvl.css'
@@ -59,9 +59,39 @@ const MyApp = ({ Component, pageProps, ...props }: AppProps) => {
             <Component {...pageProps} />
           ) : (
             <DynamicAppNavLayout overflowHidden={overflowHidden}>
+              {/* Inline setup for window.si */}
+              <Script id="vercel-si-init" strategy="beforeInteractive">
+                {`
+                  window.si = window.si || function () {
+                    (window.siq = window.siq || []).push(arguments);
+                  };
+                `}
+              </Script>
+
+              {/* External script */}
+              <Script
+                src="/_vercel/speed-insights/script.js"
+                strategy="afterInteractive"
+                defer
+              />
+
+              {/* Inline setup for window.va */}
+              <Script id="vercel-analytics-init" strategy="beforeInteractive">
+                {`
+                  window.va = window.va || function () {
+                    (window.vaq = window.vaq || []).push(arguments);
+                  };
+                `}
+              </Script>
+
+              {/* Vercel Analytics script */}
+              <Script
+                src="/_vercel/insights/script.js"
+                strategy="afterInteractive"
+                defer
+              />
+              
               <Component {...pageProps} />
-              <Analytics />
-              <SpeedInsights />
             </DynamicAppNavLayout>
           )}
         </DynamicContent>
