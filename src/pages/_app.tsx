@@ -4,6 +4,8 @@ import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { useMemo } from 'react'
 import Decimal from 'decimal.js'
+import { SpeedInsights } from '@vercel/speed-insights/next';
+import { Analytics } from '@vercel/analytics/next';
 
 import '@/components/Toast/toast.css'
 // import '@/components/LandingPage/components/tvl.css'
@@ -58,6 +60,8 @@ const MyApp = ({ Component, pageProps, ...props }: AppProps) => {
           ) : (
             <DynamicAppNavLayout overflowHidden={overflowHidden}>
               <Component {...pageProps} />
+              <Analytics />
+              <SpeedInsights />
             </DynamicAppNavLayout>
           )}
         </DynamicContent>
