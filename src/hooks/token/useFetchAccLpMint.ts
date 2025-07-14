@@ -24,7 +24,7 @@ const poolLpAuthority = new Set([
   '3uaZBfHPfmpAHW7dsimC1SnyR61X4bJqQZKWmRSCXJxv',
   'GpMZbSM2GgvTKHJirzeGfMFoaZ8UR2X7F4v8vHTvxFbL'
 ])
-// const LP_CACHE_KEY = '_r_lp_b2_'
+// const LP_CACHE_KEY = '_sherex_lp_b2_'
 // const noneLpMintSet = new Set<string>(JSON.parse(getStorageItem(LP_CACHE_KEY) || '[]'))
 
 const fetcher = async ([connection, publicKeyList]: [Connection, string[]]) => {

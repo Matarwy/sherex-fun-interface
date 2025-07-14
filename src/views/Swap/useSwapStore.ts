@@ -60,7 +60,7 @@ export interface ComputeParams {
   amount: string
 }
 
-export const SWAP_SLIPPAGE_KEY = '_r_swap_slippage_'
+export const SWAP_SLIPPAGE_KEY = '_sherex_swap_slippage_'
 const initSwapState = {
   slippage: 0.005
 }

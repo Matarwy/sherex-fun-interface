@@ -5,7 +5,7 @@ import createStore from './createStore'
 import { useAppStore } from './useAppStore'
 import { getStorageItem, setStorageItem } from '@/utils/localStorage'
 import logMessage from '@/utils/log'
-export const EXTRA_TOKEN_KEY = '_r_cus_t_'
+export const EXTRA_TOKEN_KEY = '_sherex_cus_t_'
 
 export interface TokenPrice {
   value: number

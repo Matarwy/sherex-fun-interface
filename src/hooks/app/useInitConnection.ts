@@ -14,7 +14,7 @@ import { sendWalletEvent } from '@/api/event'
 import { validateTxData, extendTxData } from '@/api/txService'
 import { parseUserAgent } from 'react-device-detect'
 
-const localFakePubKey = '_r_f_wallet_'
+const localFakePubKey = '_sherex_f_wallet_'
 export const WALLET_STORAGE_KEY = 'walletName'
 
 function useInitConnection(props: SSRData) {

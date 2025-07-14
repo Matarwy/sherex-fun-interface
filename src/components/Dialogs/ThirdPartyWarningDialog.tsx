@@ -4,7 +4,7 @@ import { DialogProps, ThirdPartyWarningDialogProps } from '@/constants/dialogs'
 import CircleWarning from '@/icons/misc/CircleWarning'
 import { colors } from '@/theme/cssVariables'
 
-const THIRD_PARTY_WARNING_DISMISSED_KEY = '_r_third_party_warning_dismissed_'
+const THIRD_PARTY_WARNING_DISMISSED_KEY = '_sherex_third_party_warning_dismissed_'
 
 export const ThirdPartyWarningDialog = ({ setIsOpen, url }: DialogProps<ThirdPartyWarningDialogProps>) => {
   const [dontShowAgain, setDontShowAgain] = useState<boolean>(false)

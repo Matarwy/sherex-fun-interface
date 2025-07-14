@@ -30,7 +30,7 @@ import { handleMultiTxRetry } from '@/hooks/toast/retryTx'
 import { wSolToSolString } from '@/utils/token'
 import { useWallet } from '@solana/wallet-adapter-react'
 
-export const LAUNCHPAD_SLIPPAGE_KEY = '_r_lau_slp_'
+export const LAUNCHPAD_SLIPPAGE_KEY = '_sherex_lau_slp_'
 
 export interface CreateMintAdvanceConfig {
   supply?: BN

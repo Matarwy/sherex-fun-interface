@@ -26,8 +26,8 @@ import { compare } from 'compare-versions'
 
 export const defaultNetWork = WalletAdapterNetwork.Mainnet // Can be set to 'devnet', 'testnet', or 'mainnet-beta'
 export const defaultEndpoint = clusterApiUrl(defaultNetWork) // You can also provide a custom RPC endpoint
-export const APR_MODE_KEY = '_r_apr_'
-export const EXPLORER_KEY = '_r_explorer_'
+export const APR_MODE_KEY = '_sherex_apr_'
+export const EXPLORER_KEY = '_sherex_explorer_'
 export const supportedExplorers = [
   {
     name: 'Solscan',
@@ -46,13 +46,13 @@ export const supportedExplorers = [
   }
 ]
 
-const RPC_URL_KEY = '_r_rpc_dev_'
-const RPC_URL_PROD_KEY = '_r_rpc_prod_'
+const RPC_URL_KEY = '_sherex_rpc_dev_'
+const RPC_URL_PROD_KEY = '_sherex_rpc_prod_'
 let isRpcLoading = false
-export const FEE_KEY = '_r_fee_'
-export const PRIORITY_LEVEL_KEY = '_r_fee_level_'
-export const PRIORITY_MODE_KEY = '_r_fee_mode_'
-export const USER_ADDED_KEY = '_r_u_added_'
+export const FEE_KEY = '_sherex_fee_'
+export const PRIORITY_LEVEL_KEY = '_sherex_fee_level_'
+export const PRIORITY_MODE_KEY = '_sherex_fee_mode_'
+export const USER_ADDED_KEY = '_sherex_u_added_'
 export enum PriorityLevel {
   Fast,
   Turbo,
@@ -187,7 +187,7 @@ export const useAppStore = createStore<AppState>(
         connection,
         urlConfigs: {
           ...urlConfigs,
-          BASE_HOST: !isProdEnv() ? getStorageItem('_r_api_host_') || urlConfigs.BASE_HOST : urlConfigs.BASE_HOST
+          BASE_HOST: !isProdEnv() ? getStorageItem('_sherex_api_host_') || urlConfigs.BASE_HOST : urlConfigs.BASE_HOST
         },
         jupTokenType,
         logRequests: !isDev,

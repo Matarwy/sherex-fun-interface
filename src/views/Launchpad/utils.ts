@@ -13,7 +13,7 @@ export function createTimeDiff(created: number) {
   return (day || hour || minutes) + (day ? 'd' : hour ? 'h' : 'm')
 }
 
-const MINT_WATCH_KEY = '_r_m_watch_'
+const MINT_WATCH_KEY = '_sherex_m_watch_'
 
 export function getMintWatchList() {
   return new Set((getStorageItem(MINT_WATCH_KEY) || '').split(',').filter(Boolean))

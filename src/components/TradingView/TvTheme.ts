@@ -1,4 +1,4 @@
-import type { ThemeName } from '@/charting_library'
+import type { ThemeName } from '@/charting_library/charting_library'
 
 export enum AppColorMode {
   GreenUp = 'GreenUp',

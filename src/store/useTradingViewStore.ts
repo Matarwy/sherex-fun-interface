@@ -27,7 +27,7 @@ export const useTradingViewStore = createStore<TradingViewState>(
       }
     }),
     {
-      name: 'persist:_r_tradingView',
+      name: 'persist:_sherex_tradingView',
       getStorage: () => localStorage
     }
   ),

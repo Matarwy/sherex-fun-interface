@@ -1,7 +1,7 @@
 import { ToastStatus } from '@/types/tx'
 import { isClient } from '../common'
 
-const HISTORY_KEY = '_r_tx_history_'
+const HISTORY_KEY = '_sherex_tx_history_'
 
 interface RecordProps {
   status: ToastStatus
