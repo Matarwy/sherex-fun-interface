@@ -37,7 +37,7 @@ const Profile = () => {
 
   const referrerInfo = useReferrerInfo({ wallet })
 
-  const { data, isLoading, loadMore, hasMore } = useOwnerMints({ wallet })
+  const { data, isLoading, loadMore, hasMore } = useOwnerMints({ wallet, platformId: useLaunchpadStore.getState().platformId })
 
   const hasWallet = !!wallet
   useEffect(() => {
@@ -76,7 +76,7 @@ const Profile = () => {
             <Flex color={colors.textLink} alignItems="center" gap={2}>
               {token.twitter ? (
                 <Link as={NextLink} href={token.twitter} isExternal>
-                  <TwitterIcon width="24px" height="24px" />
+                  <TwitterIcon width="24px" height="24px" color={colors.primary} />
                 </Link>
               ) : null}
 
@@ -88,13 +88,13 @@ const Profile = () => {
                     openDialog(DialogTypes.ThirdPartyWarning({ url: token.website! }))
                   }}
                 >
-                  <WebIcon width="24px" height="24px" />
+                  <WebIcon width="24px" height="24px" color={colors.primary} />
                 </Box>
               ) : null}
 
               {token.telegram ? (
                 <Link as={NextLink} href={token.telegram} isExternal>
-                  <TelegrameIcon width="24px" height="24px" />
+                  <TelegrameIcon width="24px" height="24px" color={colors.primary} />
                 </Link>
               ) : null}
             </Flex>
@@ -146,7 +146,7 @@ const Profile = () => {
       </GridItem>
       <GridItem overflow="auto">
         <GridTable
-          data={data.filter((d) => d.platformInfo.pubKey === useLaunchpadStore.getState().platformId)}
+          data={data}
           getRowKey={(row: MintInfo) => row.mint}
           label={'ProfileDataTable'}
           columns={columns}

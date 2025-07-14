@@ -24,7 +24,7 @@ export const darkColors: Record<keyof typeof colors, string> = {
   textLink: ' #f8d222',
 
   /** 🤔 what's this */
-  textQuaternary: ' #C4D6FF',
+  textQuaternary: 'rgb(255, 251, 196)',
   /** 🤔 what's this */
   textQuinary: ' #1a0900',
   /** 🤔 what's this */
