@@ -43,7 +43,7 @@ export const darkColors: Record<keyof typeof colors, string> = {
   buttonPrimary__01: ' #E5D0AC',
   buttonPrimary__02: ' #39D0D8',
   buttonSolidText: ' #0B1022',
-  buttonSecondary: ' #aaef6e',
+  buttonSecondary: ' #3b3222',
 
   // switch
   switchOn: ' #FF9D23',
