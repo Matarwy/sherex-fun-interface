@@ -5,6 +5,7 @@ import useSherexMintList, { MintSortField } from '@/hooks/launchpad/useSherexMin
 import useMintInfo from '@/hooks/launchpad/useMintInfo'
 import { getMintWatchList } from './utils'
 import { MintInfo, SherexMintInfo } from './type'
+import useSherexMintInfo from '@/hooks/launchpad/useSherexMintInfo'
 
 export interface SearchProps {
   isSearch: boolean
@@ -48,7 +49,7 @@ export const SherexCoinList = ({ sort, meta, platformId, showAnimations, include
     timeTag: timeRef.current
   })
 
-  const { data: watchMintData, isLoading: isWatchLoading } = useMintInfo({
+  const { data: watchMintData, isLoading: isWatchLoading } = useSherexMintInfo({
     mints: isWatchList ? Array.from(getMintWatchList()).reverse() : []
   })
 
@@ -86,7 +87,7 @@ export const SherexCoinList = ({ sort, meta, platformId, showAnimations, include
         isLoading={searchResult.isLoading}
         hasMore={isWatchList ? false : hasMore}
         onLoadMore={loadMore}
-      /> : isWatchList ? <TokenListCard
+      /> : isWatchList ? <SherexTokenListCard
         tokens={watchMintData}
         isLoading={isWatchLoading}
         hasMore={false}
