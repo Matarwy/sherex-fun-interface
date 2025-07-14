@@ -9,7 +9,7 @@ import TwitterIcon from '@/icons/misc/TwitterIcon'
 import WebIcon from '@/icons/misc/WebIcon'
 import NextLink from 'next/link'
 import ThreeStageProgress from './components/ThreeStageProgress'
-import { useAppStore, useDialogsStore } from '@/store'
+import { useAppStore, useDialogsStore, useLaunchpadStore } from '@/store'
 import useOwnerMints from '@/hooks/launchpad/useOwnerMints'
 import { MintInfo } from './type'
 import { formatCurrency } from '@/utils/numberish/formatter'
@@ -146,7 +146,7 @@ const Profile = () => {
       </GridItem>
       <GridItem overflow="auto">
         <GridTable
-          data={data}
+          data={data.filter((d) => d.platformInfo.pubKey === useLaunchpadStore.getState().platformId)}
           getRowKey={(row: MintInfo) => row.mint}
           label={'ProfileDataTable'}
           columns={columns}
