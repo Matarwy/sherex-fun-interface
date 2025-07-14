@@ -18,7 +18,7 @@
 
 # trading
 /public/charting_library
-/src/charting_library
+# /src/charting_library
 
 # misc
 .DS_Store

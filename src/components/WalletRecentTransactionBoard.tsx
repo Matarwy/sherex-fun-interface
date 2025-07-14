@@ -133,8 +133,6 @@ export default function WalletRecentTransactionBoard({ wallet, address, isOpen =
         }))
     : []
 
-  console.log(recentTransactions)
-
   const normalDrawerBody = (
     <Box>
       {/* Avatar */}
