@@ -21,8 +21,8 @@
 
 /* Theme: Dark */
 :root.theme-dark {
-  --tv-color-platform-background: #1c243e;
-  --tv-color-pane-background: #1c243e;
+  --tv-color-platform-background: #1a0900;
+  --tv-color-pane-background: #1a0900;
   --tv-color-toolbar-button-background-hover: rgba(255, 255, 255, 0.1);
   --tv-color-toolbar-button-background-expanded: rgba(255, 255, 255, 0.1);
   --tv-color-toolbar-button-background-active: rgb(249, 185, 233);
@@ -34,8 +34,9 @@
   --tv-color-item-active-text: rgba(199, 242, 132, 1);
   --tv-color-toolbar-toggle-button-background-active: white;
   --tv-color-toolbar-toggle-button-background-active-hover: rgba(199, 242, 132, 1);
-  --tv-color-toolbar-divider-background: #1c243e;
-  --tv-color-toolbar-save-layout-loader: rgb(134, 137, 147);
+  --tv-color-toolbar-divider-background: #3e2b1c;
+  --tv-color-toolbar-save-layout-loader: rgb(147, 138, 134);
+  --themed-color-tooltip-wizard-bg: #FF9D23;
 
-  --tv-color-popup-background: black;
+  --tv-color-popup-background: #1a0500;
 }

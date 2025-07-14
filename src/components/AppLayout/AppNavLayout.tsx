@@ -71,9 +71,9 @@ function AppNavLayout({
           <Box flex={'none'} mr={['', "-16", "-28", "-44"]}>
             <Link href="/">
               <Flex gap="1.5">
-                <Image src='/logo.png' w={['0', '12', '14', '16']} />
+                <Image src='/logo.png' w={['0', '12', '14', '14']} />
                 <Box mt={['0', '3', '3', '3']}>
-                  <Image src='/logo-text.png' h={['0', '6', '8', '10']} />
+                  <Image src='/logo-text.png' h={['0', '6', '8', '8']} />
                 </Box>
               </Flex>
             </Link>

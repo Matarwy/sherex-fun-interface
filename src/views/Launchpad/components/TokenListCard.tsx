@@ -201,7 +201,7 @@ const TokenCard = ({ token }: { token: MintInfo }) => {
                 left: 0,
                 borderRadius: '8px',
                 padding: '1px',
-                background: 'linear-gradient(245.22deg, #DA2EEF 7.97%, #2B6AFF 49.17%, #39D0D8 92.1%)',
+                background: 'linear-gradient(245.22deg,rgb(239, 107, 46) 7.97%,rgb(255, 251, 43) 49.17%, rgb(239, 107, 46) 92.1%)',
                 mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
                 maskComposite: 'exclude',
                 pointerEvents: 'none'
@@ -238,7 +238,7 @@ const TokenCard = ({ token }: { token: MintInfo }) => {
                   token.finishingRate >= HEATING_RATE
                     ? {
                         background: isLight
-                          ? 'linear-gradient(245.22deg, #DA2EEF 7.97%, #2B6AFF 49.17%, #39D0D8 92.1%)'
+                          ? 'linear-gradient(245.22deg,rgb(239, 107, 46) 7.97%,rgb(255, 251, 43) 49.17%, rgb(239, 107, 46) 92.1%)'
                           : 'linear-gradient(245.22deg, #FF9C32 7.97%, #FFD000 39.94%, #EDFFDC 92.1%)',
                         WebkitBackgroundClip: 'text',
                         WebkitTextFillColor: 'transparent',

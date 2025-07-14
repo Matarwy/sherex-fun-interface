@@ -53,11 +53,11 @@ export function SlippageSettingField({ onClose }: { onClose?: () => void }) {
       my="2"
       p="4"
       border={`1px solid ${colors.backgroundTransparent10}`}
-      bg={colors.backgroundTransparent07}
+      bg={colors.backgroundDark}
       rounded="xl"
     >
       <HStack alignItems="center" flexWrap={['wrap', 'nowrap']}>
-        <Text color={colors.textSecondary}>Sherex.fun slippage tolerance</Text>
+        <Text color={colors.textSecondary}>Queen Sherex slippage tolerance</Text>
         <QuestionToolTip label='Set your slippage tolerance for Sherex.fun buy/sell transactions.' iconProps={{ color: colors.textSecondary }} />
         <Spacer />
         <Close style={{ cursor: 'pointer' }} width={12} height={12} color={colors.textSecondary} onClick={onClose} />

@@ -9,6 +9,6 @@ export default CreatePage
 
 export async function getStaticProps() {
   return {
-    props: { title: 'Create new token' }
+    props: { title: 'Launch New' }
   }
 }

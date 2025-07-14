@@ -72,13 +72,14 @@ export function SlippageSettingModal(props: { isOpen: boolean; onClose: () => vo
       <ModalContent
         borderRadius="20px"
         border={`1px solid ${colors.backgroundDark}`}
+        bg={colors.backgroundDark}
         boxShadow="0px 8px 48px 0px #4F53F31A"
         paddingInline="2rem"
         py="2rem"
       >
         <ModalHeader marginTop={0} marginBottom={'48px'}>
           <HStack spacing="6px">
-            <Text>Sherex.fun slippage tolerance</Text>
+            <Text>Queen Sherex slippage tolerance</Text>
             <QuestionToolTip label='Set your slippage tolerance for Sherex.fun buy/sell transactions.' iconProps={{ color: colors.textSecondary }} />
           </HStack>
         </ModalHeader>

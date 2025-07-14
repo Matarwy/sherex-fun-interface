@@ -164,7 +164,7 @@ export default function Info({
         sx={
           isLight
             ? {
-                border: '1px solid #BFD2FF80'
+                border: '1px solid #ffdebf80'
               }
             : {}
         }
@@ -436,7 +436,7 @@ export default function Info({
         sx={
           isLight
             ? {
-                border: '1px solid #BFD2FF80'
+                border: '1px solid #ffdebf80'
               }
             : {}
         }

@@ -6,3 +6,9 @@ function CoinDetailPage() {
 }
 
 export default CoinDetailPage
+
+export async function getStaticProps() {
+  return {
+    props: { title: '' }
+  }
+}

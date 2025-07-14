@@ -29,12 +29,12 @@ type ThemeColorBase = {
 }
 
 const DarkThemeBase: () => ThemeColorBase = () => ({
-  layer0: '#1C243E',
-  layer1: '#0b1022',
-  textPrimary: '#ECF5FF',
-  accent: '#7774FF',
-  positive: '#4CDCC1',
-  negative: '#FF4272'
+  layer0: '#1a0900',
+  layer1: '#441c07',
+  textPrimary: ' #ECF5FF',
+  accent: ' #7774FF',
+  positive: ' #4CDCC1',
+  negative: ' #FF4272'
 })
 
 const LightThemeBase: () => ThemeColorBase = () => ({

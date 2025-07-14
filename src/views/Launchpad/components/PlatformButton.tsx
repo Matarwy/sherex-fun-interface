@@ -40,7 +40,7 @@ export default function PlatformButton({ defaultValue, onChange }: { defaultValu
         bg={'#ABC4FF1F'}
         color={colors.lightPurple}
         _hover={{
-          bg: '#374151'
+          bg: 'rgb(81, 68, 55)'
         }}
         _active={{
           bg: colors.buttonPrimary,

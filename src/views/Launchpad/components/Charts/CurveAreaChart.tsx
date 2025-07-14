@@ -41,7 +41,7 @@ export const CurveAreaChart = ({ data, isLoading = false }: { data: Point[]; isL
               <XAxis
                 dataKey="x"
                 domain={['dataMin', 'dataMax']}
-                stroke="#BFD2FF80"
+                stroke="#ffdebf80"
                 tickFormatter={(value) => {
                   if (typeof value === 'number') {
                     return formatCurrency(value, { abbreviated: true })
@@ -52,7 +52,7 @@ export const CurveAreaChart = ({ data, isLoading = false }: { data: Point[]; isL
               />
               <YAxis
                 yAxisId="left"
-                stroke="#BFD2FF80"
+                stroke="#ffdebf80"
                 label={{
                   value: 'price(10^-7)',
                   angle: -90,
@@ -71,7 +71,7 @@ export const CurveAreaChart = ({ data, isLoading = false }: { data: Point[]; isL
               {/* <YAxis
                 yAxisId="right"
                 orientation="right"
-                stroke="#BFD2FF80"
+                stroke="#ffdebf80"
                 label={{ value: 'Percent Increase', angle: 90, position: 'insideRight' }}
                 domain={[0, 1800]}
                 tickFormatter={(value) => `${value}%`}

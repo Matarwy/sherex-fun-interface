@@ -372,7 +372,7 @@ export default function TradeBox({
       sx={
         isLight
           ? {
-              border: '1px solid #BFD2FF80'
+              border: '1px solid #ffdebf80'
             }
           : {}
       }
@@ -563,17 +563,17 @@ export default function TradeBox({
       ) : null}
       <Box my={5} color={isLight ? '#000248' : colors.lightPurple}>
         <Text>
-          <Text as="span" color={isLight ? '#bb7f47' : '#BFD2FF80'} pr={1}>
+          <Text as="span" color={isLight ? '#bb7f47' : '#ffdebf80'} pr={1}>
             You receive:
           </Text>
           {amount.amountOut || '--'} {isBuy ? symbolA : symbolB}
         </Text>
         <Text>
-          <Text as="span" color={isLight ? '#bb7f47' : '#BFD2FF80'} pr={1}>
+          <Text as="span" color={isLight ? '#bb7f47' : '#ffdebf80'} pr={1}>
             (Minimum received:
           </Text>
           {amount.minAmountOut || '--'} {isBuy ? symbolA : symbolB}
-          <Text as="span" color={isLight ? '#bb7f47' : '#BFD2FF80'} pr={1}>
+          <Text as="span" color={isLight ? '#bb7f47' : '#ffdebf80'} pr={1}>
             )
           </Text>
         </Text>

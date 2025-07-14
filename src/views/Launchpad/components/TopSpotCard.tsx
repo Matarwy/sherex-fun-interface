@@ -121,7 +121,7 @@ export const TopSpotCard = ({
                     bgGradient={
                       isLight
                         ? 'linear-gradient(245.22deg, #DA2EEF 7.97%, #2B6AFF 49.17%, #39D0D8 92.1%)'
-                        : 'linear-gradient(245.22deg, #FF2FC8 7.97%, #FFB12B 49.17%, #D3D839 92.1%)'
+                        : 'linear-gradient(245.22deg,rgb(239, 107, 46) 7.97%,rgb(255, 251, 43) 49.17%, rgb(239, 107, 46) 92.1%)'
                     }
                     bgClip="text"
                   >
@@ -153,7 +153,7 @@ export const TopSpotCard = ({
                         color: '#bb7f47'
                       }
                     : {
-                        bgGradient: 'linear-gradient(245.22deg, #FF2FC8 7.97%, #FFB12B 49.17%, #D3D839 92.1%)',
+                        bgGradient: 'linear-gradient(245.22deg,rgb(239, 107, 46) 7.97%,rgb(255, 251, 43) 49.17%, rgb(239, 107, 46) 92.1%)',
                         bgClip: 'text'
                       }
                 }
@@ -172,7 +172,7 @@ export const TopSpotCard = ({
                         isLight
                           ? {}
                           : {
-                              bgGradient: 'linear-gradient(245.22deg, #FF2FC8 7.97%, #FFB12B 49.17%, #D3D839 92.1%)',
+                              bgGradient: 'linear-gradient(245.22deg,rgb(239, 107, 46) 7.97%,rgb(255, 251, 43) 49.17%, rgb(239, 107, 46) 92.1%)',
                               bgClip: 'text'
                             }
                       }
@@ -202,7 +202,7 @@ export const TopSpotCard = ({
                         background={
                           isLight
                             ? 'linear-gradient(245.22deg, #DA2EEF 7.97%, #2B6AFF 49.17%, #39D0D8 92.1%)'
-                            : 'linear-gradient(245.22deg, #FF2FC8 7.97%, #FFB12B 49.17%, #D3D839 92.1%)'
+                            : 'linear-gradient(245.22deg,rgb(239, 107, 46) 7.97%,rgb(255, 251, 43) 49.17%, rgb(239, 107, 46) 92.1%)'
                         }
                       />
                     </SliderTrack>

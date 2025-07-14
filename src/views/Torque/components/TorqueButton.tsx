@@ -13,7 +13,7 @@ export default function TorqueButton() {
   return (
     <>
       <Button variant="ghost" onClick={onOpen} display="flex" alignItems="center" gap={2}>
-        <Box as="span" bgGradient="linear-gradient(245.22deg, #FF2FC8 7.97%, #FFB12B 49.17%, #D3D839 92.1%)" bgClip="text">
+        <Box as="span" bgGradient="linear-gradient(245.22deg,rgb(239, 107, 46) 7.97%,rgb(255, 251, 43) 49.17%, rgb(239, 107, 46) 92.1%)" bgClip="text">
           Rewards
         </Box>
         {activeOffersCount > 0 && <Badge variant="crooked">{activeOffersCount}</Badge>}

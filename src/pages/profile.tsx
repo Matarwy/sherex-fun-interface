@@ -6,3 +6,9 @@ function ProfilePage() {
 }
 
 export default ProfilePage
+
+export async function getStaticProps() {
+  return {
+    props: { title: 'Profile' }
+  }
+}

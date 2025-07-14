@@ -145,7 +145,7 @@ export const AnimatedCardStack = ({
                           left: 0,
                           borderRadius: '8px',
                           padding: '1px',
-                          background: 'linear-gradient(245.22deg, #DA2EEF 7.97%, #2B6AFF 49.17%, #39D0D8 92.1%)',
+                          background: 'linear-gradient(245.22deg,rgb(239, 107, 46) 7.97%,rgb(255, 251, 43) 49.17%, rgb(239, 107, 46) 92.1%)',
                           mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
                           maskComposite: 'exclude',
                           pointerEvents: 'none'

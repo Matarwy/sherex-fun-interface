@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import { Button, Flex, Grid, Text, Spinner, Switch, Input } from '@chakra-ui/react'
+import { Button, Flex, Grid, Text, Spinner, Switch, Input, ButtonGroup } from '@chakra-ui/react'
 import { colors } from '@/theme/cssVariables/colors'
 import dayjs from 'dayjs'
 import ExternalLink from '@/icons/misc/ExternalLink'
@@ -58,7 +58,7 @@ const Transactions = ({ poolId, mintBInfo }: { poolId?: string; mintBInfo?: ApiV
           </Text>
           <Switch checked={myTransaction} onChange={() => setMyTransaction((b) => !b)} />
         </Flex>
-        {/* <Flex gap={2} alignItems="center">
+        <Flex gap={2} alignItems="center">
           <Text fontSize="sm" fontWeight="medium" color={colors.lightPurple}>
             Type
           </Text>
@@ -66,8 +66,8 @@ const Transactions = ({ poolId, mintBInfo }: { poolId?: string; mintBInfo?: ApiV
             <Button
               border="none"
               background="#ABC4FF1F"
-              color="#BFD2FF80"
-              fontSize="18px"
+              color="#ffdebf80"
+              // fontSize="14px"
               borderRadius="22px"
               _hover={{
                 color: colors.lightPurple
@@ -83,7 +83,7 @@ const Transactions = ({ poolId, mintBInfo }: { poolId?: string; mintBInfo?: ApiV
             <Button
               border="none"
               background="#ABC4FF1F"
-              color="#BFD2FF80"
+              color="#ffdebf80"
               textTransform="capitalize"
               _hover={{
                 color: colors.lightPurple
@@ -99,7 +99,7 @@ const Transactions = ({ poolId, mintBInfo }: { poolId?: string; mintBInfo?: ApiV
             <Button
               border="none"
               background="#ABC4FF1F"
-              color="#BFD2FF80"
+              color="#ffdebf80"
               borderRadius="22px"
               textTransform="capitalize"
               _hover={{
@@ -114,7 +114,7 @@ const Transactions = ({ poolId, mintBInfo }: { poolId?: string; mintBInfo?: ApiV
               {TransactionType.Sell}
             </Button>
           </ButtonGroup>
-        </Flex> */}
+        </Flex>
         <Flex gap={2} alignItems="center">
           <Text fontSize="sm" fontWeight="medium" color={colors.lightPurple}>
             Size greater than

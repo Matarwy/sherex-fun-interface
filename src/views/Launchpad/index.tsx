@@ -182,7 +182,7 @@ export default function Launchpad() {
                       bgGradient={
                         isLight
                           ? 'linear-gradient(245.22deg, #DA2EEF 7.97%, #2B6AFF 49.17%, #39D0D8 92.1%)'
-                          : 'linear-gradient(245.22deg, #FF2FC8 7.97%, #FFB12B 49.17%, #D3D839 92.1%)'
+                          : 'linear-gradient(245.22deg,rgb(239, 107, 46) 7.97%,rgb(255, 251, 43) 49.17%, rgb(239, 107, 46) 92.1%)'
                       }
                       bgClip="text"
                     >
@@ -214,7 +214,7 @@ export default function Launchpad() {
                     bgGradient={
                       isLight
                         ? 'linear-gradient(245.22deg, #DA2EEF 7.97%, #2B6AFF 49.17%, #39D0D8 92.1%)'
-                        : 'linear-gradient(245.22deg, #FF2FC8 7.97%, #FFB12B 49.17%, #D3D839 92.1%)'
+                        : 'linear-gradient(245.22deg,rgb(239, 107, 46) 7.97%,rgb(255, 251, 43) 49.17%, rgb(239, 107, 46) 92.1%)'
                     }
                     bgClip="text"
                   >
@@ -298,7 +298,7 @@ export default function Launchpad() {
           <>
             {/* <TopMobileCarousel indexTopMint={indexTopMint} lastTrade={topLastTrade[0]} /> */}
             <Flex direction="column" gap={3}>
-              <Flex justifyContent="space-between" alignItems="center">
+              {/* <Flex justifyContent="space-between" alignItems="center">
                 <DropdownSelectMenu
                   placement="bottom-end"
                   triggerSx={{
@@ -327,7 +327,7 @@ export default function Launchpad() {
                   value={sort}
                   onValueChange={setSort}
                 />
-                {/* <Flex gap={2} alignItems="center">
+                <Flex gap={2} alignItems="center">
                   <Button variant="ghost" px="1" height="34px" isLoading={isLoading} onClick={handleClickRefresh}>
                     <RefreshIcon width="24px" height="24px" color={colors.buttonPrimary__01} />
                   </Button>
@@ -337,8 +337,8 @@ export default function Launchpad() {
                   >
                     <UserIcon width="24px" height="24px" color={colors.buttonPrimary__01} />
                   </Link>
-                </Flex> */}
-                {/* <Link href={`/create${referrerQuery}`} shallow>
+                </Flex>
+                <Link href={`/create${referrerQuery}`} shallow>
                   <Button
                     width="8.75rem"
                     height="2.125rem"
@@ -357,10 +357,38 @@ export default function Launchpad() {
                   >
                     Launch token
                   </Button>
-                </Link> */}
-              </Flex>
+                </Link>
+              </Flex> */}
               <Flex justifyContent="space-between" alignItems="center">
                 <Flex gap={3}>
+                  <DropdownSelectMenu
+                    placement="bottom-end"
+                    triggerSx={{
+                      width: '8.625rem',
+                      height: '2.5rem',
+                      minHeight: '2.5rem',
+                      background: colors.backgroundDark,
+                      border: `1px solid ${colors.buttonPrimary__01}`,
+                      color: colors.buttonPrimary__01,
+                      _hover: { background: colors.backgroundDark }
+                    }}
+                    popoverSx={{
+                      py: 2,
+                      button: {
+                        color: colors.textPrimary,
+                        px: '0.75rem',
+                        py: '0.25rem'
+                      }
+                    }}
+                    items={[
+                      {
+                        group: 'sort',
+                        items: DropdownItems
+                      }
+                    ]}
+                    value={sort}
+                    onValueChange={setSort}
+                  />
                   <MetasList
                     onMetaSelected={(val) => setMeta(val as any)}
                     activeMeta={meta}

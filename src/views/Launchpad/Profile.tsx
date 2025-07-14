@@ -169,7 +169,7 @@ const Profile = () => {
             '--table-row-height': '4.375rem'
           }}
           headerRowSx={{
-            background: '#1C243E4D',
+            background: 'rgba(62, 43, 28, 0.3)',
             color: colors.textSecondary,
             fontSize: 'sm',
             fontWeight: 'medium',

@@ -9,6 +9,6 @@ export default LaunchpadPage
 
 export async function getStaticProps() {
   return {
-    props: { title: '' }
+    props: { title: 'Board' }
   }
 }

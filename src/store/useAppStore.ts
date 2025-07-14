@@ -124,7 +124,7 @@ interface AppState {
   setProgramIdConfigAct: (urls: ProgramIdConfig) => void
   setRpcUrlAct: (url: string, skipToast?: boolean, skipError?: boolean) => Promise<boolean>
   setAprModeAct: (mode: 'M' | 'D') => void
-  checkAppVersionAct: () => Promise<void>
+  // checkAppVersionAct: () => Promise<void>
   fetchPriorityFeeAct: () => Promise<void>
 }
 
@@ -392,14 +392,14 @@ export const useAppStore = createStore<AppState>(
       setStorageItem(APR_MODE_KEY, mode)
       set({ aprMode: mode })
     },
-    checkAppVersionAct: async () => {
-      const { urlConfigs, appVersion } = get()
-      const res = await axios.get<{
-        latest: string
-        least: string
-      }>(`${urlConfigs.BASE_HOST}${urlConfigs.VERSION}`)
-      set({ needRefresh: compare(appVersion, res.data.latest, '<') })
-    },
+    // checkAppVersionAct: async () => {
+    //   const { urlConfigs, appVersion } = get()
+    //   const res = await axios.get<{
+    //     latest: string
+    //     least: string
+    //   }>(`${urlConfigs.BASE_HOST}${urlConfigs.VERSION}`)
+    //   set({ needRefresh: compare(appVersion, res.data.latest, '<') })
+    // },
 
     fetchPriorityFeeAct: async () => {
       const { urlConfigs } = get()

@@ -72,9 +72,9 @@ export const CurveLineChart = ({
               onMouseLeave={() => setActiveIndex(-1)}
             >
               <CartesianGrid stroke={colors.lightPurple} opacity={0.1} />
-              <YAxis yAxisId="left" dataKey={yKey} tickMargin={8} domain={['auto', 'auto']} stroke="#BFD2FF80" tick={false} />
+              <YAxis yAxisId="left" dataKey={yKey} tickMargin={8} domain={['auto', 'auto']} stroke="#ffdebf80" tick={false} />
               <ReferenceLine y={0} yAxisId="left" strokeWidth={2} stroke={colors.lightPurple} opacity={0.2} />
-              <XAxis type="number" dataKey={xKey} domain={['dataMin', 'dataMax']} stroke="#BFD2FF80" tickMargin={8} tick={false} />
+              <XAxis type="number" dataKey={xKey} domain={['dataMin', 'dataMax']} stroke="#ffdebf80" tickMargin={8} tick={false} />
               {/* <Scatter yAxisId="left" xAxisId="0" dataKey={yKey} name="red" fill="red" data={currentPoints} shape={<CustomLabel />} /> */}
               <Line
                 yAxisId="left"

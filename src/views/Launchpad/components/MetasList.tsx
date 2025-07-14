@@ -70,7 +70,7 @@ const MetasContent = memo(({ onMetaSelected, activeMeta, metas }: MetasContentPr
                     bg={isActive ? colors.buttonPrimary : '#ABC4FF1F'}
                     color={isActive ? colors.buttonSolidText : colors.lightPurple}
                     _hover={{
-                      bg: isActive ? colors.buttonPrimary : '#374151'
+                      bg: isActive ? colors.buttonPrimary : 'rgb(81, 68, 55)'
                     }}
                     transitionProperty="color,background-color,border-color,text-decoration-color,fill,stroke"
                     transitionTimingFunction="cubic-bezier(.4,0,.2,1)"

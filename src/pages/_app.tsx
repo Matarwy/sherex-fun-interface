@@ -17,6 +17,7 @@ import { DialogManager } from '@/components/DialogManager'
 import { useDisclosure } from '@chakra-ui/react'
 import { useAppStore } from '@/store'
 import shallow from 'zustand/shallow'
+import { setStorageItem } from '@/utils/localStorage';
 
 const DynamicProviders = dynamic(() => import('@/provider').then((mod) => mod.Providers))
 const DynamicContent = dynamic(() => import('@/components/Content'))
@@ -27,7 +28,10 @@ const OVERFLOW_HIDDEN_PATH = ['/liquidity-pools']
 
 Decimal.set({ precision: 1e3 })
 
+const COLOR_MODE_KEY = 'chakra-ui-color-mode'
+
 const MyApp = ({ Component, pageProps, ...props }: AppProps) => {
+  setStorageItem(COLOR_MODE_KEY, 'dark');
   const { pathname } = useRouter()
 
   const [onlyContent, overflowHidden] = useMemo(
@@ -50,24 +54,24 @@ const MyApp = ({ Component, pageProps, ...props }: AppProps) => {
 
   return (
     <>
-      <GoogleAnalytics gaId="G-DR3V6FTKE3" />
+      {/* <GoogleAnalytics gaId="G-DR3V6FTKE3" /> */}
       <Head>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
         <meta name="twitter:image" content="https://sherex.fun/logo.png" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:site" content="@sherex" />
         <meta name="twitter:creator" content="@sherexcoin" />
-        <meta name="twitter:title" content="sherex.fun" />
+        <meta name="twitter:title" content="Queen Sherex" />
         <meta name="twitter:description" content="" />
         <meta property="og:description" content="" />
         <meta property="og:url" content="https://sherex.fun/" />
         <meta property="og:type" content="website" />
         <meta property="og:image" content="https://sherex.fun/logo.png" />
-        <meta property="og:image:alt" content="sherex.fun" />
+        <meta property="og:image:alt" content="Queen Sherex" />
         <meta property="og:locale" content="en" />
-        <meta property="og:site_name" content="sherex.fun" />
-        <meta property="og:title" content="sherex.fun" />
-        <title>{pageProps?.title ? `${pageProps.title} sherex.fun` : 'sherex.fun'}</title>
+        <meta property="og:site_name" content="Queen Sherex" />
+        <meta property="og:title" content="Queen Sherex" />
+        <title>{pageProps?.title ? `${pageProps.title} | Queen Sherex` : 'Queen Sherex'}</title>
       </Head>
       <DynamicProviders>
         <DynamicContent {...props}>

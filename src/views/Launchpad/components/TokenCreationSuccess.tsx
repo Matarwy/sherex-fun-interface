@@ -51,7 +51,7 @@ export const TokenCreationSuccess = ({ token }: { token: MintInfo }) => {
           left: 0,
           borderRadius: '8px',
           padding: '1px',
-          background: 'linear-gradient(245.22deg, #FF2FC8 7.97%, #FFB12B 49.17%, #D3D839 92.1%)',
+          background: 'linear-gradient(245.22deg,rgb(239, 107, 46) 7.97%,rgb(255, 251, 43) 49.17%, rgb(239, 107, 46) 92.1%)',
           mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
           maskComposite: 'exclude',
           pointerEvents: 'none'
@@ -105,7 +105,7 @@ export const TokenCreationSuccess = ({ token }: { token: MintInfo }) => {
           px={5}
           py={3}
           borderRadius="12px"
-          border="1px solid #BFD2FF33"
+          border="1px solid #ffdebf33"
           mb={4}
         >
           <Box>
@@ -136,7 +136,7 @@ export const TokenCreationSuccess = ({ token }: { token: MintInfo }) => {
           px={5}
           py={3}
           borderRadius="12px"
-          border="1px solid #BFD2FF33"
+          border="1px solid #ffdebf33"
         >
           <Box>
             <Text fontWeight="medium">View token</Text>

@@ -163,7 +163,7 @@ export default function TokenCreate() {
                   bgGradient={
                     isLight
                       ? 'linear-gradient(245.22deg, #DA2EEF 7.97%, #2B6AFF 49.17%, #39D0D8 92.1%)'
-                      : 'linear-gradient(245.22deg, #FF2FC8 7.97%, #FFB12B 49.17%, #D3D839 92.1%)'
+                      : 'linear-gradient(245.22deg,rgb(239, 107, 46) 7.97%,rgb(255, 251, 43) 49.17%, rgb(239, 107, 46) 92.1%)'
                   }
                   bgClip="text"
                 >
@@ -205,7 +205,7 @@ export default function TokenCreate() {
           items={panelItems}
           sx={{
             '.chakra-tabs__tab-indicator': {
-              background: value === Tab.JustSendIt ? '#22D1F8' : 'linear-gradient(245.22deg, #FF2FC8 7.97%, #FFB12B 49.17%, #D3D839 92.1%)'
+              background: value === Tab.JustSendIt ? '#22D1F8' : 'linear-gradient(245.22deg,rgb(239, 107, 46) 7.97%,rgb(255, 251, 43) 49.17%, rgb(239, 107, 46) 92.1%)'
             }
           }}
         />
@@ -458,7 +458,7 @@ const JustSendIt = () => {
                 alignItems="center"
                 borderRadius="8px"
                 background="#ABC4FF12"
-                border="1px solid #BFD2FF1A"
+                border="1px solid #ffdebf1A"
               >
                 <Flex alignItems="center" gap={1} lineHeight="20px">
                   <Text color={colors.lightPurple} fontWeight="medium">
@@ -1602,7 +1602,7 @@ const LaunchLabForm = () => {
                     alignItems="center"
                     borderRadius="8px"
                     background="#ABC4FF12"
-                    border="1px solid #BFD2FF1A"
+                    border="1px solid #ffdebf1A"
                   >
                     <Flex alignItems="center" gap={1} lineHeight="20px">
                       <Text color={colors.lightPurple} fontWeight="medium">
@@ -1825,7 +1825,7 @@ const LaunchLabForm = () => {
           right={0}
           bg={colors.backgroundLight}
           borderTopRadius="24px"
-          border="1px solid #BFD2FF80"
+          border="1px solid #ffdebf80"
           pt={4}
           pb={5}
           onClick={() => openDialog(DialogTypes.CurvePreview({ data }))}
