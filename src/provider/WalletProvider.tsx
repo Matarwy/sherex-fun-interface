@@ -73,7 +73,7 @@ const App: FC<PropsWithChildren<any>> = ({ children }) => {
         new WalletConnectWalletAdapter({
           network: network as WalletAdapterNetwork.Mainnet,
           options: {
-            projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PJ_ID,
+            projectId: process.env.NEXT_PUBLIC_WALLET_CONNECT_PJ_ID || '887686ad41c2e08e696c7536ab80897f',
             metadata: {
               name: 'Sherex.fun',
               description: 'Sherex.fun',

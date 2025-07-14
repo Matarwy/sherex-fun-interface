@@ -200,7 +200,7 @@ function useTxStatus() {
                 update: true,
                 title: isMultisigWallet
                   ? 'Transaction initiated'
-                  : `${title || 'Transaction'} "Confirmed`,
+                  : `${title || 'Transaction'} Confirmed`,
                 description: isMultisigWallet ? 'You can now cast votes for this proposal on the Squads app.' : description || `${explorerUrl}/tx/${txId}`,
                 detail: renderDetail('success'),
                 status: 'success',

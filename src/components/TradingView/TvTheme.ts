@@ -10,8 +10,8 @@ export enum AppTheme {
 }
 
 export const THEME_NAMES: Record<AppTheme, ThemeName> = {
-  [AppTheme.Dark]: 'Dark',
-  [AppTheme.Light]: 'Light'
+  [AppTheme.Dark]: 'dark',
+  [AppTheme.Light]: 'light'
 }
 
 type Theme = {
@@ -39,7 +39,7 @@ const DarkThemeBase: () => ThemeColorBase = () => ({
 
 const LightThemeBase: () => ThemeColorBase = () => ({
   layer0: '#F5F8FF',
-  layer1: '#fffaed',
+  layer1: '#EDEDFF',
   textPrimary: '#0B1022',
   accent: '#7774FF',
   positive: '#4CDCC1',

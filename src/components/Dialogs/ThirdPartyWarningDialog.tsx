@@ -37,7 +37,7 @@ export const ThirdPartyWarningDialog = ({ setIsOpen, url }: DialogProps<ThirdPar
               Third-party website warning
             </Text>
             <Text textAlign="center" color={colors.lightPurple} lineHeight="20px" mb={6}>
-              You are being redirected to a third-party website outside of Raydium.
+              You are being redirected to a third-party website outside of Sherex.fun.
             </Text>
             <Text fontWeight="bold" color={colors.semanticWarning}>
               Be extremely cautious of scams!

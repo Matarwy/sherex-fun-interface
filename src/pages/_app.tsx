@@ -2,7 +2,7 @@ import type { AppProps } from 'next/app'
 import Head from 'next/head'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
-import { useMemo } from 'react'
+import { useEffect, useMemo } from 'react'
 import Decimal from 'decimal.js'
 
 import '@/components/Toast/toast.css'
@@ -12,6 +12,9 @@ import 'react-day-picker/dist/style.css'
 import { GoogleAnalytics } from '@next/third-parties/google'
 import { OnboardingDialog } from '@/components/Dialogs/OnboardingDialog'
 import { DialogManager } from '@/components/DialogManager'
+import { useDisclosure } from '@chakra-ui/react'
+import { useAppStore } from '@/store'
+import shallow from 'zustand/shallow'
 
 const DynamicProviders = dynamic(() => import('@/provider').then((mod) => mod.Providers))
 const DynamicContent = dynamic(() => import('@/components/Content'))
@@ -29,6 +32,19 @@ const MyApp = ({ Component, pageProps, ...props }: AppProps) => {
     () => [CONTENT_ONLY_PATH.includes(pathname), OVERFLOW_HIDDEN_PATH.includes(pathname)],
     [pathname]
   )
+
+  const [setRpcUrlAct] = useAppStore((s) => [s.setRpcUrlAct], shallow)
+  const { onOpen: onLoading, onClose: offLoading } = useDisclosure()
+
+  useEffect(() => {
+    const setRpcUrl = async () => {
+      onLoading()
+      await setRpcUrlAct('https://mainnet.helius-rpc.com/?api-key=e6eb0566-8ed5-4c78-aee0-bdbfc3fa91b8') //https://mainnet.helius-rpc.com/?api-key=e6eb0566-8ed5-4c78-aee0-bdbfc3fa91b8
+      offLoading()
+    }
+
+    setRpcUrl().catch(console.error)
+  }, [])
 
   return (
     <>

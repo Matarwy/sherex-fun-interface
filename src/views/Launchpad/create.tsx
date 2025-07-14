@@ -452,7 +452,7 @@ const JustSendIt = () => {
                   </Text>
                 ) : null}
               </Box>
-              <Flex
+              {/* <Flex
                 justifyContent="space-between"
                 p={2}
                 alignItems="center"
@@ -490,7 +490,7 @@ const JustSendIt = () => {
                     }
                   }}
                 />
-              </Flex>
+              </Flex> */}
               <Button
                 variant="ghost"
                 _hover={{

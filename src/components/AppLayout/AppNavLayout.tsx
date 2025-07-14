@@ -112,7 +112,7 @@ function AppNavLayout({
         <Flex gap={[0.5, 2]} align="center">
           {/* <TorqueButton /> */}
           {/* <PriorityButton /> */}
-          <SettingsMenu />
+          {/* <SettingsMenu /> */}
           {/* <EVMWallet />  don't need currently yet*/}
           <SolWallet />
         </Flex>

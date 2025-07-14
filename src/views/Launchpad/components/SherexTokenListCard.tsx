@@ -306,7 +306,7 @@ const TokenCard = ({ token }: { token: SherexMintInfo }) => {
               noOfLines={2}
               wordBreak="break-word"
             >
-              {/* {token.description} */}
+              {token.description}
             </Text>
             <Flex justifyContent="space-between">
               <Grid templateRows="1fr auto" alignItems="center" rowGap={1}>

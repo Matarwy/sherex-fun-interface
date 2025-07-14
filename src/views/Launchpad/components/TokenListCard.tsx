@@ -277,7 +277,8 @@ const TokenCard = ({ token }: { token: MintInfo }) => {
               </Tooltip>
             )}
             <SocialLinks
-              platformInfo={token.platformInfo}
+              // platformInfo={token.platformInfo}
+              platformInfo={undefined}
               twitter={token.twitter}
               website={token.website}
               telegram={token.telegram}

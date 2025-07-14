@@ -19,9 +19,9 @@ export default function Dev(props: SvgIcon) {
       />
       <defs>
         <linearGradient id="paint0_linear_38056_25690" x1="29.1213" y1="14" x2="12.1049" y2="22.2058" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#DA2EEF" />
-          <stop offset="0.489658" stopColor="#2B6AFF" />
-          <stop offset="1" stopColor="#39D0D8" />
+          <stop stopColor="rgb(59, 35, 13)" />
+          <stop offset="0.489658" stopColor="rgb(54, 51, 10)" />
+          <stop offset="1" stopColor="rgb(49, 63, 17)" />
         </linearGradient>
       </defs>
     </svg>

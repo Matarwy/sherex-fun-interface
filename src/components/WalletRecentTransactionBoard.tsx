@@ -124,14 +124,16 @@ export default function WalletRecentTransactionBoard({ wallet, address, isOpen =
         .filter((r) => r.owner && r.owner === address)
         .map((record) => ({
           txId: record.txId,
-          name: (record.isMultiSig ? `Multisig Wallet ` : '') + `${record.title} ${record.txValues || {}}`,
+          name: (record.isMultiSig ? `Multisig Wallet ` : '') + `${record.title}`,
           status: record.status,
-          description: `${record.description} ${record.txValues || {}}`.replaceAll(/(<([^>]+)>)/gi, ''),
+          description: `${record.description}`.replaceAll(/(<([^>]+)>)/gi, ''),
           date: record.time,
           relatedTokens: record.mintInfo || [],
           sub: record.subTx
         }))
     : []
+
+  console.log(recentTransactions)
 
   const normalDrawerBody = (
     <Box>

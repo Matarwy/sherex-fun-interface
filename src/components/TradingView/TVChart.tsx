@@ -11,11 +11,13 @@ import {
 import { useEffect, useMemo, useState } from 'react'
 import { Themes, THEME_NAMES, AppTheme, AppColorMode } from './TvTheme'
 import { Box, useColorMode } from '@chakra-ui/react'
+import { useTranslation } from 'react-i18next'
 import Datafeed from './datafeed'
 import DatafeedBirdeye from './datafeedBirdeye'
 import { closeSocket, setArrowListener } from './streaming'
+import { useTradingViewStore } from '@/store/useTradingViewStore'
 import { getSavedResolution } from './utils'
-import { useAppStore, useLaunchpadStore, useTradingViewStore } from '@/store'
+import { useAppStore, useLaunchpadStore } from '@/store'
 import { formatCurrency } from '@/utils/numberish/formatter'
 import { SymbolInfo } from './type'
 import { isEmpty } from 'lodash'
@@ -54,6 +56,8 @@ export default function TVChart({
   const appTheme = colorMode === 'light' ? AppTheme.Light : AppTheme.Dark
   const appColorMode = AppColorMode.GreenUp
   const theme = Themes[appTheme][appColorMode]
+  const { i18n } = useTranslation()
+  const locale = i18n.language === 'zh-CN' ? 'zh' : i18n.language
 
   const updateChartConfig = useTradingViewStore((s) => (birdeye ? s.updateBirdeyeChartConfig : s.updateChartConfig))
 
@@ -176,8 +180,7 @@ export default function TVChart({
         'trading_account_manager',
         'hide_main_series_symbol_from_indicator_legend',
         'display_market_status',
-        'volume_force_overlay',
-        'header_undo_redo'
+        'volume_force_overlay'
       ],
       enabled_features: [
         'side_toolbar_in_fullscreen_mode',
@@ -201,10 +204,10 @@ export default function TVChart({
 
       datafeed: new ChartDataFeed({ connection, mintInfo, mintBInfo, curveType }),
       interval: (resolutionSupported ? savedResolution : birdeye ? '15' : '5') as ResolutionString,
-      locale: 'en',
-      // numeric_formatting: { decimal_sign: '.', grouping_separator: '.' },
+      locale: locale as LanguageCode,
+      // numeric_formatting: { decimal_sign: '.' },
       saved_data: !isEmpty(savedTvChartConfig) ? savedTvChartConfig : undefined,
-      // custom_formatters: {
+      // customFormatters: {
       //   priceFormatterFactory: (symbolInfo, minTick) => {
       //     if (symbolInfo === null) return null
       //     const decimals = (symbolInfo as SymbolInfo).decimals
@@ -214,21 +217,21 @@ export default function TVChart({
       //       }
       //     }
       //   }
-        // studyFormatterFactory: (format, symbol) => {
-        //   if (!symbol) return null
-        //   if (format.type === 'volume') {
-        //     const decimals = (symbol as any).decimals
-        //     return {
-        //       format: (val) => {
-        //         return formatCurrency((val! / 10 ** 6).toFixed(decimals), {
-        //           maximumDecimalTrailingZeroes: 5,
-        //           decimalPlaces: decimals
-        //         })
-        //       }
-        //     }
-        //   }
-        //   return null
-        // }
+      //   // studyFormatterFactory: (format, symbol) => {
+      //   //   if (!symbol) return null
+      //   //   if (format.type === 'volume') {
+      //   //     const decimals = (symbol as any).decimals
+      //   //     return {
+      //   //       format: (val) => {
+      //   //         return formatCurrency((val! / 10 ** 6).toFixed(decimals), {
+      //   //           maximumDecimalTrailingZeroes: 5,
+      //   //           decimalPlaces: decimals
+      //   //         })
+      //   //       }
+      //   //     }
+      //   //   }
+      //   //   return null
+      //   // }
       // },
       auto_save_delay: 1
     }
@@ -237,36 +240,6 @@ export default function TVChart({
 
     let lastInterval = 0
     let lastEntityId: EntityId
-    let mCapButton: null | HTMLElement
-
-    // landed launchpad
-    // if (birdeye && mintInfo) {
-    //   tvChartWidget.headerReady().then(function () {
-    //     mCapButton = tvChartWidget.createButton()
-    //     mCapButton.style.cursor = 'pointer'
-    //     mCapButton.innerHTML = "<span style='color:#2937e8'>Price</span>/<span>Mcap</span>"
-
-    //     mCapButton.addEventListener('click', function () {
-    //       const isMarketCap = tvChartWidget.activeChart().symbolExt()?.name.includes('marketcap')
-    //       tvChartWidget.setSymbol(`${poolId}${isMarketCap ? '' : '_marketcap'}`, tvChartWidget.activeChart().resolution(), () => {
-    //         // mCapButton!.innerHTML = `<span ${isMarketCap ? "style='color:#2937e8'" : ''}>Price</span> / <span ${
-    //         //   !isMarketCap ? "style='color:#2937e8'" : ''
-    //         // }>Mcap</span>`
-    //       })
-    //     })
-
-    //     tvChartWidget.activeChart().onSymbolChanged().unsubscribeAll(null)
-    //     tvChartWidget
-    //       .activeChart()
-    //       .onSymbolChanged()
-    //       .subscribe(null, () => {
-    //         const isMarketCap = tvChartWidget.activeChart().symbolExt()?.name.includes('marketcap')
-    //         mCapButton!.innerHTML = `<span ${isMarketCap ? '' : "style='color:#2937e8'"}>Price</span> / <span ${
-    //           !isMarketCap ? '' : "style='color:#2937e8'"
-    //         }>Mcap</span>`
-    //       })
-    //   })
-    // }
 
     tvChartWidget.onChartReady(() => {
       const chartIns = tvChartWidget.activeChart()
@@ -341,7 +314,7 @@ export default function TVChart({
         //   })
         // }
 
-        setArrowListener((prev: Bar, next: Bar) => {
+        setArrowListener(async (prev: Bar, next: Bar) => {
           window.clearInterval(lastInterval)
           lastEntityId && chartIns.removeEntity(lastEntityId)
           chartIns.removeAllShapes()
@@ -350,18 +323,14 @@ export default function TVChart({
           const isUp = !prev.close || next.close > prev.close
 
           try {
-            const id = chartIns.createShape(
+            const id = await chartIns.createShape(
               {
                 time: next.time * 1000000,
                 price: isUp ? next.low : next.close
               },
               { shape: isUp ? 'arrow_up' : 'arrow_down', overrides: { fontsize: 8, visible: true, arrowColor: 'yellow' } }
             )!
-            try {
-              chartIns.bringToFront([id])
-            } catch {
-              console.info('bringToFront not works')
-            }
+            chartIns.bringToFront([id])
             lastEntityId = id
 
             let i = 0
@@ -377,7 +346,7 @@ export default function TVChart({
             }, 100)
 
             // lastClose = d.close
-          } catch (e) {
+          } catch {
             console.log('reset')
             chartIns.resetData()
           }
@@ -389,7 +358,6 @@ export default function TVChart({
       // if (onTickCbk) tvChartWidget.unsubscribe('onTick', onTickCbk)
       setArrowListener(undefined)
       tvChartWidget.remove()
-
       clearInterval(lastInterval)
     }
   }, [poolId, birdeye, id, theme, connection, reloadChartTag, mintInfo?.mint, mintBInfo?.address, curveType])

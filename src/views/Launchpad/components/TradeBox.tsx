@@ -30,6 +30,8 @@ import ConnectedButton from '@/components/ConnectedButton'
 import { isSolWSol } from '@/utils/token'
 import { useLaunchPadShareInfo } from '../utils'
 import { ToLaunchPadConfig } from '@/hooks/launchpad/utils'
+import { useWallet } from '@solana/wallet-adapter-react'
+import { Keypair } from '@solana/web3.js'
 
 export default function TradeBox({
   poolInfo,
@@ -48,6 +50,7 @@ export default function TradeBox({
   isMigrating?: boolean
   isLanded?: boolean
 }) {
+  const { signTransaction } = useWallet();
   const thousandSeparator = useMemo(() => (detectedSeparator === ',' ? '.' : ','), [])
   const { isOpen: isSending, onOpen: onSending, onClose: offSending } = useDisclosure()
   const { checkToken } = useCheckToken()
@@ -220,8 +223,9 @@ export default function TradeBox({
       const onConfirmed = () => setAmount({ amountIn: '', amountOut: '', minAmountOut: '' })
       if (isBuy) {
         if (!isMintCreated) {
+          const pair = Keypair.generate();
           await createAndBuyAct({
-            mint: mintInfo.mint,
+            pair,
             uri: mintInfo.metadataUrl,
             name: mintInfo.name,
             symbol: mintInfo.symbol,
@@ -236,6 +240,8 @@ export default function TradeBox({
             platformFeeRate: new BN(mintInfo.platformInfo.feeRate),
             totalSellA: new BN(mintInfo.totalSellA),
             totalFundRaisingB: new BN(mintInfo.totalFundRaisingB),
+
+            onSignTx: signTransaction,
 
             onConfirmed,
             onFinally: offLoading
@@ -254,6 +260,7 @@ export default function TradeBox({
 
           configInfo: ToLaunchPadConfig(mintInfo.configInfo),
           platformFeeRate: new BN(mintInfo.platformInfo.feeRate),
+          onSignTx: signTransaction,
           onConfirmed,
           onFinally: offLoading
         })
@@ -269,6 +276,7 @@ export default function TradeBox({
         shareFeeReceiver: wallet,
         configInfo: ToLaunchPadConfig(mintInfo.configInfo),
         platformFeeRate: new BN(mintInfo.platformInfo.feeRate),
+        onSignTx: signTransaction,
         onConfirmed,
         onFinally: offLoading
       })

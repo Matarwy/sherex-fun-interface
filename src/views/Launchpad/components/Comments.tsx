@@ -97,7 +97,7 @@ const CommentItem = ({ comment, isDeveloper, isFirst }: { comment: Comment; isDe
               bottom: 0,
               borderRadius: 'inherit',
               padding: '1px',
-              background: 'linear-gradient(245.22deg, #DA2EEF 7.97%, #2B6AFF 49.17%, #39D0D8 92.1%)',
+              background: 'linear-gradient(245.22deg,rgb(239, 139, 46) 7.97%,rgb(255, 241, 43) 49.17%,rgb(168, 216, 57) 92.1%)',
               WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
               WebkitMaskComposite: 'xor',
               maskComposite: 'exclude',
@@ -139,7 +139,7 @@ const CommentItem = ({ comment, isDeveloper, isFirst }: { comment: Comment; isDe
               sx={
                 isDeveloper
                   ? {
-                      background: 'linear-gradient(245.22deg, #DA2EEF 7.97%, #2B6AFF 49.17%, #39D0D8 92.1%)',
+                      background: 'linear-gradient(245.22deg,rgb(239, 139, 46) 7.97%,rgb(255, 241, 43) 49.17%,rgb(168, 216, 57) 92.1%)',
                       WebkitBackgroundClip: 'text',
                       WebkitTextFillColor: 'transparent',
                       backgroundClip: 'text'

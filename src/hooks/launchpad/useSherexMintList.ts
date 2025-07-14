@@ -43,14 +43,13 @@ export default function useSherexMintList({
   notRefresh?: boolean
   timeTag?: number
 }) {
-  const mintHost = useLaunchpadStore((s) => s.mintHost)
+  const backendHost = useLaunchpadStore((s) => s.backendHost)
   const mintType = useMemo(() => {
     const value = propsMintType?.replace('_up', '')
     if (validTypeValue.indexOf(value) === -1) return 'default'
     return value || 'default'
   }, [propsMintType])
   const nextPageRef = useRef<Map<string, Record<number, string>>>(new Map())
-  console.log(nextPageRef)
   const {
     data,
     setSize,
@@ -61,7 +60,7 @@ export default function useSherexMintList({
     (index) =>
       shouldFetch && (index === 0 || (index > 0 && nextPageRef.current.get(`${sort}-${mintType}`)?.[index]))
         ? [
-          `${mintHost}/get/list?sort=${sort}&size=${size}&mintType=${mintType}${`&includeNsfw=${includeNsfw}`}${platformId ? `&platformId=${platformId}` : ''
+          `${backendHost}/get/list?sort=${sort}&size=${size}&mintType=${mintType}${`&includeNsfw=${includeNsfw}`}${platformId ? `&platformId=${platformId}` : ''
           }${nextPageRef.current.get(`${sort}-${mintType}`)?.[index]
             ? `&nextPageId=${nextPageRef.current.get(`${sort}-${mintType}`)![index]}`
             : ''
@@ -108,6 +107,7 @@ export default function useSherexMintList({
         }) || []
     )
   }, [data, sort, mintType])
+
   const hasMore = data && !!data[data.length - 1].data.nextPageId
 
   const loadMore = useEvent(() => {

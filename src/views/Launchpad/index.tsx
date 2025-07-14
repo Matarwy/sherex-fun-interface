@@ -1,48 +1,49 @@
 import {
   Box,
   Button,
-  Collapse,
+  // Collapse,
   Flex,
-  Text,
+  // Text,
   Grid,
-  FormControl,
-  FormLabel,
-  Switch,
-  Skeleton,
+  // FormControl,
+  // FormLabel,
+  // Switch,
+  // Skeleton,
   useBreakpointValue,
   useColorMode,
   useOutsideClick
 } from '@chakra-ui/react'
-import Link from 'next/link'
+// import Link from 'next/link'
 import { colors } from '@/theme/cssVariables/colors'
-import { CoinList, CoinListActionRef } from './CoinList'
+import { SherexCoinList, CoinListActionRef } from './SherexCoinList'
 import { MetasList } from './components/MetasList'
-import { SearchInput, OnSearchChangeData } from './components/SearchInput'
-import { TopSpotCard } from './components/TopSpotCard'
+// import { SearchInput, OnSearchChangeData } from './components/SearchInput'
+import { SearchInput, OnSearchChangeData } from './components/SherexSearchInput'
+// import { TopSpotCard } from './components/TopSpotCard'
 import { DropdownSelectMenu } from '@/components/DropdownSelectMenu'
-import RefreshIcon from '@/icons/misc/RefreshIcon'
-import UserIcon from '@/icons/misc/UserIcon'
+// import RefreshIcon from '@/icons/misc/RefreshIcon'
+// import UserIcon from '@/icons/misc/UserIcon'
 import SearchIcon from '@/icons/misc/SearchIcon'
-import { MintSortField } from '@/hooks/launchpad/useMintList'
+import { MintSortField } from '@/hooks/launchpad/useSherexMintList'
 import { useRef, useState, ChangeEvent, useCallback } from 'react'
 import { useRouteQuery } from '@/utils/routeTools'
 import { useDisclosure } from '@/hooks/useDelayDisclosure'
-import useTopMintList from '@/hooks/launchpad/useTopMintList'
-import { TopListCard } from './components/TopListCard'
-import { AnimatedCardStack } from './components/AnimatedCardStack'
+// import useTopMintList from '@/hooks/launchpad/useTopMintList'
+// import { TopListCard } from './components/TopListCard'
+// import { AnimatedCardStack } from './components/AnimatedCardStack'
 import { createTimeDiff, useReferrerQuery } from './utils'
-import { formatCurrency } from '@/utils/numberish/formatter'
-import MoreListControllers from '@/icons/misc/MoreListControllers'
+// import { formatCurrency } from '@/utils/numberish/formatter'
+// import MoreListControllers from '@/icons/misc/MoreListControllers'
 import { useStateWithUrl } from '@/hooks/useStateWithUrl'
 import useResponsive from '@/hooks/useResponsive'
 import { useEvent } from '@/hooks/useEvent'
-import { MintInfo } from './type'
+import { MintInfo, SherexMintInfo } from './type'
 import { useAppStore } from '@/store'
-import { X } from 'react-feather'
-import { useLocalStorage } from '@/hooks/useLocalStorage'
-import { LocalStorageKey } from '@/constants/localStorage'
-import PlatformButton from './components/PlatformButton'
-import { TopMobileCarousel } from './components/TopMobileCarousel'
+// import { X } from 'react-feather'
+// import { useLocalStorage } from '@/hooks/useLocalStorage'
+// import { LocalStorageKey } from '@/constants/localStorage'
+// import PlatformButton from './components/PlatformButton'
+// import { TopMobileCarousel } from './components/TopMobileCarousel'
 
 const DropdownItems = [
   // { label: 'Featured', value: MintSortField.Featured },
@@ -54,14 +55,14 @@ const DropdownItems = [
 
 export default function Launchpad() {
   const { sort: querySort } = useRouteQuery<{ sort?: MintSortField; feat?: string }>()
-  const publicKey = useAppStore((s) => s.publicKey)
-  const { isOpen: isLoading, onOpen: onLoading, onClose: offLoading } = useDisclosure()
+  // const publicKey = useAppStore((s) => s.publicKey)
+  // const { isOpen: isLoading, onOpen: onLoading, onClose: offLoading } = useDisclosure()
   const [sort, setSort] = useState(querySort || MintSortField.LastTrade)
   const [isSearch, setIsSearch] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
-  const searchResultRef = useRef<MintInfo[]>([])
-  const timeRef = useRef(Date.now())
-  const referrerQuery = useReferrerQuery('?')
+  const searchResultRef = useRef<SherexMintInfo[]>([])
+  // const timeRef = useRef(Date.now())
+  // const referrerQuery = useReferrerQuery('?')
 
   const actionRef = useRef<CoinListActionRef>({ refresh: () => {}, onSearchChange: () => {} })
 
@@ -85,62 +86,63 @@ export default function Launchpad() {
     toUrl: (v) => (v === 'PlatformWhiteList' ? '' : v)
   })
 
-  const handlePlatformChange = useCallback((val?: string) => {
-    setPlatform(val || '')
-  }, [])
+  // const handlePlatformChange = useCallback((val?: string) => {
+  //   setPlatform(val || '')
+  // }, [])
 
-  const {
-    topLastTrade,
-    isLoading: isTopMintListLoading,
-    topMarketCapMints,
-    indexTopMint,
-    mutate
-  } = useTopMintList({ notRefresh: !showAnimations, includeNsfw: isIncludeNsfw, timeTag: timeRef.current })
+  // const {
+  //   topLastTrade,
+  //   isLoading: isTopMintListLoading,
+  //   topMarketCapMints,
+  //   indexTopMint,
+  //   mutate
+  // } = useTopMintList({ notRefresh: !showAnimations, includeNsfw: isIncludeNsfw, timeTag: timeRef.current })
 
-  const { isOpen: isCollapseOpen, onToggle: toggleCollapse } = useDisclosure()
+  // const { isOpen: isCollapseOpen, onToggle: toggleCollapse } = useDisclosure()
   const { isOpen: isMobileSearchOpen, onOpen: openMobileSearch, onClose: closeMobileSearch } = useDisclosure()
-  const listControllerIconSize = useBreakpointValue({ base: '24px', sm: '28px' })
-  const { colorMode } = useColorMode()
-  const isLight = colorMode === 'light'
+  // const listControllerIconSize = useBreakpointValue({ base: '24px', sm: '28px' })
+  // const { colorMode } = useColorMode()
+  // const isLight = colorMode === 'light'
   const { isMobile, isDesktopSmall, isDesktopMedium, isDesktopLarge } = useResponsive()
-  const [isFeeDistributionBannerShown, setIsFeeDistributionBannerShown] = useLocalStorage({
-    key: LocalStorageKey.IsFeeDistributionBannerShown,
-    defaultValue: false
-  })
+  // const [isFeeDistributionBannerShown, setIsFeeDistributionBannerShown] = useLocalStorage({
+  //   key: LocalStorageKey.IsFeeDistributionBannerShown,
+  //   defaultValue: false
+  // })
 
-  const [isReferBannerShown, setIsReferBannerShown] = useLocalStorage({
-    key: LocalStorageKey.IsReferBannerShown,
-    defaultValue: false
-  })
+  // const [isReferBannerShown, setIsReferBannerShown] = useLocalStorage({
+  //   key: LocalStorageKey.IsReferBannerShown,
+  //   defaultValue: false
+  // })
 
-  const handleClickRefresh = () => {
-    onLoading()
-    actionRef.current.refresh()
-    mutate()
-    setTimeout(() => {
-      offLoading()
-    }, 700)
-  }
+  // const handleClickRefresh = () => {
+  //   onLoading()
+  //   actionRef.current.refresh()
+  //   mutate()
+  //   setTimeout(() => {
+  //     offLoading()
+  //   }, 700)
+  // }
 
-  const handleSwitchAnimationsChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setShowAnimations(e.currentTarget.checked)
-  }
+  // const handleSwitchAnimationsChange = (e: ChangeEvent<HTMLInputElement>) => {
+  //   setShowAnimations(e.currentTarget.checked)
+  // }
 
-  const handleSwitchNsfwChange = (e: ChangeEvent<HTMLInputElement>) => {
-    setIsIncludeNsfw(e.currentTarget.checked)
-  }
+  // const handleSwitchNsfwChange = (e: ChangeEvent<HTMLInputElement>) => {
+  //   setIsIncludeNsfw(e.currentTarget.checked)
+  // }
 
   const handleSearchResultChange = useEvent((props: OnSearchChangeData) => {
     // const isSearch = !!props.searchTerm
+    // console.log(!!props.searchTerm)
     setIsSearch(!!props.searchTerm)
     if (!!props.searchTerm && !isMobileSearchOpen) {
       openMobileSearch()
     }
 
-    if (isSearch && props.data !== searchResultRef.current) setSort(MintSortField.MarketCap)
+    if (!!props.searchTerm && props.data !== searchResultRef.current) setSort(MintSortField.MarketCap)
     searchResultRef.current = props.data
     actionRef.current.onSearchChange({
-      isSearch,
+      isSearch: !!props.searchTerm,
       ...props
     })
   })
@@ -564,7 +566,7 @@ export default function Launchpad() {
           </Flex>
         </Flex>
       </Collapse> */}
-      <CoinList
+      <SherexCoinList
         actionRef={actionRef}
         sort={sort}
         meta={meta}

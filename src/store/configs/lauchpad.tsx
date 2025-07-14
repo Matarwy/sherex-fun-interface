@@ -1,5 +1,6 @@
 import { Text } from '@chakra-ui/react'
 import { colors } from '@/theme/cssVariables/colors'
+import i18n from '@/i18n'
 import { Trans } from 'react-i18next';
 
 const LAUCHPAD_TX_MSG = {
@@ -29,10 +30,10 @@ const LAUCHPAD_TX_MSG = {
 export const getTxMeta = ({ action, values }: { action: keyof typeof LAUCHPAD_TX_MSG; values: Record<string, unknown> }) => {
   const meta = LAUCHPAD_TX_MSG[action]
   return {
-    title: meta.title,
+    title: i18n.t(meta.title, values),
     description: <Trans i18nKey={meta.desc} values={values} components={meta.components} />,
     txHistoryTitle: meta.txHistoryTitle || meta.title,
-    txHistoryDesc: meta.txHistoryDesc || meta.desc,
+    txHistoryDesc: i18n.t(meta.txHistoryDesc, values) || i18n.t(meta.desc, values),
     txValues: values
   }
 }

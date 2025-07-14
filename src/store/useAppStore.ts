@@ -338,24 +338,24 @@ export const useAppStore = createStore<AppState>(
       }
     },
     setRpcUrlAct: async (url, skipToast, skipError) => {
-      if (url === get().rpcNodeUrl) {
-        toastSubject.next({
-          status: 'info',
-          title: 'Switch Rpc Node',
-          description: 'Rpc node already in use'
-        })
-        return true
-      }
+      // if (url === get().rpcNodeUrl) {
+      //   toastSubject.next({
+      //     status: 'info',
+      //     title: 'Switch Rpc Node',
+      //     description: 'Rpc node already in use'
+      //   })
+      //   return true
+      // }
       try {
         if (!isValidUrl(url)) throw new Error('invalid url')
-        if (isRpcLoading) {
-          toastSubject.next({
-            status: 'warning',
-            title: 'Switch Rpc Node',
-            description: 'Validating Rpc node..'
-          })
-          return false
-        }
+        // if (isRpcLoading) {
+        //   toastSubject.next({
+        //     status: 'warning',
+        //     title: 'Switch Rpc Node',
+        //     description: 'Validating Rpc node..'
+        //   })
+        //   return false
+        // }
         isRpcLoading = true
         await retry<Promise<EpochInfo>>(() => axios.post(url, { method: 'getEpochInfo' }, { skipError: true }), {
           retryCount: 3,
@@ -371,12 +371,12 @@ export const useAppStore = createStore<AppState>(
             url
           })
         )
-        if (!skipToast)
-          toastSubject.next({
-            status: 'success',
-            title: 'Switch Rpc Node Success',
-            description: 'Rpc node switched'
-          })
+        // if (!skipToast)
+        //   toastSubject.next({
+        //     status: 'success',
+        //     title: 'Switch Rpc Node Success',
+        //     description: 'Rpc node switched'
+        //   })
         return true
       } catch {
         if (!skipError)

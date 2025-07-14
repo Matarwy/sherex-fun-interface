@@ -90,7 +90,7 @@ export const darkColors: Record<keyof typeof colors, string> = {
   priceFloatingFlat: '#888888',
 
   // tooltip (this color is not in figma ui color system,but in figma ui page)
-  tooltipBg: '#0D1A3E',
+  tooltipBg: '#81622b',
 
   popoverBg: '#141f3a',
 
@@ -128,7 +128,7 @@ export const darkColors: Record<keyof typeof colors, string> = {
   text02: '#fff',
   text03: '#b5b7da',
   /** it's designer's variable name in Figma */
-  brandGradient: 'linear-gradient(244deg, #7748FC 8.17%, #39D0D8 101.65%)',
+  brandGradient: 'linear-gradient(244deg,rgb(252, 168, 72) 8.17%,rgb(205, 216, 57) 101.65%)',
   dividerDashGradient: 'repeating-linear-gradient(to right, currentColor 0 5px, transparent 5px 10px)',
 
   tokenAvatarBg: 'linear-gradient(127deg, rgba(171, 196, 255, 0.20) 28.69%, rgba(171, 196, 255, 0.00) 100%) #0b102280',
@@ -271,7 +271,7 @@ export const lightColors: Partial<typeof darkColors> = {
   text02: '#000',
   text03: '#bb7f47',
   /** it's designer's variable name in Figma */
-  brandGradient: 'linear-gradient(244deg, #7748FC 8.17%, #39D0D8 101.65%)',
+  brandGradient: 'linear-gradient(244deg,rgb(32, 22, 9) 8.17%,rgb(36, 39, 10) 101.65%)',
   dividerDashGradient: 'repeating-linear-gradient(to right, currentColor 0 5px, transparent 5px 10px)',
 
   tokenAvatarBg: 'linear-gradient(127deg, rgba(171, 196, 255, 0.20) 28.69%, rgba(171, 196, 255, 0.00) 100%) #fffe',

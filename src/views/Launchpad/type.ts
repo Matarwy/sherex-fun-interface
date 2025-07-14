@@ -81,6 +81,7 @@ export interface SherexMintInfo {
   poolId: string
   name: string
   symbol: string
+  description: string
   creator: string
   metadataUrl: string
   imgUrl: string
