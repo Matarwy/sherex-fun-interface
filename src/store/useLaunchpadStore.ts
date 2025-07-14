@@ -165,7 +165,7 @@ const initialState = {
   commentHost: process.env.NEXT_PUBLIC_LAUNCH_COMMENT_HOST || 'https://launch-forum-v1.raydium.io',
   historyHost: process.env.NEXT_PUBLIC_LAUNCH_HISTORY_HOST || 'https://launch-history-v1.raydium.io',
   mintHost: process.env.NEXT_PUBLIC_LAUNCH_MINT_HOST || 'https://launch-mint-v1.raydium.io',
-  backendHost: process.env.NEXT_PUBLIC_BACKEND_HOST || 'http://82.29.179.229:5052',
+  backendHost: process.env.NEXT_PUBLIC_BACKEND_HOST || 'https://api.sherex.fun',
   platformId: process.env.NEXT_PUBLIC_PLATFORM_ID || 'FwKALh5mEfqWVPU24e5VXavydtnwb1veUi4Z3ShiYb8g',
   slippage: 0.025,
   configInfo: new Map()
