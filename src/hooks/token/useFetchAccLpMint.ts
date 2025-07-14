@@ -54,7 +54,7 @@ const fetcher = async ([connection, publicKeyList]: [Connection, string[]]) => {
     .flat()
     .map((accountData, idx) => {
       if (accountData?.data.length === MintLayout.span) {
-        const r = MintLayout.decode(accountData.data)
+        const r = MintLayout.decode(accountData.data as any)
         const mintData = { ...r, address: newFetchList[idx] }
         preFetchMints.set(mintData.address.toBase58(), mintData)
         // if (!poolLpAuthority.has(mintData.mintAuthority.toBase58())) noneLpMintSet.add(mintData.address.toBase58())

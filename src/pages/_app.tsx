@@ -41,7 +41,7 @@ const MyApp = ({ Component, pageProps, ...props }: AppProps) => {
   useEffect(() => {
     const setRpcUrl = async () => {
       onLoading()
-      await setRpcUrlAct('https://mainnet.helius-rpc.com/?api-key=e6eb0566-8ed5-4c78-aee0-bdbfc3fa91b8') //https://mainnet.helius-rpc.com/?api-key=e6eb0566-8ed5-4c78-aee0-bdbfc3fa91b8
+      await setRpcUrlAct('https://mainnet.helius-rpc.com/?api-key=1595a210-c001-4e74-a596-ba8a420c7828') //https://mainnet.helius-rpc.com/?api-key=1595a210-c001-4e74-a596-ba8a420c7828
       offLoading()
     }
 

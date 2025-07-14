@@ -1,13 +1,4 @@
-import {
-  LanguageCode,
-  ResolutionString,
-  EntityId,
-  TradingTerminalWidgetOptions,
-  widget as Widget,
-  ChartPropertiesOverrides,
-  Timezone,
-  Bar
-} from '@/charting_library/charting_library'
+import * as TradingView from '@/charting_library'
 import { useEffect, useMemo, useState } from 'react'
 import { Themes, THEME_NAMES, AppTheme, AppColorMode } from './TvTheme'
 import { Box, useColorMode } from '@chakra-ui/react'
@@ -109,7 +100,7 @@ export default function TVChart({
     if (!connection || !poolId) return
 
     const overrides = {
-      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone as Timezone,
+      timezone: Intl.DateTimeFormat().resolvedOptions().timeZone as TradingView.Timezone,
       'paneProperties.background': theme.layer0,
       'paneProperties.horzGridProperties.color': theme.layer1,
       'paneProperties.vertGridProperties.color': theme.layer1,
@@ -150,7 +141,7 @@ export default function TVChart({
       'chartEventsSourceProperties.breaks.visible': false,
 
       volumePaneSize: 'small'
-    } as Partial<ChartPropertiesOverrides>
+    } as Partial<TradingView.ChartPropertiesOverrides>
 
     const studies_overrides = {
       'volume.volume.color.0': theme.negative,
@@ -162,12 +153,12 @@ export default function TVChart({
 
     const ChartDataFeed = birdeye ? DatafeedBirdeye : Datafeed
     const resolutionSupported =
-      savedResolution && ChartDataFeed.configurationData.supported_resolutions.indexOf(savedResolution as ResolutionString) > -1
+      savedResolution && ChartDataFeed.configurationData.supported_resolutions.indexOf(savedResolution as TradingView.ResolutionString) > -1
 
-    const options: TradingTerminalWidgetOptions = {
+    const options: TradingView.TradingTerminalWidgetOptions = {
       // debug: true,
       container: id,
-      library_path: '/charting_library/charting_library/',
+      library_path: '/charting_library/charting_library/charting_library',
       custom_css_url: '/tradingview.css',
       autosize: true,
       disabled_features: [
@@ -203,8 +194,8 @@ export default function TVChart({
       symbol: poolId, // Default symbol
 
       datafeed: new ChartDataFeed({ connection, mintInfo, mintBInfo, curveType }),
-      interval: (resolutionSupported ? savedResolution : birdeye ? '15' : '5') as ResolutionString,
-      locale: locale as LanguageCode,
+      interval: (resolutionSupported ? savedResolution : birdeye ? '15' : '5') as TradingView.ResolutionString,
+      locale: locale as TradingView.LanguageCode,
       // numeric_formatting: { decimal_sign: '.' },
       saved_data: !isEmpty(savedTvChartConfig) ? savedTvChartConfig : undefined,
       // customFormatters: {
@@ -236,10 +227,10 @@ export default function TVChart({
       auto_save_delay: 1
     }
 
-    const tvChartWidget = new Widget(options)
+    const tvChartWidget = new TradingView.widget(options)
 
     let lastInterval = 0
-    let lastEntityId: EntityId
+    let lastEntityId: TradingView.EntityId
 
     tvChartWidget.onChartReady(() => {
       const chartIns = tvChartWidget.activeChart()
@@ -314,7 +305,7 @@ export default function TVChart({
         //   })
         // }
 
-        setArrowListener(async (prev: Bar, next: Bar) => {
+        setArrowListener(async (prev: TradingView.Bar, next: TradingView.Bar) => {
           window.clearInterval(lastInterval)
           lastEntityId && chartIns.removeEntity(lastEntityId)
           chartIns.removeAllShapes()
