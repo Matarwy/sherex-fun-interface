@@ -17,7 +17,7 @@
 /build
 
 # trading
-/public/charting_library
+# /public/charting_library
 # /src/charting_library
 
 # misc
