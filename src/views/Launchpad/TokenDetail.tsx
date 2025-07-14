@@ -40,6 +40,7 @@ import { isMobile } from 'react-device-detect'
 import useFetchRpcPoolData from '@/hooks/pool/amm/useFetchRpcPoolData'
 import useFetchCpmmRpcPoolData from '@/hooks/pool/amm/useFetchCpmmRpcPoolData'
 import useMeta from '@/hooks/launchpad/useMeta'
+import useResponsive from '@/hooks/useResponsive'
 
 enum Tab {
   Comments = 'Comments',
@@ -58,6 +59,7 @@ type TabItem<T = Tab> = {
 const TokenDetail = () => {
   const { checkToken } = useCheckToken()
   const router = useRouter()
+  const { isMobile, isDesktopSmall, isDesktopMedium, isDesktopLarge } = useResponsive()
   const openDialog = useDialogsStore((s) => s.openDialog)
   const programId = useAppStore((s) => s.programIdConfig.LAUNCHPAD_PROGRAM)
   const publicKey = useAppStore((s) => s.publicKey)
@@ -213,7 +215,7 @@ const TokenDetail = () => {
     ]
 
     if (isMobile) {
-      baseItems.unshift({
+      baseItems.push({
         content: (
           <>
             <Info
@@ -251,7 +253,7 @@ const TokenDetail = () => {
                   openDialog(DialogTypes.AddComment({ poolId: poolId!, onUploadSuccess: commentRef.current.loadNewComments }))
                 }}
               >
-                <CommentIcon />
+                <CommentIcon color={colors.textLink} />
               </Button>
               <Button
                 minWidth="15rem"
