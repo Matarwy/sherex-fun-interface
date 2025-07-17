@@ -90,6 +90,7 @@ function AppNavLayout({
         <Desktop>
           <HStack flexGrow={1} justify="center" overflow={['auto', 'visible']} gap={[15, 0, 15]}>
             <RouteLink href="/" isActive={pathname === '/'} title="Board" />
+            <RouteLink href="/swap" isActive={pathname === '/swap'} title="Swap" />
             <RouteLink href="/create" isActive={pathname === '/create'} title="Launch New" />
             <RouteLink href="/profile" isActive={pathname === '/profile'} title="Profile" />
             {/* <Menu size="lg">

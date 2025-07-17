@@ -20,7 +20,6 @@ import {
   SystemStyleObject,
   useColorMode
 } from '@chakra-ui/react'
-// import { useTranslation } from 'react-i18next'
 import ChevronLeftIcon from '@/icons/misc/ChevronLeftIcon'
 import ChevronDownIcon from '@/icons/misc/ChevronDownIcon'
 import ChevronUpIcon from '@/icons/misc/ChevronUpIcon'
@@ -611,7 +610,6 @@ const initPoolData = {
 }
 
 const LaunchLabForm = () => {
-  // const { t } = useTranslation()
   const openDialog = useDialogsStore((s) => s.openDialog)
   const { checkToken, getTokenFromStorage } = useWalletSign()
   const { isOpen, onOpen, onClose } = useDisclosure()

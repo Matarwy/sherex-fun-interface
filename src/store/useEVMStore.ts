@@ -10,7 +10,7 @@ interface EVNState {
   setChainIdAct: (chainId: number) => void
 }
 
-const CHAIN_CACHE_KEY = '_ray_chain_id_'
+const CHAIN_CACHE_KEY = '_sherex_chain_id_'
 
 const evmInitState = {
   chainId: Number(isClient() ? localStorage.getItem(CHAIN_CACHE_KEY) || 1 : 1)

@@ -13,7 +13,6 @@ import {
   VStack
 } from '@chakra-ui/react'
 import Decimal from 'decimal.js'
-import { useTranslation } from 'react-i18next'
 import DecimalInput from '@/components/DecimalInput'
 import { colors } from '@/theme/cssVariables'
 import { useSwapStore, SWAP_SLIPPAGE_KEY } from '@/views/Swap/useSwapStore'
@@ -25,7 +24,6 @@ import WarningIcon from '@/icons/misc/WarningIcon'
 import { QuestionToolTip } from '@/components/QuestionToolTip'
 
 export function SlippageSettingModal(props: { variant: 'swap' | 'liquidity'; isOpen: boolean; onClose: () => void }) {
-  const { t } = useTranslation()
   const isSwap = props.variant === 'swap'
   const SLIPPAGE_KEY = SWAP_SLIPPAGE_KEY
   const swapSlippage = useSwapStore((s) => s.slippage)
@@ -67,7 +65,7 @@ export function SlippageSettingModal(props: { variant: 'swap' | 'liquidity'; isO
   const isForerun = slippageDecimal.gt('3')
   const isFailrun = slippageDecimal.lt('0.5')
   const isWarn = isSwap && (isForerun || isFailrun)
-  const warnText = isForerun ? t('setting_board.slippage_tolerance_forerun') : isFailrun ? t('setting_board.slippage_tolerance_fail') : ''
+  const warnText = isForerun ? 'Your transaction may be frontrun and result in an unfavorable trade' : isFailrun ? 'Your transaction may fail' : ''
 
   return (
     <Modal size={'md'} isOpen={props.isOpen} onClose={props.onClose}>
@@ -81,9 +79,9 @@ export function SlippageSettingModal(props: { variant: 'swap' | 'liquidity'; isO
       >
         <ModalHeader marginTop={0} marginBottom={'48px'}>
           <HStack spacing="6px">
-            <Text>{isSwap ? t('setting_board.slippage_tolerance_swap') : t('setting_board.slippage_tolerance_liquidity')}</Text>
+            <Text>{isSwap ? 'Swap slippage tolerance' : 'Liquidity slippage tolerance'}</Text>
             <QuestionToolTip
-              label={isSwap ? t('setting_board.slippage_tolerance_tooltip_swap') : t('setting_board.slippage_tolerance_tooltip_liquidity')}
+              label={isSwap ? 'Set your slippage tolerance for swap transactions.' : 'Set tolerance for changes in the quote/base token deposit ratio.'}
               iconProps={{ color: colors.textSecondary }}
             />
           </HStack>
@@ -109,7 +107,7 @@ export function SlippageSettingModal(props: { variant: 'swap' | 'liquidity'; isO
               </Flex>
               <Flex alignItems="center" rounded="full">
                 <Text fontSize="xs" whiteSpace={'nowrap'} color={colors.textSecondary}>
-                  {t('setting_board.custom')}
+                  Custom
                 </Text>
                 <DecimalInput
                   variant="filledDark"
@@ -153,7 +151,7 @@ export function SlippageSettingModal(props: { variant: 'swap' | 'liquidity'; isO
               onClick={handleSaveFee}
             >
               <Text fontSize="md" fontWeight="medium" bgClip="text" color={colors.buttonSolidText}>
-                {t('button.save')}
+                Save
               </Text>
             </Button>
           </VStack>

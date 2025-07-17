@@ -29,9 +29,9 @@ export default function useWalletSign() {
   const { setVisible } = useWalletModal()
   const authHost = useLaunchpadStore((s) => s.authHost)
 
-  const ledgerStorageKey = `_ray_ledger_${publicKey?.toBase58()}`
+  const ledgerStorageKey = `_sherex_ledger_${publicKey?.toBase58()}`
   const useLedger = wallet?.adapter.name === 'Ledger' || getStorageItem(ledgerStorageKey) === 'true'
-  const tokenStorageKey = `_ray_pump_token_${publicKey?.toBase58()}`
+  const tokenStorageKey = `_sherex_pump_token_${publicKey?.toBase58()}`
 
   const getTokenFromStorage = useEvent((): StorageToken | undefined => {
     const storage = getStorageItem(tokenStorageKey)

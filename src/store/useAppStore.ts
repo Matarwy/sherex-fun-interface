@@ -23,6 +23,7 @@ import { isValidUrl } from '@/utils/url'
 import { setStorageItem, getStorageItem } from '@/utils/localStorage'
 import { retry, isProdEnv } from '@/utils/common'
 import { compare } from 'compare-versions'
+import { SHEREX } from './configs/constants'
 
 export const defaultNetWork = WalletAdapterNetwork.Mainnet // Can be set to 'devnet', 'testnet', or 'mainnet-beta'
 export const defaultEndpoint = clusterApiUrl(defaultNetWork) // You can also provide a custom RPC endpoint
@@ -226,14 +227,15 @@ export const useAppStore = createStore<AppState>(
         })
       useTokenStore.setState(
         {
-          tokenList,
+          tokenList: [SHEREX, ...tokenList],
           displayTokenList: tokenList.filter((token) => {
             return (
               (displayTokenSettings.official && raydium.token.mintGroup.official.has(token.address)) ||
               (displayTokenSettings.jup && raydium.token.mintGroup.jup.has(token.address))
             )
-          }),
-          tokenMap,
+          })
+          .concat([SHEREX]),
+          tokenMap: tokenMap.set(SHEREX.address, SHEREX),
           mintGroup: raydium.token.mintGroup,
           whiteListMap: new Set(Array.from(raydium.token.whiteListMap))
         },

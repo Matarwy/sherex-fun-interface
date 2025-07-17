@@ -131,9 +131,9 @@ export const darkColors: Record<keyof typeof colors, string> = {
   brandGradient: '#FF9D23',
   dividerDashGradient: 'repeating-linear-gradient(to right, currentColor 0 5px, transparent 5px 10px)',
 
-  tokenAvatarBg: 'linear-gradient(127deg, rgba(171, 196, 255, 0.20) 28.69%, rgba(171, 196, 255, 0.00) 100%) #0b102280',
+  tokenAvatarBg: 'linear-gradient(127deg, rgba(255, 205, 171, 0.2) 28.69%, rgba(255, 226, 171, 0) 100%)rgba(34, 21, 11, 0.5)',
 
-  panelCardShadow: '0px 8px 24px rgba(79, 83, 243, 0.12)',
+  panelCardShadow: '0px 8px 24px rgba(243, 145, 79, 0.12)',
   panelCardBorder: 'unset',
 
   positive: ' #FF9D23',

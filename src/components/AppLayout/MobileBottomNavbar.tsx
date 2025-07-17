@@ -21,6 +21,8 @@ export function MobileBottomNavbar() {
 
   const boardHref = '/'
   const isBoardActive = pathname === boardHref
+  const swapHref = '/swap'
+  const isSwapActive = pathname === swapHref
   const createHref = '/create'
   const isCreateActive = pathname === createHref
   const profileHref = '/profile'
@@ -67,8 +69,14 @@ export function MobileBottomNavbar() {
         isActive={isBoardActive}
       />
       <BottomNavbarItem
+        href={swapHref}
+        text="Swap"
+        icon={(colorMode) => <LiquidityPageThumbnailIcon w="240px" colorMode={colorMode} isActive={isSwapActive} />}
+        isActive={isSwapActive}
+      />
+      <BottomNavbarItem
         href={createHref}
-        text="Launch New"
+        text="Create"
         icon={(colorMode) => <LaunchpadPageThumbnailIcon colorMode={colorMode} isActive={isCreateActive} />}
         isActive={isCreateActive}
       />

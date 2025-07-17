@@ -22,8 +22,6 @@ import ChevronDownIcon from '@/icons/misc/ChevronDownIcon'
 import { useAppStore, useTokenAccountStore, useTokenStore } from '@/store'
 import { colors } from '@/theme/cssVariables'
 import { trimTrailZero, formatCurrency, detectedSeparator } from '@/utils/numberish/formatter'
-
-import { t } from 'i18next'
 import Button from './Button'
 import TokenAvatar from './TokenAvatar'
 import TokenSelectDialog, { TokenSelectDialogProps } from './TokenSelectDialog'
@@ -31,6 +29,7 @@ import TokenUnknownAddDialog from './TokenSelectDialog/components/TokenUnknownAd
 import TokenFreezeDialog from './TokenSelectDialog/components/TokenFreezeDialog'
 import { TokenListHandles } from './TokenSelectDialog/components/TokenList'
 import useResponsive from '@/hooks/useResponsive'
+import { SHEREX } from '@/store/configs/constants'
 
 export const DEFAULT_SOL_RESERVER = 0.01
 export interface InputActionRef {
@@ -232,6 +231,15 @@ function TokenInput(props: TokenInputProps) {
   })
 
   const handleSelectToken = useEvent((token: TokenInfo) => {
+    if (token.address === SHEREX.address) {
+      setExtraTokenListAct({ token: { ...token, userAdded: true } as TokenInfo, addToStorage: true, update: true })
+      onCloseUnknownTokenConfirm()
+      onTokenChange?.(token)
+      setTimeout(() => {
+        onTokenChange?.(token)
+      }, 0)
+      onClose()
+    }
     const isFreeze = isFreezeToken(token)
     if (isFreeze) {
       setFreezeToken(token)
@@ -356,7 +364,7 @@ function TokenInput(props: TokenInputProps) {
         {hideControlButton ? null : (
           <HStack>
             <Button disabled={disableClickBalance} onClick={handleClickMax} variant="rect-rounded-radio" size="xs">
-              {t('input.max_button')}
+              Max
             </Button>
             <Button disabled={disableClickBalance} onClick={handleClickHalf} variant="rect-rounded-radio" size="xs">
               50%

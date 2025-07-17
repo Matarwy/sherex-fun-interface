@@ -20,6 +20,7 @@ import useTokenInfo from '@/hooks/token/useTokenInfo'
 import { isValidPublicKey } from '@/utils/publicKey'
 import { formatToRawLocaleStr } from '@/utils/numberish/formatter'
 import useTokenPrice, { TokenPrice } from '@/hooks/token/useTokenPrice'
+import { SHEREX } from '@/store/configs/constants'
 
 const perPage = 30
 
@@ -150,8 +151,8 @@ export default forwardRef<
   const RAY = useMemo(() => orgTokenMap.get(RAYMint), [orgTokenMap])
   const USDT = useMemo(() => orgTokenMap.get(USDTMint), [orgTokenMap])
 
-  const [usdcDisabled, solDisabled, rayDisabled, usdtDisabled] = filterFn
-    ? [!USDC || !filterFn(USDC), !SOL || !filterFn(SOL), !RAY || !filterFn(RAY), !USDT || !filterFn(USDT)]
+  const [usdcDisabled, solDisabled, rayDisabled, sherexDisabled, usdtDisabled] = filterFn
+    ? [!USDC || !filterFn(USDC), !SOL || !filterFn(SOL), !RAY || !filterFn(RAY), !SHEREX || !filterFn(SHEREX), !USDT || !filterFn(USDT)]
     : [false, false, false, false]
 
   const renderTokenItem = useCallback(
@@ -198,7 +199,8 @@ export default forwardRef<
         <SimpleGrid gridTemplateColumns={'repeat(auto-fill, minmax(80px, 1fr))'} gap={3}>
           <PopularTokenCell token={USDC} onClick={(token) => onChooseToken(token)} disabled={usdcDisabled} />
           <PopularTokenCell token={SOL} onClick={(token) => onChooseToken(token)} disabled={solDisabled} />
-          <PopularTokenCell token={RAY} onClick={(token) => onChooseToken(token)} disabled={rayDisabled} />
+          {/* <PopularTokenCell token={RAY} onClick={(token) => onChooseToken(token)} disabled={rayDisabled} /> */}
+          <PopularTokenCell token={SHEREX} onClick={(token) => onChooseToken(token)} disabled={sherexDisabled} />
           <PopularTokenCell token={USDT} onClick={(token) => onChooseToken(token)} disabled={usdtDisabled} />
         </SimpleGrid>
       </Box>
@@ -328,7 +330,8 @@ function TokenRowItem({
               <Text color={colors.textSecondary} mt="0.5">
                 {token.symbol}
               </Text>
-              {isUnknown ? (
+              {/* {isUnknown ? ( */}
+              {token.address !== SHEREX.address && isUnknown ? (
                 <Box
                   className="addRemoveCtrlContent"
                   display="none"
