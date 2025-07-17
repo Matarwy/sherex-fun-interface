@@ -12,6 +12,11 @@ import LaunchpadPageThumbnailIcon from '@/icons/pageNavigation/LaunchpadPageThum
 import { colors } from '@/theme/cssVariables'
 import { NavMoreButtonMenuPanel } from './components/NavMoreButtonMenuPanel'
 import { shrinkToValue } from '@/utils/shrinkToValue'
+import AcceleraytorPageThumbnailIcon from '@/icons/pageNavigation/AcceleraytorPageThumbnailIcon'
+import DisclaimerThumbnailIcon from '@/icons/pageNavigation/DisclaimerThumbnailIcon'
+import DocThumbnailIcon from '@/icons/pageNavigation/DocThumbnailIcon'
+import FeedbackThumbnailIcon from '@/icons/pageNavigation/FeedbackThumbnailIcon'
+import UserIcon from '@/icons/misc/UserIcon'
 
 /** only used is Mobile */
 export function MobileBottomNavbar() {
@@ -33,7 +38,7 @@ export function MobileBottomNavbar() {
       gridAutoFlow={'column'}
       gridAutoColumns={'1fr'}
       placeItems={'center'}
-      height={'54px'}
+      height={'60px'}
       py={2}
       bg={colors.backgroundLight}
       borderTop={isLight ? `1px solid rgba(171, 196, 255, 0.2)` : `1px solid transparent`}
@@ -65,25 +70,25 @@ export function MobileBottomNavbar() {
       <BottomNavbarItem
         href={boardHref}
         text="Board"
-        icon={(colorMode) => <LiquidityPageThumbnailIcon w="240px" colorMode={colorMode} isActive={isBoardActive} />}
+        icon={(colorMode) => <MorePageThumbnailIcon colorMode={colorMode} isActive={isBoardActive} width={28} height={28} />}
         isActive={isBoardActive}
       />
       <BottomNavbarItem
         href={swapHref}
         text="Swap"
-        icon={(colorMode) => <LiquidityPageThumbnailIcon w="240px" colorMode={colorMode} isActive={isSwapActive} />}
+        icon={(colorMode) => <SwapPageThumbnailIcon colorMode={colorMode} isActive={isSwapActive} width={28} height={28} />}
         isActive={isSwapActive}
       />
       <BottomNavbarItem
         href={createHref}
         text="Create"
-        icon={(colorMode) => <LaunchpadPageThumbnailIcon colorMode={colorMode} isActive={isCreateActive} />}
+        icon={(colorMode) => <LaunchpadPageThumbnailIcon colorMode={colorMode} isActive={isCreateActive} width={28} height={28} />}
         isActive={isCreateActive}
       />
       <BottomNavbarItem
         href={profileHref}
         text="Profile"
-        icon={(colorMode) => <PerpetualsPageThumbnailIcon colorMode={colorMode} isActive={isProfileActive} />}
+        icon={(colorMode) => <UserIcon colorMode={colorMode} isActive={isProfileActive} width={28} height={28} />}
         isActive={isProfileActive}
       />
       {/* <Menu size="lg" placement="top-end" offset={[0, 30]}>
@@ -117,8 +122,8 @@ function BottomNavbarItem({
     <VStack spacing={'6px'}>
       <Box>{shrinkToValue(icon, [colorMode])}</Box>
       <Text
-        color={isActive ? (isDark ? colors.textPrimary : colors.secondary) : colors.textSecondary}
-        fontSize="9px"
+        color={isActive ? colors.secondary : colors.textTertiary}
+        fontSize="12px"
         lineHeight="12px"
         fontWeight={isActive ? 500 : 400}
       >
