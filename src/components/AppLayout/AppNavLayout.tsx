@@ -68,7 +68,7 @@ function AppNavLayout({
       >
         {/* logo */}
         <Desktop>
-          <Box flex={'none'} mr={['', "-16", "-28", "-44"]}>
+          <Box flex={'none'} mr={['', "-24", "-36", "-36"]}>
             <Link href="/">
               <Flex gap="1.5">
                 <Image src='/logo.png' w={['0', '12', '14', '14']} />
@@ -82,7 +82,7 @@ function AppNavLayout({
         <Mobile>
           <HStack>
             <Image src='/logo.png' w="12" />
-            <Image src='/logo-text.png' h='6' />
+            {/* <Image src='/logo-text.png' h='6' /> */}
           </HStack>
         </Mobile>
 
