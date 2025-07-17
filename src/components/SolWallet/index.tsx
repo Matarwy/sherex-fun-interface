@@ -45,15 +45,15 @@ export default function SolWallet() {
         <HStack
           cursor="pointer"
           onClick={onOpen}
-          py="5px"
+          py={['5px', '8px']}
           px={['5px', '8px']}
           backgroundColor={colors.backgroundLight}
-          borderRadius="full"
+          borderRadius="xl"
           overflow="hidden"
         >
           {wallet && (
             <Box flex="none" rounded="full" overflow="hidden">
-              <Image src={wallet.adapter.icon} width={['28px', '40px']} height={['28px', '40px']} />
+              <Image src={wallet.adapter.icon} width={['28px', '32px']} height={['28px', '32px']} />
             </Box>
           )}
           <Text fontSize="sm">
