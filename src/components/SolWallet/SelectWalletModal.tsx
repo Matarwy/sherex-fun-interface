@@ -74,8 +74,8 @@ export default function SelectWalletModal({ wallets, isOpen, onSelectWallet, onC
   return (
     <Modal variant={'mobileFullPage'} isOpen={isOpen} onClose={onClose} onCloseComplete={handleCloseComplete}>
       <ModalOverlay />
-      <ModalContent color={colors.textPrimary} width={['unset', '36em']}>
-        <ModalHeader>Connect your wallet to Sherex.fun</ModalHeader>
+      <ModalContent color={colors.textPrimary} width={['90%', '36em']}>
+        <ModalHeader>Connect your wallet to Sherex</ModalHeader>
         <ModalCloseButton />
         {isWalletNotInstalled ? (
           <ModalBody display={'grid'}>
@@ -175,7 +175,7 @@ export default function SelectWalletModal({ wallets, isOpen, onSelectWallet, onC
                 ))}
               </HStack>
             </Box> */}
-              <Box mb={6} flex={'1'} overflowY={'scroll'}>
+              <Box mb={6} flex={'1'} overflowY={'auto'}>
                 <HStack justifyContent="space-between">
                   <Text fontSize={['sm', 'md']} color={colors.textPrimary} fontWeight={500} mb={4}>
                     Choose wallet
