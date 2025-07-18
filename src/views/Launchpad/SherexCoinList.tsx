@@ -72,8 +72,6 @@ export const SherexCoinList = ({ sort, meta, platformId, showAnimations, include
     [mutate]
   )
 
-  console.log(searchResult.isSearch)
-
   return (
     <>
       {/* <TokenListCard

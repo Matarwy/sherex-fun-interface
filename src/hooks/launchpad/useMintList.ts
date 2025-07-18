@@ -52,7 +52,6 @@ export default function useMintList({
     return value || 'default'
   }, [propsMintType])
   const nextPageRef = useRef<Map<string, Record<number, string>>>(new Map())
-  console.log(nextPageRef)
   const {
     data,
     setSize,
