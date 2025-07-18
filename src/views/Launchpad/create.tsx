@@ -333,7 +333,7 @@ const JustSendIt = () => {
                     maxLength={32}
                     placeholder="Solana"
                     color={colors.lightPurple}
-                    fontSize="xl"
+                    fontSize="lg"
                     fontWeight="medium"
                     width="100%"
                   />
@@ -371,14 +371,14 @@ const JustSendIt = () => {
                         background: colors.backgroundDark
                       }}
                       placeholder="SOL"
-                      fontSize="xl"
+                      fontSize="lg"
                       fontWeight="medium"
                       sx={{
                         px: 1,
                         background: colors.backgroundDark,
                         color: colors.lightPurple,
                         fontWeight: '500',
-                        fontSize: '20px',
+                        // fontSize: '20px',
                         lineHeight: '26px',
                         flex: 1,
                         width: '100%',
@@ -524,7 +524,7 @@ const JustSendIt = () => {
                       }}
                       placeholder="Optional"
                       color={colors.lightPurple}
-                      fontSize="xl"
+                      fontSize="lg"
                       fontWeight="medium"
                       width="100%"
                     />
@@ -554,7 +554,7 @@ const JustSendIt = () => {
                       }}
                       placeholder="Optional"
                       color={colors.lightPurple}
-                      fontSize="xl"
+                      fontSize="lg"
                       fontWeight="medium"
                       width="100%"
                     />
@@ -578,7 +578,7 @@ const JustSendIt = () => {
                       }}
                       placeholder="Optional"
                       color={colors.lightPurple}
-                      fontSize="xl"
+                      fontSize="lg"
                       fontWeight="medium"
                       width="100%"
                     />

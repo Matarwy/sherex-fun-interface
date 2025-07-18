@@ -21,7 +21,7 @@ import { TimeType } from '@/hooks/pool/useFetchPoolKLine'
 import { SlippageAdjuster } from '@/components/SlippageAdjuster'
 import { getMintPriority, solToWSolToken } from '@/utils/token'
 import Tooltip from '@/components/Tooltip'
-// import { MoonpayBuy } from '@/components/Moonpay'
+import { MoonpayBuy } from '@/components/Moonpay'
 import { toastSubject } from '@/hooks/toast/useGlobalToast'
 import useResponsive from '@/hooks/useResponsive'
 import TVChart from '@/components/TradingView/TVChart'
@@ -134,14 +134,14 @@ export default function Swap() {
       >
         <GridItem gridArea="controls">
           <HStack justifyContent="space-between" my={[1, 0]}>
-            {/* <MoonpayBuy>
+            <MoonpayBuy>
               <HStack gap={1}>
                 <CreditCardIcon />
                 <Text color={colors.textLink} fontWeight="medium">
                   Buy
                 </Text>
               </HStack>
-            </MoonpayBuy> */}
+            </MoonpayBuy>
             <HStack>
               <SlippageAdjuster />
               {/* <Tooltip

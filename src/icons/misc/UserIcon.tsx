@@ -6,7 +6,7 @@ export default function UserIcon(props: SvgIcon & { isActive?: boolean; colorMod
   const { colorMode, isActive, color = isActive ? colors.secondary : colors.textTertiary, ...restProps } = props
 
   return (
-    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" {...props} className="chakra-icon" xmlns="http://www.w3.org/2000/svg">
+    <svg width="16" height="16" viewBox="0 0 16 16" fill="none" {...restProps} className="chakra-icon" xmlns="http://www.w3.org/2000/svg">
       <path
         d="M12.6668 14V12.6667C12.6668 11.9594 12.4046 11.2811 11.9379 10.781C11.4711 10.281 10.838 10 10.1779 10H5.82238C5.16229 10 4.52923 10.281 4.06247 10.781C3.59572 11.2811 3.3335 11.9594 3.3335 12.6667V14"
         stroke={color}

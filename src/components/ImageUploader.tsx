@@ -208,7 +208,7 @@ const ImageUploader = ({
         ) : (
           <>
             <UploadIcon />
-            <Text fontSize="xl" fontWeight="medium" color={colors.lightPurple} opacity={0.5}>
+            <Text fontSize="lg" fontWeight="medium" color={colors.lightPurple} opacity={0.5}>
               Drag and drop an image or GIF
             </Text>
           </>

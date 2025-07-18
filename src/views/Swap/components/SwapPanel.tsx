@@ -515,7 +515,14 @@ export function SwapPanel({
         gap={1}
       >
         <RaydiumLogo width={28} />
-        <Text>Powered by Raydium</Text>
+        <Text
+          sx={{
+            background: 'linear-gradient(245.22deg, #DA2EEF 7.97%, #2B6AFF 49.17%, #39D0D8 92.1%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            backgroundClip: 'text'
+          }}
+        >Powered by Raydium</Text>
       </Flex>
     </>
   )
