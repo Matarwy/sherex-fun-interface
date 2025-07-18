@@ -92,11 +92,11 @@ export default function WalletRecentTransactionBoard({ wallet, address, isOpen =
   const handleDisConnect = useEvent(() => {
     onDisconnect()
     onClose()
-    sendWalletEvent({
-      type: 'connectWallet',
-      connectStatus: 'userUnlink',
-      walletName: wallet?.adapter.name || 'unknown'
-    })
+    // sendWalletEvent({
+    //   type: 'connectWallet',
+    //   connectStatus: 'userUnlink',
+    //   walletName: wallet?.adapter.name || 'unknown'
+    // })
   })
 
   const { isOpen: isRecentTransactionDetailView, onOpen: turnOn, onClose: turnOff } = useDisclosure()
