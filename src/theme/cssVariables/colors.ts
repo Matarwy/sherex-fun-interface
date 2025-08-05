@@ -5,20 +5,20 @@ export const darkColors: Record<keyof typeof colors, string> = {
   secondary10: 'rgba(34, 209, 248, 0.1)',
 
   // component color
-  backgroundDark:  ' #1a0900',
-  backgroundDark50: ' #1a090080',
-  backgroundMedium: ' #705732',
-  backgroundLight: ' #271804',
-  backgroundLight50: ' #27180488',
-  backgroundLight30: ' #2718044d',
-  backgroundTransparent12: 'rgba(255, 198, 171, 0.12)',
-  backgroundTransparent07: 'rgba(255, 198, 171, 0.07)',
-  backgroundTransparent10: 'rgba(255, 198, 171, 0.1)',
+  backgroundDark:  ' #080c16',
+  backgroundDark50: ' #080c1680',
+  backgroundMedium: 'rgb(50, 54, 112)',
+  backgroundLight: ' #0D1017',
+  backgroundLight50: ' #0D101788',
+  backgroundLight30: ' #0D10174d',
+  backgroundTransparent12: 'rgba(173, 171, 255, 0.12)',
+  backgroundTransparent07: 'rgba(173, 171, 255, 0.07)',
+  backgroundTransparent10: 'rgba(173, 171, 255, 0.1)',
 
   // text
   textPrimary: ' #ECF5FF',
-  textSecondary: ' #FEF9E1',
-  textTertiary: ' #FEF9E190',
+  textSecondary: ' #e1e9fe',
+  textTertiary: 'rgb(131, 141, 150)',
   textRevertPrimary: ' #211c0d',
 
   textLink: ' #f8d222',
@@ -66,15 +66,15 @@ export const darkColors: Record<keyof typeof colors, string> = {
   chart09: ' #8C6EEF33',
 
   // Icon
-  iconBg: ' #E5D0AC',
-  iconEmptyStroke: ' #C14600',
+  iconBg: 'rgb(172, 201, 229)',
+  iconEmptyStroke: 'rgb(0, 35, 193)',
 
   // success/warning/error/info
   semanticSuccess: ' #f8d222',
   semanticError: ' #FF4EA3',
   semanticWarning: ' #E5D0AC',
   semanticNeutral: ' #FEF9E1', //
-  semanticFocus: ' #A259FF',
+  semanticFocus: 'rgb(89, 133, 255)',
   semanticFocusShadow: ' #A259FF33',
 
   // Tab
@@ -108,12 +108,12 @@ export const darkColors: Record<keyof typeof colors, string> = {
   inputMask: ' #0B102266',
 
   // customize (by V3 frontend coder)
-  backgroundApp: 'linear-gradient(0deg, #180900 -18.98%, #291000 14.6%, #351400 56.26%, #180900 85.27%)',
-  solidButtonBg: ' #FF9D23',
+  backgroundApp: ' #050810',
+  solidButtonBg: ' linear-gradient(90deg, #5C2ABC 0.37%, #F99007 99.74%)',
   outlineButtonBg: 'linear-gradient(272.03deg, rgba(57, 208, 216, 0.1) 2.63%, rgba(34, 209, 248, 0.1) 95.31%)',
   filledProgressBg: '#FF9D23',
   transparentContainerBg: 'linear-gradient(271.31deg, rgba(96, 59, 200, 0.2) 1.47%, rgba(140, 110, 239, 0.12) 100%)',
-  cardStackBg: 'linear-gradient(89.25deg, #174756 0.37%, #1A2A5F 52.97%, #3E1958 99.74%)',
+  cardStackBg: 'linear-gradient(90deg, #5C2ABC 0.37%, #F99007 99.74%)',
   modalContainerBg: ' #FEF9E112', //
   infoButtonBg: ' #FEF9E133',//
   warnButtonBg: ' #E5D0AC33', //
@@ -131,9 +131,9 @@ export const darkColors: Record<keyof typeof colors, string> = {
   brandGradient: '#FF9D23',
   dividerDashGradient: 'repeating-linear-gradient(to right, currentColor 0 5px, transparent 5px 10px)',
 
-  tokenAvatarBg: 'linear-gradient(127deg, rgba(255, 205, 171, 0.2) 28.69%, rgba(255, 226, 171, 0) 100%)rgba(34, 21, 11, 0.5)',
+  tokenAvatarBg: 'linear-gradient(127deg, rgba(171, 198, 255, 0.2) 28.69%, rgba(171, 186, 255, 0) 100%)rgba(11, 14, 34, 0.5)',
 
-  panelCardShadow: '0px 8px 24px rgba(243, 145, 79, 0.12)',
+  panelCardShadow: '0px 4px 12px rgba(79, 131, 243, 0.12)',
   panelCardBorder: 'unset',
 
   positive: ' #FF9D23',

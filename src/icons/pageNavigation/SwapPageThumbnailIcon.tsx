@@ -4,7 +4,7 @@ import { ColorMode } from '@chakra-ui/react'
 
 /** used in mobile nav bottom bar */
 export default function SwapPageThumbnailIcon(props: SvgIcon & { isActive?: boolean; colorMode?: ColorMode }) {
-  const { colorMode, isActive, color = isActive ? colors.secondary : colors.textTertiary, ...restProps } = props
+  const { colorMode, isActive, color = isActive ? colors.textSecondary : colors.textTertiary, ...restProps } = props
 
   return isActive ? (
     <svg

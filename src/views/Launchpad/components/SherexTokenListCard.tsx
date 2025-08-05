@@ -25,7 +25,7 @@ const CardSkeleton = ({ index }: { index: number }) => {
   return (
     <Box
       width="100%"
-      minWidth={['100%', '360px']}
+      minWidth={['100%']}
       maxWidth="500px"
       background="#ABC4FF12"
       border="1px solid #ABC4FF1A"
@@ -182,7 +182,7 @@ const TokenCard = ({ token }: { token: SherexMintInfo }) => {
       px={3}
       py={2}
       width="100%"
-      minWidth={['100%', '360px']}
+      minWidth={['100%']}
       maxWidth="500px"
       m={[0, 'auto', 0]}
       cursor="pointer"

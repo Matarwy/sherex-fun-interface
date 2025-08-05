@@ -3,7 +3,7 @@ import { colors } from '@/theme/cssVariables'
 import { ColorMode } from '@chakra-ui/react'
 
 export default function UserIcon(props: SvgIcon & { isActive?: boolean; colorMode?: ColorMode }) {
-  const { colorMode, isActive, color = isActive ? colors.secondary : colors.textTertiary, ...restProps } = props
+  const { colorMode, isActive, color = isActive ? colors.textSecondary : colors.textTertiary, ...restProps } = props
 
   return (
     <svg width="16" height="16" viewBox="0 0 16 16" fill="none" {...restProps} className="chakra-icon" xmlns="http://www.w3.org/2000/svg">
