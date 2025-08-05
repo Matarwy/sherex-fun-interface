@@ -50,6 +50,7 @@ import UserIcon from '@/icons/misc/UserIcon'
 import TelegrameIcon from '@/icons/misc/TelegrameIcon'
 import TwitterIcon from '@/icons/misc/TwitterIcon'
 import { Instagram } from 'react-feather'
+import { Mail } from 'react-feather'
 import Button from '../Button'
 import Close from '@/icons/misc/Close'
 import { useHover } from '@/hooks/useHover'
@@ -189,23 +190,30 @@ function AppNavLayout({
             <VStack w="full" alignItems="left" gap={1}>
               <Box w="full" borderTop="1px solid" borderColor={colors.textTertiary} />
               <RouteLink 
-                href="/" 
+                href="mailto:support@sherex.vip" 
+                icon={<Mail color={colors.textTertiary} width={20} height={20} />}
+                isActive={false} 
+                title="Support" 
+              />
+              <RouteLink 
+                href="https://t.me/sherexcoin" 
                 icon={<TelegrameIcon color={colors.textTertiary} width={20} height={20} />}
                 isActive={false} 
                 title="Telegram" 
               />
               <RouteLink 
-                href="/" 
+                href="https://x.com/sherexcoin" 
                 icon={<TwitterIcon color={colors.textTertiary} width={20} height={20} />}
                 isActive={false} 
                 title="Twitter" 
               />
               <RouteLink 
-                href="/" 
+                href="https://www.instagram.com/queensherex/" 
                 icon={<Instagram color={colors.textTertiary} width={20} height={20} />}
                 isActive={false} 
                 title="Instagram" 
               />
+              
             </VStack>
           </VStack>
         </Desktop>
@@ -271,21 +279,28 @@ function AppNavLayout({
               <VStack w="full" alignItems="left" gap={1}>
                 <Box w="full" borderTop="1px solid" borderColor={colors.textTertiary} mb="2px" />
                 <RouteLink 
-                  href="https://x.com"
+                  href="mailto:support@sherex.vip" 
+                  external
+                  icon={<Mail color={colors.textTertiary} width={20} height={20} />}
+                  isActive={false} 
+                  title="Support" 
+                />
+                <RouteLink 
+                  href="https://x.com/sherexcoin"
                   external 
                   icon={<TwitterIcon color={colors.textTertiary} width={20} height={20} />}
                   isActive={false} 
                   title="Twitter" 
                 />
                 <RouteLink 
-                  href="https://t.me/"
+                  href="https://t.me/sherexcoin"
                   external 
                   icon={<TelegrameIcon color={colors.textTertiary} width={20} height={20} />}
                   isActive={false} 
                   title="Telegram" 
                 />
                 <RouteLink 
-                  href="https://instagram.com"
+                  href="https://www.instagram.com/queensherex/"
                   external 
                   icon={<Instagram color={colors.textTertiary} width={20} height={20} />}
                   isActive={false} 
