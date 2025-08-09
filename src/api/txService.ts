@@ -68,11 +68,11 @@ interface TxExtendResponse {
 // }
 
 // src/api/txService.ts (quick bypass version)
-export const validateTxData = async (): Promise<CheckTxResponse> => {
+export const validateTxData = async (props: { data: string[]; preData: string[]; userSignTime: number }): Promise<CheckTxResponse> => {
   return { id: '', success: true }
 }
 
-export const extendTxData = async (): Promise<TxExtendResponse> => {
+export const extendTxData = async (txData: string[]): Promise<TxExtendResponse> => {
   return { id: '', success: true, data: [] }
 }
 
