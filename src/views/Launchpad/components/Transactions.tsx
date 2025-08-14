@@ -67,7 +67,7 @@ const Transactions = ({ poolId, mintBInfo }: { poolId?: string; mintBInfo?: ApiV
               border="none"
               background="#ABC4FF1F"
               color="#ffdebf80"
-              // fontSize="14px"
+              fontSize="14px"
               borderRadius="22px"
               _hover={{
                 color: colors.lightPurple
@@ -139,13 +139,13 @@ const Transactions = ({ poolId, mintBInfo }: { poolId?: string; mintBInfo?: ApiV
               value={values.min}
               onChange={handleChange('min')}
               type="number"
-              // step="0.1"
+              step="0.1"
               min={0}
               _focus={{
                 outline: 'none'
               }}
             />
-            {/* <Text color={colors.lightPurple}>-</Text>
+            <Text color={colors.lightPurple}>-</Text>
             <Input
               variant="unstyled"
               width="25px"
@@ -156,12 +156,12 @@ const Transactions = ({ poolId, mintBInfo }: { poolId?: string; mintBInfo?: ApiV
               value={values.max}
               onChange={handleChange('max')}
               type="number"
-              // step="0.1"
-              // min={values.min}
+              step="0.1"
+              min={values.min}
               _focus={{
                 outline: 'none'
               }}
-            /> */}
+            />
           </Flex>
           <Text fontSize="sm" fontWeight="medium" color={colors.lightPurple}>
             {mintBInfo?.symbol ?? 'SOL'}
@@ -173,9 +173,9 @@ const Transactions = ({ poolId, mintBInfo }: { poolId?: string; mintBInfo?: ApiV
           templateColumns={['130px 50px 100px 100px 120px 140px', 'repeat(6, auto)', 'repeat(6, auto)']}
           justifyContent="space-between"
           columnGap={4}
-          // overflow="auto"
-          // scrollBehavior="smooth"
-          // overscrollBehavior="contain"
+          overflow="auto"
+          scrollBehavior="smooth"
+          overscrollBehavior="contain"
           alignContent={data.length === 0 ? 'initial' : 'start'}
           mb={hasMore ? 0 : 10}
         >

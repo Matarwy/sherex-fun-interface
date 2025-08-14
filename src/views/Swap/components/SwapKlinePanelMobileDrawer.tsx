@@ -18,7 +18,7 @@ import Tabs from '@/components/Tabs'
 import TokenAvatarPair from '@/components/TokenAvatarPair'
 import { colors } from '@/theme/cssVariables'
 import { TimeType } from '@/hooks/pool/useFetchPoolKLine'
-// import CandleChart from './CandleChart'
+import CandleChart from './CandleChart'
 import toPercentString from '@/utils/numberish/toPercentString'
 import { formatCurrency, formatToRawLocaleStr } from '@/utils/numberish/formatter'
 import dayjs from 'dayjs'
@@ -30,8 +30,8 @@ import { solToWSolToken } from '@/utils/token'
 function SwapKlinePanelMobileDrawerContent({
   baseToken,
   quoteToken,
-  // timeType,
-  // untilDate,
+  timeType,
+  untilDate,
   onDirectionToggle,
   onTimeTypeChange
 }: {
@@ -76,7 +76,7 @@ function SwapKlinePanelMobileDrawerContent({
             </HStack>
           </HStack>
         </GridItem>
-        {/* <GridItem gridArea="tabs" mt={3} mb={3} pl={2}>
+        <GridItem gridArea="tabs" mt={3} mb={3} pl={2}>
           <Tabs
             items={['15m', '1H', '4H', '1D', '1W']}
             variant="squarePanel"
@@ -85,7 +85,7 @@ function SwapKlinePanelMobileDrawerContent({
             }}
             tabItemSX={{ minWidth: '3em', fontSize: 'xs' }}
           ></Tabs>
-        </GridItem> */}
+        </GridItem>
         <GridItem area={'chartwrap'} height="100%">
           <Grid
             gridTemplate={`
@@ -98,7 +98,7 @@ function SwapKlinePanelMobileDrawerContent({
             bg={colors.backgroundDark}
             borderTopRadius="md"
           >
-            {/* <GridItem gridArea="price" pt={4} pl={3}>
+            <GridItem gridArea="price" pt={4} pl={3}>
               <HStack spacing={2} alignItems="baseline">
                 <Text fontSize="xl" fontWeight={700} color={colors.textPrimary}>
                   {price ? formatCurrency(price.current, { maximumDecimalTrailingZeroes: 5 }) : price}
@@ -117,7 +117,7 @@ function SwapKlinePanelMobileDrawerContent({
                   {price ? formatToRawLocaleStr(toPercentString(price.change, { alwaysSigned: true })) : ''}
                 </Text>
               </HStack>
-            </GridItem> */}
+            </GridItem>
             <TVChart
               id="swap-mobile-tv-chart"
               height="100%"
@@ -125,7 +125,7 @@ function SwapKlinePanelMobileDrawerContent({
               poolId={`${baseToken ? solToWSolToken(baseToken).address : ''}_${quoteToken ? solToWSolToken(quoteToken).address : ''}`}
               mintBInfo={quoteToken}
             />
-            {/* <CandleChart untilDate={untilDate} onPriceChange={setPrice} baseMint={baseToken} quoteMint={quoteToken} timeType={timeType} /> */}
+            <CandleChart untilDate={untilDate} onPriceChange={setPrice} baseMint={baseToken} quoteMint={quoteToken} timeType={timeType} />
           </Grid>
         </GridItem>
       </Grid>

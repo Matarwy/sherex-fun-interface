@@ -7,7 +7,7 @@ import PanelCard from '@/components/PanelCard'
 import { useIsomorphicLayoutEffect } from '@/hooks/useIsomorphicLayoutEffect'
 import SwapChatEmptyIcon from '@/icons/misc/SwapChatEmptyIcon'
 import SwapChatIcon from '@/icons/misc/SwapChatIcon'
-// import SwapExchangeIcon from '@/icons/misc/SwapExchangeIcon'
+import SwapExchangeIcon from '@/icons/misc/SwapExchangeIcon'
 import LinkIcon from '@/icons/misc/LinkIcon'
 import CreditCardIcon from '@/icons/misc/CreditCardIcon'
 import { useAppStore, useTokenStore } from '@/store'
@@ -98,12 +98,12 @@ export default function Swap() {
   }, [])
 
   useEffect(() => {
-    // inputMint === solMintAddress || outputMint === solMintAddress ? setIsBlinkReferralActive(true) : setIsBlinkReferralActive(false)
+    inputMint === solMintAddress || outputMint === solMintAddress ? setIsBlinkReferralActive(true) : setIsBlinkReferralActive(false)
     setIsBlinkReferralActive(true)
     const def = PublicKey.default.toString()
     const _inputMint = inputMint === def ? 'sol' : inputMint
     const _outputMint = outputMint === def ? 'sol' : outputMint
-    const href = `https://raydium.io/swap/?inputMint=${_inputMint}&outputMint=${_outputMint}`
+    const href = `https://sherex.fun/swap/?inputMint=${_inputMint}&outputMint=${_outputMint}`
     const walletAddress = publicKey?.toBase58()
     const copyUrl = connected ? href + `&referrer=${walletAddress}` : href
     setValue(copyUrl)
@@ -144,10 +144,11 @@ export default function Swap() {
             </MoonpayBuy>
             <HStack>
               <SlippageAdjuster />
-              {/* <Tooltip
-                label={t('swap.blink_referral_desc', {
-                  symbol: outputMint === solMintAddress ? tokenMap.get(inputMint)?.symbol : tokenMap.get(outputMint)?.symbol
-                })}
+              <Tooltip
+                label={`Invite friends to Blink and earn ${outputMint === solMintAddress
+                ? tokenMap.get(inputMint)?.symbol
+                : tokenMap.get(outputMint)?.symbol} rewards!`}
+
               >
                 <Box
                   cursor="pointer"
@@ -157,16 +158,16 @@ export default function Swap() {
                       onCopy()
                       toastSubject.next({
                         status: 'success',
-                        title: t('common.copy_success')
+                        title: ''
                       })
                     }
                   }}
                 >
                   <LinkIcon />
                 </Box>
-              </Tooltip> */}
+              </Tooltip>
 
-              {/* {!isMobile && isPCChartShown && (
+              {!isMobile && isPCChartShown && (
                 <Box
                   cursor="pointer"
                   onClick={() => {
@@ -175,7 +176,7 @@ export default function Swap() {
                 >
                   <SwapExchangeIcon />
                 </Box>
-              )} */}
+              )}
               <Box
                 cursor="pointer"
                 onClick={() => {
@@ -202,7 +203,7 @@ export default function Swap() {
             <SwapPanel
               onInputMintChange={setInputMint}
               onOutputMintChange={setOutputMint}
-              // onDirectionNeedReverse={() => setIsDirectionNeedReverse((b) => !b)}
+              onDirectionNeedReverse={() => setIsDirectionNeedReverse((b) => !b)}
             />
           </PanelCard>
         </GridItem>

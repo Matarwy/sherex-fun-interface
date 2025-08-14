@@ -1,68 +1,68 @@
 import {
   Box,
   Button,
-  // Collapse,
+  Collapse,
   Flex,
-  // Text,
+  Text,
   Grid,
-  // FormControl,
-  // FormLabel,
-  // Switch,
-  // Skeleton,
+  FormControl,
+  FormLabel,
+  Switch,
+  Skeleton,
   useBreakpointValue,
   useColorMode,
   useOutsideClick
 } from '@chakra-ui/react'
-// import Link from 'next/link'
+import Link from 'next/link'
 import { colors } from '@/theme/cssVariables/colors'
 import { SherexCoinList, CoinListActionRef } from './SherexCoinList'
 import { MetasList } from './components/MetasList'
 // import { SearchInput, OnSearchChangeData } from './components/SearchInput'
 import { SearchInput, OnSearchChangeData } from './components/SherexSearchInput'
-// import { TopSpotCard } from './components/TopSpotCard'
+import { TopSpotCard } from './components/TopSpotCard'
 import { DropdownSelectMenu } from '@/components/DropdownSelectMenu'
-// import RefreshIcon from '@/icons/misc/RefreshIcon'
-// import UserIcon from '@/icons/misc/UserIcon'
+import RefreshIcon from '@/icons/misc/RefreshIcon'
+import UserIcon from '@/icons/misc/UserIcon'
 import SearchIcon from '@/icons/misc/SearchIcon'
 import { MintSortField } from '@/hooks/launchpad/useSherexMintList'
 import { useRef, useState, ChangeEvent, useCallback } from 'react'
 import { useRouteQuery } from '@/utils/routeTools'
 import { useDisclosure } from '@/hooks/useDelayDisclosure'
-// import useTopMintList from '@/hooks/launchpad/useTopMintList'
-// import { TopListCard } from './components/TopListCard'
-// import { AnimatedCardStack } from './components/AnimatedCardStack'
+import useTopMintList from '@/hooks/launchpad/useTopMintList'
+import { TopListCard } from './components/TopListCard'
+import { AnimatedCardStack } from './components/AnimatedCardStack'
 import { createTimeDiff, useReferrerQuery } from './utils'
-// import { formatCurrency } from '@/utils/numberish/formatter'
-// import MoreListControllers from '@/icons/misc/MoreListControllers'
+import { formatCurrency } from '@/utils/numberish/formatter'
+import MoreListControllers from '@/icons/misc/MoreListControllers'
 import { useStateWithUrl } from '@/hooks/useStateWithUrl'
 import useResponsive from '@/hooks/useResponsive'
 import { useEvent } from '@/hooks/useEvent'
 import { MintInfo, SherexMintInfo } from './type'
 import { useAppStore } from '@/store'
-// import { X } from 'react-feather'
-// import { useLocalStorage } from '@/hooks/useLocalStorage'
-// import { LocalStorageKey } from '@/constants/localStorage'
-// import PlatformButton from './components/PlatformButton'
-// import { TopMobileCarousel } from './components/TopMobileCarousel'
+import { X } from 'react-feather'
+import { useLocalStorage } from '@/hooks/useLocalStorage'
+import { LocalStorageKey } from '@/constants/localStorage'
+import PlatformButton from './components/PlatformButton'
+import { TopMobileCarousel } from './components/TopMobileCarousel'
 
 const DropdownItems = [
   // { label: 'Featured', value: MintSortField.Featured },
   { label: 'Last Trade', value: MintSortField.LastTrade },
   { label: 'New', value: MintSortField.New },
-  { label: 'Market cap', value: MintSortField.MarketCap }
+  { label: 'Market cap', value: MintSortField.MarketCap },
   // { label: 'Finish Rate', value: MintSortField.FinishRate }
 ]
 
 export default function Launchpad() {
   const { sort: querySort } = useRouteQuery<{ sort?: MintSortField; feat?: string }>()
-  // const publicKey = useAppStore((s) => s.publicKey)
-  // const { isOpen: isLoading, onOpen: onLoading, onClose: offLoading } = useDisclosure()
+  const publicKey = useAppStore((s) => s.publicKey)
+  const { isOpen: isLoading, onOpen: onLoading, onClose: offLoading } = useDisclosure()
   const [sort, setSort] = useState(querySort || MintSortField.LastTrade)
   const [isSearch, setIsSearch] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
   const searchResultRef = useRef<SherexMintInfo[]>([])
-  // const timeRef = useRef(Date.now())
-  // const referrerQuery = useReferrerQuery('?')
+  const timeRef = useRef(Date.now())
+  const referrerQuery = useReferrerQuery('?')
 
   const actionRef = useRef<CoinListActionRef>({ refresh: () => {}, onSearchChange: () => {} })
 
@@ -86,53 +86,53 @@ export default function Launchpad() {
     toUrl: (v) => (v === 'PlatformWhiteList' ? '' : v)
   })
 
-  // const handlePlatformChange = useCallback((val?: string) => {
-  //   setPlatform(val || '')
-  // }, [])
+  const handlePlatformChange = useCallback((val?: string) => {
+    setPlatform(val || '')
+  }, [])
 
-  // const {
-  //   topLastTrade,
-  //   isLoading: isTopMintListLoading,
-  //   topMarketCapMints,
-  //   indexTopMint,
-  //   mutate
-  // } = useTopMintList({ notRefresh: !showAnimations, includeNsfw: isIncludeNsfw, timeTag: timeRef.current })
+  const {
+    topLastTrade,
+    isLoading: isTopMintListLoading,
+    topMarketCapMints,
+    indexTopMint,
+    mutate
+  } = useTopMintList({ notRefresh: !showAnimations, includeNsfw: isIncludeNsfw, timeTag: timeRef.current })
 
-  // const { isOpen: isCollapseOpen, onToggle: toggleCollapse } = useDisclosure()
+  const { isOpen: isCollapseOpen, onToggle: toggleCollapse } = useDisclosure()
   const { isOpen: isMobileSearchOpen, onOpen: openMobileSearch, onClose: closeMobileSearch } = useDisclosure()
-  // const listControllerIconSize = useBreakpointValue({ base: '24px', sm: '28px' })
-  // const { colorMode } = useColorMode()
-  // const isLight = colorMode === 'light'
+  const listControllerIconSize = useBreakpointValue({ base: '24px', sm: '28px' })
+  const { colorMode } = useColorMode()
+  const isLight = colorMode === 'light'
   const { isMobile, isDesktopSmall, isDesktopMedium, isDesktopLarge } = useResponsive()
-  // const [isFeeDistributionBannerShown, setIsFeeDistributionBannerShown] = useLocalStorage({
-  //   key: LocalStorageKey.IsFeeDistributionBannerShown,
-  //   defaultValue: false
-  // })
+  const [isFeeDistributionBannerShown, setIsFeeDistributionBannerShown] = useLocalStorage({
+    key: LocalStorageKey.IsFeeDistributionBannerShown,
+    defaultValue: false
+  })
 
-  // const [isReferBannerShown, setIsReferBannerShown] = useLocalStorage({
-  //   key: LocalStorageKey.IsReferBannerShown,
-  //   defaultValue: false
-  // })
+  const [isReferBannerShown, setIsReferBannerShown] = useLocalStorage({
+    key: LocalStorageKey.IsReferBannerShown,
+    defaultValue: false
+  })
 
-  // const handleClickRefresh = () => {
-  //   onLoading()
-  //   actionRef.current.refresh()
-  //   mutate()
-  //   setTimeout(() => {
-  //     offLoading()
-  //   }, 700)
-  // }
+  const handleClickRefresh = () => {
+    onLoading()
+    actionRef.current.refresh()
+    mutate()
+    setTimeout(() => {
+      offLoading()
+    }, 700)
+  }
 
-  // const handleSwitchAnimationsChange = (e: ChangeEvent<HTMLInputElement>) => {
-  //   setShowAnimations(e.currentTarget.checked)
-  // }
+  const handleSwitchAnimationsChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setShowAnimations(e.currentTarget.checked)
+  }
 
-  // const handleSwitchNsfwChange = (e: ChangeEvent<HTMLInputElement>) => {
-  //   setIsIncludeNsfw(e.currentTarget.checked)
-  // }
+  const handleSwitchNsfwChange = (e: ChangeEvent<HTMLInputElement>) => {
+    setIsIncludeNsfw(e.currentTarget.checked)
+  }
 
   const handleSearchResultChange = useEvent((props: OnSearchChangeData) => {
-    // const isSearch = !!props.searchTerm
+    const isSearch = !!props.searchTerm
     // console.log(!!props.searchTerm)
     setIsSearch(!!props.searchTerm)
     if (!!props.searchTerm && !isMobileSearchOpen) {
@@ -158,11 +158,11 @@ export default function Launchpad() {
 
   return (
     <Grid
-      // minWidth={['initial', '1240px', 'initial']}
+      minWidth={['initial', '1240px', 'initial']}
       height="fit-content"
       pt={1}
     >
-      {/* {(!isReferBannerShown || !isFeeDistributionBannerShown) && (
+      {(!isReferBannerShown || !isFeeDistributionBannerShown) && (
         <Box marginX={['-20px', 0, `min((100vw - 1600px) / -2, -7%)`]} mb={[0, 6]}>
           <Flex
             direction={['column', 'column', 'row']}
@@ -188,7 +188,7 @@ export default function Launchpad() {
                     >
                       Share, Refer, Earn SOL! Share your link and get referral fees airdropped to you!
                     </Text>
-                    <Link
+                    {/* <Link
                       href="https://docs.raydium.io/raydium/pool-creation/launchlab/earn-referral-fees"
                       shallow
                       target="_blank"
@@ -199,7 +199,7 @@ export default function Launchpad() {
                       }}
                     >
                       More info
-                    </Link>
+                    </Link> */}
                   </Flex>
                 </Flex>
                 <X width="22px" height="22px" color="#4F53F3" cursor="pointer" onClick={() => setIsReferBannerShown(true)} />
@@ -218,7 +218,7 @@ export default function Launchpad() {
                     }
                     bgClip="text"
                   >
-                    Rewards are LIVE for traders AND creators! Check ‘Rewards’ tab and X account for updates!
+                    Rewards are LIVE for traders AND creators! Check X account for updates!
                   </Text>
                 </Flex>
                 <X width="22px" height="22px" color="#4F53F3" cursor="pointer" onClick={() => setIsFeeDistributionBannerShown(true)} />
@@ -226,7 +226,7 @@ export default function Launchpad() {
             ) : null}
           </Flex>
         </Box>
-      )} */}
+      )}
       <Grid gap={[2, 5]}>
         {/* <Flex justifyContent="space-evenly" alignItems="center">
           {(isDesktopMedium || isDesktopLarge) && (
@@ -495,7 +495,7 @@ export default function Launchpad() {
                   onValueChange={setSort}
                 />
                 <SearchInput onSearchResultChange={handleSearchResultChange} includeNsfw={isIncludeNsfw} />
-                {/* <Button
+                <Button
                   onClick={() => {
                     toggleCollapse()
                   }}
@@ -504,7 +504,7 @@ export default function Launchpad() {
                   isActive={isCollapseOpen}
                 >
                   <MoreListControllers color={colors.textSecondary} width={listControllerIconSize} height={listControllerIconSize} />
-                </Button> */}
+                </Button>
                 <MetasList
                   onMetaSelected={(val) => setMeta(val as any)}
                   activeMeta={meta}
@@ -513,9 +513,9 @@ export default function Launchpad() {
                     //   word: 'heating',
                     //   word_with_strength: (
                     //     <Flex alignItems="center" gap="10px">
-                    //       {/* {isDesktopSmall ? <Text fontSize="sm">Heating up</Text> : null}Heating up
-                    //       🔥 */}
-                    //       Heating up
+                    //       {isDesktopSmall ? <Text fontSize="sm">Heating up</Text> : null}Heating up
+                    //       🔥
+                    //       {/* Heating up */}
                     //     </Flex>
                     //   )
                     // },
@@ -523,9 +523,9 @@ export default function Launchpad() {
                       word: 'watch_list',
                       word_with_strength: (
                         <Flex alignItems="center" gap="10px">
-                          {/* {isDesktopSmall || isDesktopMedium || isDesktopLarge ? <Text fontSize="sm">Watch list</Text> : null}
-                          ⭐️ */}
-                          Watch list
+                          {isDesktopSmall || isDesktopMedium || isDesktopLarge ? <Text fontSize="sm">Watch list</Text> : null}
+                          ⭐️
+                          {/* Watch list */}
                         </Flex>
                       )
                     },
@@ -533,9 +533,9 @@ export default function Launchpad() {
                       word: 'graduated',
                       word_with_strength: (
                         <Flex alignItems="center" gap="10px">
-                          {/* {isDesktopSmall || isDesktopMedium || isDesktopLarge ? <Text fontSize="sm">Graduated</Text> : null}
-                          🎓 */}
-                          Graduated
+                          {isDesktopSmall || isDesktopMedium || isDesktopLarge ? <Text fontSize="sm">Graduated</Text> : null}
+                          🎓
+                          {/* Graduated */}
                         </Flex>
                       )
                     }
@@ -543,7 +543,7 @@ export default function Launchpad() {
                 />
                 {/* <PlatformButton defaultValue={platform} onChange={handlePlatformChange} /> */}
               </Flex>
-              {/* <Flex alignItems="center" gap={[2, 2, 7]}>
+              <Flex alignItems="center" gap={[2, 2, 7]}>
                 <Flex gap="1" alignItems="center">
                   <Button variant="ghost" px="1" isLoading={isLoading} onClick={handleClickRefresh}>
                     <RefreshIcon color={colors.buttonPrimary__01} />
@@ -573,12 +573,12 @@ export default function Launchpad() {
                     Launch token
                   </Button>
                 </Link>
-              </Flex> */}
+              </Flex>
             </Flex>
           </Box>
         )}
       </Grid>
-      {/* <Collapse in={isCollapseOpen}>
+      <Collapse in={isCollapseOpen}>
         <Flex justifyContent={['space-between', 'flex-start']} gap={16} pt={3}>
           <Flex alignItems="center">
             <FormControl display="flex" alignItems="center">
@@ -588,12 +588,12 @@ export default function Launchpad() {
           </Flex>
           <Flex alignItems="center">
             <FormControl display="flex" alignItems="center">
-              <FormLabel color={colors.lightPurple}>{t('launchpad.include_nsfw')}</FormLabel>
+              <FormLabel color={colors.lightPurple}>{'NSFW'}{/*t('launchpad.include_nsfw')*/}</FormLabel>
               <Switch defaultChecked={isIncludeNsfw} onChange={handleSwitchNsfwChange} />
             </FormControl>
           </Flex>
         </Flex>
-      </Collapse> */}
+      </Collapse>
       <SherexCoinList
         actionRef={actionRef}
         sort={sort}

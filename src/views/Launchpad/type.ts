@@ -78,19 +78,58 @@ export interface MintInfo {
 
 export interface SherexMintInfo {
   mintId: string
-  poolId: string
-  name: string
-  symbol: string
-  description: string
-  creator: string
-  metadataUrl: string
-  imgUrl: string
-  telegram?: string
-  website?: string
-  twitter?: string
-  marketCap: string
-  finishingRate: string
-  createAt: number
   lastTradeAt: number
   graduated: boolean
+  creator: string
+  decimals: string
+  description: string
+  imgUrl: string
+  marketCap: number
+  metadataUrl: string
+  mint: string
+  mintB: ApiV3Token
+  name: string
+  origin: { name: string; icon: string }
+  poolId: string
+  supply: number
+  symbol: string
+  createAt: number
+  website?: string
+  twitter?: string
+  telegram?: string
+  finishingRate: number
+  initPrice: string
+  endPrice: string
+  migrateAmmId?: string
+  priceStageTime1?: number
+  priceStageTime2?: number
+  priceFinalTime?: number
+
+  volumeA: number
+  volumeB: number
+  volumeU: number
+
+  configId: string
+  configInfo: ConfigInfo
+
+  platformInfo: {
+    feeRate: string
+    img: string
+    name: string
+    platformClaimFeeWallet: string
+    pubKey: string
+    web: string
+  }
+
+  cliffPeriod: string
+  unlockPeriod: string
+  totalAllocatedShare: number
+  totalLockedAmount: number
+
+  defaultCurve?: boolean
+
+  totalSellA: string
+  totalFundRaisingB: string
+
+  migrateType: 'cpmm' | 'amm'
 }

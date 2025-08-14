@@ -53,12 +53,12 @@ const App: FC<PropsWithChildren<any>> = ({ children }) => {
     // logoDataUri: 'OPTIONAL ADD IN-WALLET LOGO URL HERE',
     // buttonLogoUri: 'ADD OPTIONAL LOGO FOR WIDGET BUTTON HERE'
   })
-  // registerMoonGateWallet({
-  //   authMode: 'Twitter',
-  //   position: 'top-right'
-  //   // logoDataUri: 'OPTIONAL ADD IN-WALLET LOGO URL HERE',
-  //   // buttonLogoUri: 'ADD OPTIONAL LOGO FOR WIDGET BUTTON HERE'
-  // })
+  registerMoonGateWallet({
+    authMode: 'Twitter',
+    position: 'top-right'
+    // logoDataUri: 'OPTIONAL ADD IN-WALLET LOGO URL HERE',
+    // buttonLogoUri: 'ADD OPTIONAL LOGO FOR WIDGET BUTTON HERE'
+  })
   registerMoonGateWallet({
     authMode: 'Apple',
     position: 'top-right'
@@ -123,12 +123,12 @@ const App: FC<PropsWithChildren<any>> = ({ children }) => {
 
   const onWalletError = useEvent((error: WalletError, adapter?: Adapter) => {
     if (!adapter) return
-    // sendWalletEvent({
-    //   type: 'connectWallet',
-    //   walletName: adapter.name,
-    //   connectStatus: 'failure',
-    //   errorMsg: error.message || error.stack
-    // })
+    sendWalletEvent({
+      type: 'connectWallet',
+      walletName: adapter.name,
+      connectStatus: 'failure',
+      errorMsg: error.message || error.stack
+    })
   })
 
   return (

@@ -61,9 +61,9 @@ export default function CandleChart({ onPriceChange, baseMint, quoteMint, timeTy
         }
       },
       localization: {
-        // timeFormatter: (time: number) => {
-        //   return dayjs(time).utc().format('H:mm')
-        // }
+        timeFormatter: (time: number) => {
+          return dayjs(time).utc().format('H:mm')
+        }
       }
     })
 

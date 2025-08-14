@@ -455,7 +455,7 @@ export default function Info({
         <Flex alignItems="center" justifyContent="space-between" color={colors.textSecondary} gap={1}>
           <Flex alignItems="center" gap="1">
             Platform LP fee share
-            {/* <Tooltip
+            <Tooltip
               hasArrow
               placement="top"
               label={`After the token graduates, token creators can claim ${
@@ -463,7 +463,7 @@ export default function Info({
               }% of LP fees from AMM pool trades.`}
             >
               <QuestionCircleIcon color={colors.lightPurple} />
-            </Tooltip> */}
+            </Tooltip>
           </Flex>
           <Flex alignItems="center" gap="1">
             {mintInfo.migrateType === 'cpmm' ? 'Yes' : 'No'}

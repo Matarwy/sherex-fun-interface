@@ -313,8 +313,8 @@ export function SwapPanel({
       unwrapSol: tokenOutput?.address === PublicKey.default.toString(),
       onCloseToast: offSending,
       onConfirmed: () => {
-        // setAmountIn('')
-        // setNeedPriceUpdatedAlert(false)
+        setAmountIn('')
+        setNeedPriceUpdatedAlert(false)
         offSending()
       },
       onError: () => {
@@ -508,7 +508,7 @@ export function SwapPanel({
       <Flex
         rounded="xl"
         mt="2"
-        // fontSize="sm"
+        fontSize="sm"
         color={colors.badgeBlue}
         alignItems="center"
         justifyContent="center"

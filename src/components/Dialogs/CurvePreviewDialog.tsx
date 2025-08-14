@@ -49,10 +49,10 @@ export const CurvePreviewDialog = ({ setIsOpen, data }: DialogProps<CurvePreview
                 </Text>
               </Flex>
               <Text color="#C4D6FF80" fontSize="sm">
-                This tool is for advanced users. Before changing launch parameters, make sure to go through the{' '}
-                <Link color="#22D1F8" href="#" textDecoration="underline">
+                This tool is for advanced users. Before changing launch parameters, make sure to go through the Docs{' '}
+                {/* <Link color="#22D1F8" href="#" textDecoration="underline">
                   detailed guide
-                </Link>
+                </Link> */}
                 .
               </Text>
             </Box>

@@ -37,24 +37,24 @@ const createStore = <T>(
         return fn(logSet, get, store, $$storeMutations)
 
         // maybe need while try to catch all tx
-        // const storeState = fn(logSet, get, store, $$storeMutations)
-        // const newState = { ...storeState }
+        const storeState = fn(logSet, get, store, $$storeMutations)
+        const newState = { ...storeState }
 
-        // /* eslint-disable */
-        // /* @ts-ignore */
-        // Object.keys(newState).forEach((key) => {
-        //   /* @ts-ignore */
-        //   if (typeof newState[key] === 'function') {
-        //     /* @ts-ignore */
-        //     newState[key] = (...props: any) => {
-        //       if (key.indexOf('Act') !== -1) console.log( 'call', key)
-        //       /* @ts-ignore */
-        //       return storeState[key].bind({})(...props)
-        //     }
-        //   }
-        // })
-        // /* eslint-enable */
-        // return newState
+        /* eslint-disable */
+        /* @ts-ignore */
+        Object.keys(newState).forEach((key) => {
+          /* @ts-ignore */
+          if (typeof newState[key] === 'function') {
+            /* @ts-ignore */
+            newState[key] = (...props: any) => {
+              if (key.indexOf('Act') !== -1) console.log( 'call', key)
+              /* @ts-ignore */
+              return storeState[key].bind({})(...props)
+            }
+          }
+        })
+        /* eslint-enable */
+        return newState
       }),
 
       name ? { name } : undefined

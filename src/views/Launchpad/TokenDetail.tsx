@@ -355,7 +355,7 @@ const TokenDetail = () => {
               Back
             </Text>
           </Link>
-          {/* {!isFeeDistributionBannerShown ? (
+          {!isFeeDistributionBannerShown ? (
             <Flex borderRadius="8px" background="#8C6EEF33" width="100%" px={3} py={2} ml={4} justifyContent="space-between">
               <Flex alignItems="center" lineHeight="18px">
                 <Text>🤑</Text>
@@ -368,12 +368,12 @@ const TokenDetail = () => {
                   }
                   bgClip="text"
                 >
-                  Rewards are LIVE for traders AND creators! Check ‘Rewards’ tab and X account for updates!
+                  Rewards are LIVE for traders AND creators! Check X account for updates!
                 </Text>
               </Flex>
               <X width="22px" height="22px" color="#4F53F3" cursor="pointer" onClick={() => setIsFeeDistributionBannerShown(true)} />
             </Flex>
-          ) : null} */}
+          ) : null}
         </Flex>
       </GridItem>
       <GridItem gridArea="header">
@@ -524,7 +524,7 @@ const TokenDetail = () => {
             : {}
         }
       >
-        {/* {isMobile ? (
+        {isMobile ? (
           <Flex px={4} mb="2" py="10px" borderRadius="8px" background="#8C6EEF33" alignItems="center" gap={8}>
             <Text
               fontSize="sm"
@@ -572,7 +572,7 @@ const TokenDetail = () => {
               <ConnectedButton width="fit-content" height="28px" minHeight="28px" mx="auto" fontSize="sm" />
             )}
           </Flex>
-        ) : null} */}
+        ) : null}
         <TabContent
           value={panelItems.some((item) => item.value === value) ? value : Tab.Comments}
           onValueChange={setValue}
@@ -620,7 +620,7 @@ const TokenDetail = () => {
             isMigrating={isMigrating}
             isLanded={isLanded}
           />
-          {/* <Flex px={4} py="10px" borderRadius="8px" background="#8C6EEF33" alignItems="center" gap={8}>
+          <Flex px={4} py="10px" borderRadius="8px" background="#8C6EEF33" alignItems="center" gap={8}>
             <Text
               fontSize="sm"
               bgGradient={
@@ -666,7 +666,7 @@ const TokenDetail = () => {
             ) : (
               <ConnectedButton width="fit-content" height="28px" minHeight="28px" mx="auto" fontSize="sm" />
             )}
-          </Flex> */}
+          </Flex>
           <Info
             poolInfo={poolInfo}
             mintInfo={mintInfo}

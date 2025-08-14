@@ -184,11 +184,11 @@ function useInitConnection(props: SSRData) {
 
   useEffect(() => {
     if (connected && publicKey) {
-      // sendWalletEvent({
-      //   type: 'connectWallet',
-      //   connectStatus: 'success',
-      //   walletName: wallet?.adapter.name || 'unknown'
-      // })
+      sendWalletEvent({
+        type: 'connectWallet',
+        connectStatus: 'success',
+        walletName: wallet?.adapter.name || 'unknown'
+      })
       if (wallet) localStorage.setItem(WALLET_STORAGE_KEY, `"${wallet?.adapter.name}"`)
     }
   }, [publicKey, connected, wallet?.adapter.name])

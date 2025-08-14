@@ -57,8 +57,8 @@ export default function SolWallet() {
             </Box>
           )}
           <Text fontSize="sm">
-            {/* {isMobile || isTablet ? publicKey?.toBase58().substring(0, 3) + '...' : encodeStr(publicKey?.toBase58(), 4)} */}
-            {encodeStr(publicKey?.toBase58(), 4)}
+            {isMobile || isTablet ? publicKey?.toBase58().substring(0, 3) + '...' : encodeStr(publicKey?.toBase58(), 4)}
+            {/* {encodeStr(publicKey?.toBase58(), 4)} */}
           </Text>
           <Box flex={'none'}>
             <ChevronDownIcon width={12} height={12} />

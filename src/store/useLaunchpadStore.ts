@@ -588,7 +588,7 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
       buyAmount,
       slippage,
       mintB,
-      // minMintAAmount, // use sdk to get realtime rpc data
+      minMintAAmount, // use sdk to get realtime rpc data
       shareFeeReceiver,
       shareFeeRate: shareFeeReceiver ? defaultShareFeeRate : undefined,
       configInfo,
@@ -638,27 +638,27 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
 
     return txId
 
-    // return execute()
-    //   .then(({ txId, signedTx }) => {
-    //     txStatusSubject.next({
-    //       txId,
-    //       ...meta,
-    //       signedTx,
-    //       onSent,
-    //       onError,
-    //       onConfirmed: () => {
-    //         onConfirmed?.()
-    //         useTokenAccountStore.getState().fetchTokenAccountAct({})
-    //       }
-    //     })
-    //     return txId
-    //   })
-    //   .catch((e) => {
-    //     onError?.()
-    //     toastSubject.next({ ...meta, txError: e })
-    //     return ''
-    //   })
-    //   .finally(onFinally)
+    return execute()
+      .then(({ txId, signedTx }) => {
+        txStatusSubject.next({
+          txId,
+          ...meta,
+          signedTx,
+          onSent,
+          onError,
+          onConfirmed: () => {
+            onConfirmed?.()
+            useTokenAccountStore.getState().fetchTokenAccountAct({})
+          }
+        })
+        return txId
+      })
+      .catch((e) => {
+        onError?.()
+        toastSubject.next({ ...meta, txError: e })
+        return ''
+      })
+      .finally(onFinally)
   },
 
   sellAct: async ({
@@ -690,7 +690,7 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
       sellAmount,
       slippage,
       mintB,
-      // minAmountB,
+      minAmountB,
       configInfo,
       platformFeeRate,
       shareFeeReceiver,
@@ -740,27 +740,27 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
 
     return txId;
 
-    // return execute()
-    //   .then(({ txId, signedTx }) => {
-    //     txStatusSubject.next({
-    //       txId,
-    //       ...meta,
-    //       signedTx,
-    //       onSent,
-    //       onError,
-    //       onConfirmed: () => {
-    //         onConfirmed?.()
-    //         useTokenAccountStore.getState().fetchTokenAccountAct({})
-    //       }
-    //     })
-    //     return txId
-    //   })
-    //   .catch((e) => {
-    //     onError?.()
-    //     toastSubject.next({ ...meta, txError: e })
-    //     return ''
-    //   })
-    //   .finally(onFinally)
+    return execute()
+      .then(({ txId, signedTx }) => {
+        txStatusSubject.next({
+          txId,
+          ...meta,
+          signedTx,
+          onSent,
+          onError,
+          onConfirmed: () => {
+            onConfirmed?.()
+            useTokenAccountStore.getState().fetchTokenAccountAct({})
+          }
+        })
+        return txId
+      })
+      .catch((e) => {
+        onError?.()
+        toastSubject.next({ ...meta, txError: e })
+        return ''
+      })
+      .finally(onFinally)
   },
   getConfigInfo: async (configId) => {
     const { connection } = useAppStore.getState()

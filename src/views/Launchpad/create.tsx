@@ -58,7 +58,7 @@ import { useDisclosure } from '@/hooks/useDelayDisclosure'
 import useResponsive from '@/hooks/useResponsive'
 import { useLocalStorage } from '@/hooks/useLocalStorage'
 import { LocalStorageKey } from '@/constants/localStorage'
-
+import  i18n  from '@/i18n'
 const supplyList = ['100000000', '1000000000', '10000000000']
 interface CreateMintFormValue {
   name: string
@@ -151,7 +151,7 @@ export default function TokenCreate() {
       mt={2}
     >
       <GridItem area="back">
-        {/* {isLaunchTokenBannerShown && (
+        {isLaunchTokenBannerShown && (
           <Box marginX={['-20px', 0, `min((100vw - 1600px) / -2, -7%)`]} mb={3}>
             <Flex borderRadius="8px" background="#8C6EEF33" width="100%" px={3} py={2} justifyContent="space-between">
               <Box></Box>
@@ -166,27 +166,27 @@ export default function TokenCreate() {
                   }
                   bgClip="text"
                 >
-                  Launch tokens, earn rewards! Check ‘Rewards’ tab and X account for updates!
+                  Launch tokens, earn rewards! Check X account for updates!
                 </Text>
               </Flex>
               <X width="22px" height="22px" color="#4F53F3" cursor="pointer" onClick={() => setIsLaunchTokenBannerShown(false)} />
             </Flex>
           </Box>
-        )} */}
-        {/* <Flex alignItems="center" gap={1} opacity={0.5}>
+        )}
+        <Flex alignItems="center" gap={1} opacity={0.5}>
           <Link as={NextLink} href={`/${referrerQuery}`} display="contents" shallow color={colors.lightPurple}>
             <ChevronLeftIcon />
             <Text fontWeight="500" fontSize="xl">
-              {t('common.back')}
+              {'Back'}{/* {i18n.t('common.back')} */}
             </Text>
           </Link>
-        </Flex> */}
+        </Flex>
       </GridItem>
       <GridItem area="panel">
         <Text color={colors.lightPurple} fontSize="xl" fontWeight="medium" textAlign="center" mb={7}>
           Launch New
         </Text>
-        {/* <Flex background="#22D1F833" alignItems="center" px={4} py="10px" gap={2} borderRadius="8px" mt={6}>
+        <Flex background="#22D1F833" alignItems="center" px={4} py="10px" gap={2} borderRadius="8px" mt={6}>
       <Box>
         <Info width="18px" height="18px" color={colors.textLaunchpadLink} />
       </Box>
@@ -197,7 +197,7 @@ export default function TokenCreate() {
         </Text>{' '}
         when your coin completes its bonding curve
       </Text>
-    </Flex> */}
+    </Flex>
         <TabContent
           value={value}
           onValueChange={setValue}
@@ -287,13 +287,13 @@ const JustSendIt = () => {
 
   return (
     <Box
-      // background={colors.backgroundLight}
+      background={colors.backgroundLight}
       mt={3}
       px={[3, 6]}
       py={4}
       borderRadius="20px"
-      // border={`1px solid ${colors.buttonSolidText}`}
-      // boxShadow="0px 8px 48px 0px #4F53F31A"
+      border={`1px solid ${colors.buttonSolidText}`}
+      boxShadow="0px 8px 48px 0px #4F53F31A"
       mx="auto"
       width={['100%', '420px', '500px']}
     >
@@ -355,9 +355,9 @@ const JustSendIt = () => {
                     border={`1px solid ${isFocused ? colors.textSecondary : 'transparent'}`}
                     transition="border 0.2s ease"
                   >
-                    {/* <Text fontWeight="medium" fontSize="xl" lineHeight="26px" userSelect="none" whiteSpace="nowrap">
+                    <Text fontWeight="medium" fontSize="xl" lineHeight="26px" userSelect="none" whiteSpace="nowrap">
                       $
-                    </Text> */}
+                    </Text>
                     <Input
                       name="ticker"
                       onChange={handleChange}
@@ -378,7 +378,7 @@ const JustSendIt = () => {
                         background: colors.backgroundDark,
                         color: colors.lightPurple,
                         fontWeight: '500',
-                        // fontSize: '20px',
+                        fontSize: '20px',
                         lineHeight: '26px',
                         flex: 1,
                         width: '100%',
@@ -451,7 +451,7 @@ const JustSendIt = () => {
                   </Text>
                 ) : null}
               </Box>
-              {/* <Flex
+              <Flex
                 justifyContent="space-between"
                 p={2}
                 alignItems="center"
@@ -489,7 +489,7 @@ const JustSendIt = () => {
                     }
                   }}
                 />
-              </Flex> */}
+              </Flex>
               <Button
                 variant="ghost"
                 _hover={{
@@ -1419,7 +1419,7 @@ const LaunchLabForm = () => {
                         value={values.tokenSoldPercent}
                         onChange={(val) => {
                           setFieldValue('tokenSoldPercent', val)
-                          // setPoolData({ ...values, tokenSoldPercent: val })
+                          setPoolData({ ...values, tokenSoldPercent: val })
                         }}
                         onBlur={(e) => {
                           handleBlur(e)
@@ -1879,15 +1879,15 @@ const LaunchLabForm = () => {
               </Text>
             </Flex>
             <Text color="#C4D6FF80" fontSize="sm">
-              This tool is for advanced users. Before changing launch parameters, make sure to go through the{' '}
-              <Link
+              This tool is for advanced users. Before changing launch parameters, make sure to go through the Docs{' '}
+              {/* <Link
                 color="#22D1F8"
                 target="_blank"
                 href="https://docs.raydium.io/raydium/pool-creation/launchlab/create-a-token"
                 textDecoration="underline"
               >
                 detailed guide
-              </Link>
+              </Link> */}
               .
             </Text>
           </Box>
@@ -1932,7 +1932,7 @@ const TabContent = memo(
 
     return (
       <Grid templateRows="auto 1fr">
-        {/* <Box overflow="auto" minH="40px">
+        <Box overflow="auto" minH="40px">
           <Flex justifyContent="center">
             <Tabs size="md" variant="rounded" items={tabItems} value={value} onChange={onTabChange} sx={sx} />
             {slotTabRight}
@@ -1942,7 +1942,7 @@ const TabContent = memo(
               {currentItem?.slotToolbar ?? slotToolbar}
             </Flex>
           )}
-        </Box> */}
+        </Box>
         <Grid
           templateAreas="'stack'"
           sx={{

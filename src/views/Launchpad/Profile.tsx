@@ -126,7 +126,7 @@ const Profile = () => {
   if (!wallet) return <ConnectedButton w="fit-content" mx="auto" />
   return (
     <Grid templateRows="auto auto 1fr" gap={5} height="100%">
-      {/* <GridItem>
+      <GridItem>
         <Flex alignItems="center" gap={1} opacity={0.5}>
           <Link as={NextLink} href={`/${referrerQuery.replace('&', '?')}`} display="contents" shallow color={colors.lightPurple}>
             <ChevronLeftIcon />
@@ -135,7 +135,7 @@ const Profile = () => {
             </Text>
           </Link>
         </Flex>
-      </GridItem> */}
+      </GridItem>
       <GridItem>
         <Flex justifyContent="center" direction="column" alignItems="center" gap={1}>
           <Text color={colors.lightPurple} fontSize="sm">

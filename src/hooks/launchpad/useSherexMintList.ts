@@ -8,7 +8,9 @@ import { useEvent } from '../useEvent'
 export enum MintSortField {
   MarketCap = 'marketCap',
   New = 'new',
-  LastTrade = 'lastTrade'
+  LastTrade = 'lastTrade',
+  Featured = 'featured',
+  FinishRate = 'finishRate'
 }
 
 const fetcher = ([url]: [string]): Promise<{
