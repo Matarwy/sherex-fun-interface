@@ -156,7 +156,10 @@ export default function TradeBox({
         protocolFeeRate: configInfo.tradeFeeRate,
         platformFeeRate: new BN(mintInfo?.platformInfo.feeRate ?? 0),
         curveType: configInfo.curveType,
-        shareFeeRate
+        shareFeeRate,
+        creatorFeeRate: new BN(0), // Provide actual value if available
+        transferFeeConfigA: undefined, // Provide actual value if available
+        slot: 0 // Provide actual value if available
       })
 
       return {
@@ -177,7 +180,10 @@ export default function TradeBox({
       protocolFeeRate: configInfo.tradeFeeRate,
       platformFeeRate: new BN(mintInfo?.platformInfo.feeRate ?? 0),
       curveType: configInfo.curveType,
-      shareFeeRate
+      shareFeeRate,
+      creatorFeeRate: new BN(0), // Provide actual value if available
+      transferFeeConfigA: undefined, // Provide actual value if available
+      slot: 0 // Provide actual value if available
     })
 
     return {

@@ -67,7 +67,10 @@ export const InitialBuyDialog = ({ setIsOpen, configInfo, ...mintData }: DialogP
           protocolFeeRate: new BN(configInfo.key.tradeFeeRate),
           platformFeeRate: platformInfo?.feeRate ?? new BN(7500),
           curveType: configInfo.key.curveType,
-          shareFeeRate
+          shareFeeRate,
+          creatorFeeRate: new BN(0), // or use the correct value if available
+          transferFeeConfigA: undefined, // or use the correct value if available
+          slot: 0 // or use the correct value if available
         }).amountA.toString()
       )
         .div(10 ** poolInfo.mintDecimalsA)

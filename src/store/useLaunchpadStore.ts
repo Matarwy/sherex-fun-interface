@@ -371,7 +371,7 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
     let meta = getTxMeta({
       action: 'buy',
       values: {
-        amountA: new Decimal(extInfo.outAmount.toString())
+        amountA: new Decimal(extInfo.swapInfo.decimalOutAmount.toString())
           .div(10 ** decimals)
           .toDecimalPlaces(decimals)
           .toString(),
@@ -445,7 +445,7 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
       meta = getTxMeta({
         action: 'launchBuy',
         values: {
-          amountA: new Decimal(extInfo.outAmount.toString())
+          amountA: new Decimal(extInfo.swapInfo.decimalOutAmount.toString())
             .div(10 ** decimals)
             .toDecimalPlaces(decimals)
             .toString(),
@@ -593,7 +593,7 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
     const meta = getTxMeta({
       action: 'buy',
       values: {
-        amountA: new Decimal((minMintAAmount ?? extInfo.outAmount).toString())
+        amountA: new Decimal((minMintAAmount ?? extInfo.decimalOutAmount).toString())
           .div(10 ** Number(mintInfo.decimals))
           .toDecimalPlaces(Number(mintInfo.decimals))
           .toString(),

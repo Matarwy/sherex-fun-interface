@@ -99,7 +99,9 @@ export default function usePoolRpcInfo({ poolId, mintInfo, refreshInterval = 10 
             startTime: new BN(0),
             totalAllocatedShare: new BN(0)
           },
-          fake: true
+          fake: true,
+          mintProgramFlag: 0,
+          cpmmCreatorFeeOn: 0
         }
 
         setConfigInfo({
