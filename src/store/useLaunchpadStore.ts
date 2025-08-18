@@ -1,4 +1,4 @@
-import { Keypair, PublicKey, SignatureResult, Transaction, VersionedTransaction } from '@solana/web3.js'
+import { PublicKey, SignatureResult, Transaction, VersionedTransaction } from '@solana/web3.js'
 import createStore from './createStore'
 import { useAppStore } from './useAppStore'
 import ToPublicKey from '@/utils/publicKey'
@@ -28,7 +28,6 @@ import { useTokenAccountStore } from './useTokenAccountStore'
 import { getDefaultToastData, handleMultiTxToast } from '@/hooks/toast/multiToastUtil'
 import { handleMultiTxRetry } from '@/hooks/toast/retryTx'
 import { wSolToSolString } from '@/utils/token'
-import { useWallet } from '@solana/wallet-adapter-react'
 
 export const LAUNCHPAD_SLIPPAGE_KEY = '_sherex_lau_slp_'
 
@@ -47,8 +46,6 @@ export interface LaunchpadState {
   commentHost: string
   historyHost: string
   mintHost: string
-  backendHost: string
-  platformId: string
   slippage: number
 
   refreshPoolMint?: string
@@ -86,7 +83,7 @@ export interface LaunchpadState {
   createAndBuyAct: (
     data: {
       programId?: PublicKey
-      pair: Keypair
+      mint: string
 
       name: string
       uri: string
@@ -112,7 +109,6 @@ export interface LaunchpadState {
       unlockPeriod?: BN
 
       curveType?: number
-      onSignTx?: (tx: any) => any
     } & TxCallbackProps
   ) => Promise<{ txId: string; poolInfo?: LaunchpadPoolInfo }>
 
@@ -129,7 +125,6 @@ export interface LaunchpadState {
       shareFeeReceiver?: PublicKey
       configInfo?: LaunchpadConfigInfo
       platformFeeRate?: BN
-      onSignTx?: (tx: any) => any
     } & TxCallbackProps
   ) => Promise<string>
 
@@ -146,7 +141,6 @@ export interface LaunchpadState {
       shareFeeReceiver?: PublicKey
       configInfo?: LaunchpadConfigInfo
       platformFeeRate?: BN
-      onSignTx?: (tx: any) => any
     } & TxCallbackProps
   ) => Promise<string>
 
@@ -165,7 +159,6 @@ const initialState = {
   commentHost: process.env.NEXT_PUBLIC_LAUNCH_COMMENT_HOST || 'https://launch-forum-v1.raydium.io',
   historyHost: process.env.NEXT_PUBLIC_LAUNCH_HISTORY_HOST || 'https://launch-history-v1.raydium.io',
   mintHost: process.env.NEXT_PUBLIC_LAUNCH_MINT_HOST || 'https://launch-mint-v1.raydium.io',
-  backendHost: process.env.NEXT_PUBLIC_BACKEND_HOST || 'https://api.sherex.fun',
   platformId: process.env.NEXT_PUBLIC_PLATFORM_ID || 'FwKALh5mEfqWVPU24e5VXavydtnwb1veUi4Z3ShiYb8g',
   slippage: 0.025,
   configInfo: new Map()
@@ -213,7 +206,7 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
         totalLockedAmount: props.totalLockedAmount ? props.totalLockedAmount.toString() : LaunchpadPoolInitParam.totalLockedAmount,
         cliffPeriod: props.cliffPeriod ? props.cliffPeriod.toString() : LaunchpadPoolInitParam.cliffPeriod,
         unlockPeriod: props.unlockPeriod ? props.unlockPeriod.toString() : LaunchpadPoolInitParam.unlockPeriod,
-        platformId: get().platformId,
+        platformId: LaunchpadPoolInitParam.platformId,
         migrateType: props.migrateType || 'amm',
         description: props.description ?? ''
       },
@@ -270,7 +263,7 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
         totalLockedAmount: props.totalLockedAmount ? props.totalLockedAmount.toString() : LaunchpadPoolInitParam.totalLockedAmount,
         cliffPeriod: props.cliffPeriod ? props.cliffPeriod.toString() : LaunchpadPoolInitParam.cliffPeriod,
         unlockPeriod: props.unlockPeriod ? props.unlockPeriod.toString() : LaunchpadPoolInitParam.unlockPeriod,
-        platformId: get().platformId,
+        platformId: LaunchpadPoolInitParam.platformId,
         migrateType: props.migrateType || 'amm',
         description: props.description ?? ''
       },
@@ -288,7 +281,7 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
 
   createAndBuyAct: async ({
     programId = useAppStore.getState().programIdConfig.LAUNCHPAD_PROGRAM,
-    pair,
+    mint,
     name,
     symbol,
     uri,
@@ -310,7 +303,6 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
     totalLockedAmount,
     cliffPeriod,
     unlockPeriod,
-    onSignTx,
 
     ...callback
   }) => {
@@ -339,7 +331,7 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
 
     const { execute, transactions, extInfo } = await raydium.launchpad.createLaunchpad({
       programId,
-      mintA: pair.publicKey,
+      mintA: ToPublicKey(mint),
       mintBDecimals: mintBInfo.decimals,
       decimals,
       name,
@@ -347,8 +339,7 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
       uri,
       migrateType,
       buyAmount,
-      platformId: new PublicKey(get().platformId),
-      extraSigners: [pair],
+      platformId: LaunchpadPoolInitParam.platformId,
 
       shareFeeReceiver,
       shareFeeRate: shareFeeReceiver ? defaultShareFeeRate : undefined,
@@ -376,14 +367,14 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
       }
     }
 
-    const meta = getTxMeta({
+    let meta = getTxMeta({
       action: 'buy',
       values: {
         amountA: new Decimal(extInfo.outAmount.toString())
           .div(10 ** decimals)
           .toDecimalPlaces(decimals)
           .toString(),
-        symbolA: symbol || encodeStr(pair.publicKey.toBase58(), 5),
+        symbolA: symbol || encodeStr(mint, 5),
         amountB: new Decimal(buyAmount.toString())
           .div(10 ** mintBInfo.decimals)
           .toDecimalPlaces(mintBInfo.decimals)
@@ -395,161 +386,164 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
     let txId = ''
     const isV0Tx = txVersion === TxVersion.V0
     try {
-      const bothSignedTx = await onSignTx!(transactions[0]);
       // const txSignature = await connection
-      // const { signedTxs } = await execute({ notSendToRpc: false, sequentially: true })
-      // const { data } = await axios.post(
-      //   `${get().mintHost}/create/sendTransaction`,
-      //   { txs: [txToBase64(signedTxs[0])] },
-      //   { skipError: true }
-      // )
-      // const txBuf = Buffer.from(data.tx, 'base64')
-      // const bothSignedTx = VersionedTransaction.deserialize(txBuf as any)
+      const { signedTxs } = await execute({ notSendToRpc: false, sequentially: true })
+      const { data } = await axios.post(
+        `${get().mintHost}/create/sendTransaction`,
+        { txs: [txToBase64(signedTxs[0])] },
+        { skipError: true }
+      )
+      const txBuf = Buffer.from(data.tx, 'base64')
+      const bothSignedTx = VersionedTransaction.deserialize(txBuf as any)
 
-      if (isV0Tx) {
-        txId = await raydium.connection.sendTransaction(bothSignedTx as VersionedTransaction, { skipPreflight: true })
-      } else {
-        txId = await raydium.connection.sendRawTransaction(bothSignedTx.serialize(), { skipPreflight: true })
+       if (signedTxs.length < 2) {
+        if (isV0Tx) {
+          txId = await raydium.connection.sendTransaction(bothSignedTx as VersionedTransaction, { skipPreflight: true })
+        } else {
+          txId = await raydium.connection.sendRawTransaction(bothSignedTx.serialize(), { skipPreflight: true })
+        }
+        txStatusSubject.next({
+          txId,
+          ...callback,
+          ...meta,
+          signedTx: signedTxs[0],
+          onConfirmed: () => {
+            callback.onConfirmed?.()
+            useTokenAccountStore.getState().fetchTokenAccountAct({})
+            setTimeout(() => {
+              set({ refreshPoolMint: mint })
+              refreshChartSubject.next(mint)
+            }, 1000)
+          }
+        })
+        return { txId, poolInfo: extInfo.address }
       }
-      txStatusSubject.next({
-        txId,
+        
+        
+
+      signedTxs[0] = bothSignedTx
+      console.log('simulate tx string:', signedTxs.map(txToBase64))
+
+      const txLength = signedTxs.length
+      const { toastId, handler } = getDefaultToastData({
+        txLength,
         ...callback,
-        ...meta,
-        signedTx: transactions[0],
         onConfirmed: () => {
-          callback.onConfirmed?.()
+          setTimeout(() => {
+            callback.onConfirmed?.()
+          }, 1500)
+
           useTokenAccountStore.getState().fetchTokenAccountAct({})
           setTimeout(() => {
-            set({ refreshPoolMint: pair.publicKey.toBase58() })
-            refreshChartSubject.next(pair.publicKey.toBase58())
-          }, 1000)
+            set({ refreshPoolMint: mint })
+            refreshChartSubject.next(mint)
+          }, 2000)
         }
       })
-      return { txId, poolInfo: extInfo.address }
 
-      // signedTxs[0] = bothSignedTx
-      // console.log('simulate tx string:', signedTxs.map(txToBase64))
+      meta = getTxMeta({
+        action: 'launchBuy',
+        values: {
+          amountA: new Decimal(extInfo.outAmount.toString())
+            .div(10 ** decimals)
+            .toDecimalPlaces(decimals)
+            .toString(),
+          symbolA: symbol || encodeStr(mint, 5),
+          amountB: new Decimal(buyAmount.toString())
+            .div(10 ** mintBInfo.decimals)
+            .toDecimalPlaces(mintBInfo.decimals)
+            .toString(),
+          symbolB: wSolToSolString(mintBInfo.symbol)
+        }
+      })
 
-      // const txLength = signedTxs.length
-      // const { toastId, handler } = getDefaultToastData({
-      //   txLength,
-      //   ...callback,
-      //   onConfirmed: () => {
-      //     setTimeout(() => {
-      //       callback.onConfirmed?.()
-      //     }, 1500)
+      const processedId: {
+        txId: string
+        status: 'success' | 'error' | 'sent'
+        signedTx: Transaction | VersionedTransaction
+      }[] = []
 
-      //     useTokenAccountStore.getState().fetchTokenAccountAct({})
-      //     setTimeout(() => {
-      //       set({ refreshPoolMint: pair.publicKey.toBase58() })
-      //       refreshChartSubject.next(pair.publicKey.toBase58())
-      //     }, 2000)
-      //   }
-      // })
+      const getSubTxTitle = (idx: number) => {
+        return idx === 0 ? 'launchpad.create_token' : 'launchpad.buy_token_title'
+      }
 
-      // meta = getTxMeta({
-      //   action: 'launchBuy',
-      //   values: {
-      //     amountA: new Decimal(extInfo.outAmount.toString())
-      //       .div(10 ** decimals)
-      //       .toDecimalPlaces(decimals)
-      //       .toString(),
-      //     symbolA: symbol || encodeStr(pair.publicKey.toBase58(), 5),
-      //     amountB: new Decimal(buyAmount.toString())
-      //       .div(10 ** mintBInfo.decimals)
-      //       .toDecimalPlaces(mintBInfo.decimals)
-      //       .toString(),
-      //     symbolB: wSolToSolString(mintBInfo.symbol)
-      //   }
-      // })
+      let i = 0
+      const checkSendTx = async (): Promise<void> => {
+        if (!signedTxs[i]) return
+        const tx = signedTxs[i]
+        const txId = !isV0Tx
+          ? await raydium.connection.sendRawTransaction(tx.serialize(), { skipPreflight: true, maxRetries: 0 })
+          : await raydium.connection.sendTransaction(tx as VersionedTransaction, { skipPreflight: true, maxRetries: 0 })
+        processedId.push({ txId, signedTx: tx, status: 'sent' })
 
-      // const processedId: {
-      //   txId: string
-      //   status: 'success' | 'error' | 'sent'
-      //   signedTx: Transaction | VersionedTransaction
-      // }[] = []
+        let timeout = 0
+        let intervalId = 0
+        let intervalCount = 0
 
-      // const getSubTxTitle = (idx: number) => {
-      //   return idx === 0 ? 'launchpad.create_token' : 'launchpad.buy_token_title'
-      // }
+        const cbk = (signatureResult: SignatureResult) => {
+          window.clearTimeout(timeout)
+          window.clearInterval(intervalId)
+          const targetTxIdx = processedId.findIndex((tx) => tx.txId === txId)
+          if (targetTxIdx > -1) processedId[targetTxIdx].status = signatureResult.err ? 'error' : 'success'
+          handleMultiTxRetry(processedId)
+          handleMultiTxToast({
+            toastId,
+            processedId: processedId.map((p) => ({ ...p, status: p.status === 'sent' ? 'info' : p.status })),
+            txLength,
+            meta,
+            isSwap: true,
+            handler,
+            getSubTxTitle
+          })
+          if (!signatureResult.err) checkSendTx()
+        }
 
-      // let i = 0
-      // const checkSendTx = async (): Promise<void> => {
-      //   if (!signedTxs[i]) return
-      //   const tx = signedTxs[i]
-      //   const txId = !isV0Tx
-      //     ? await raydium.connection.sendRawTransaction(tx.serialize(), { skipPreflight: true, maxRetries: 0 })
-      //     : await raydium.connection.sendTransaction(tx as VersionedTransaction, { skipPreflight: true, maxRetries: 0 })
-      //   processedId.push({ txId, signedTx: tx, status: 'sent' })
+        const subId = raydium.connection.onSignature(txId, cbk, 'processed')
+        raydium.connection.getSignatureStatuses([txId])
 
-      //   let timeout = 0
-      //   let intervalId = 0
-      //   let intervalCount = 0
+        intervalId = window.setInterval(async () => {
+          const targetTxIdx = processedId.findIndex((tx) => tx.txId === txId)
+          if (intervalCount++ > TOAST_DURATION / 2000 || processedId[targetTxIdx].status !== 'sent') {
+            window.clearInterval(intervalId)
+            return
+          }
+          try {
+            const r = await raydium.connection.getTransaction(txId, {
+              commitment: 'confirmed',
+              maxSupportedTransactionVersion: TxVersion.V0
+            })
+            if (r) {
+              console.log('tx status from getTransaction:', txId)
+              cbk({ err: r.meta?.err || null })
+              window.clearInterval(intervalId)
+              useTokenAccountStore.getState().fetchTokenAccountAct({ commitment: useAppStore.getState().commitment })
+            }
+          } catch (e) {
+            console.error('getTransaction timeout:', e, txId)
+            window.clearInterval(intervalId)
+          }
+        }, 2000)
 
-      //   const cbk = (signatureResult: SignatureResult) => {
-      //     window.clearTimeout(timeout)
-      //     window.clearInterval(intervalId)
-      //     const targetTxIdx = processedId.findIndex((tx) => tx.txId === txId)
-      //     if (targetTxIdx > -1) processedId[targetTxIdx].status = signatureResult.err ? 'error' : 'success'
-      //     handleMultiTxRetry(processedId)
-      //     handleMultiTxToast({
-      //       toastId,
-      //       processedId: processedId.map((p) => ({ ...p, status: p.status === 'sent' ? 'info' : p.status })),
-      //       txLength,
-      //       meta,
-      //       isSwap: true,
-      //       handler,
-      //       getSubTxTitle
-      //     })
-      //     if (!signatureResult.err) checkSendTx()
-      //   }
+        handleMultiTxRetry(processedId)
+        handleMultiTxToast({
+          toastId,
+          processedId: processedId.map((p) => ({ ...p, status: p.status === 'sent' ? 'info' : p.status })),
+          txLength,
+          meta,
+          isSwap: true,
+          handler,
+          getSubTxTitle
+        })
 
-      //   const subId = raydium.connection.onSignature(txId, cbk, 'processed')
-      //   raydium.connection.getSignatureStatuses([txId])
+        timeout = window.setTimeout(() => {
+          raydium.connection.removeSignatureListener(subId)
+        }, TOAST_DURATION)
 
-      //   intervalId = window.setInterval(async () => {
-      //     const targetTxIdx = processedId.findIndex((tx) => tx.txId === txId)
-      //     if (intervalCount++ > TOAST_DURATION / 2000 || processedId[targetTxIdx].status !== 'sent') {
-      //       window.clearInterval(intervalId)
-      //       return
-      //     }
-      //     try {
-      //       const r = await raydium.connection.getTransaction(txId, {
-      //         commitment: 'confirmed',
-      //         maxSupportedTransactionVersion: TxVersion.V0
-      //       })
-      //       if (r) {
-      //         console.log('tx status from getTransaction:', txId)
-      //         cbk({ err: r.meta?.err || null })
-      //         window.clearInterval(intervalId)
-      //         useTokenAccountStore.getState().fetchTokenAccountAct({ commitment: useAppStore.getState().commitment })
-      //       }
-      //     } catch (e) {
-      //       console.error('getTransaction timeout:', e, txId)
-      //       window.clearInterval(intervalId)
-      //     }
-      //   }, 2000)
+        i++
+      }
+      checkSendTx()
 
-      //   handleMultiTxRetry(processedId)
-      //   handleMultiTxToast({
-      //     toastId,
-      //     processedId: processedId.map((p) => ({ ...p, status: p.status === 'sent' ? 'info' : p.status })),
-      //     txLength,
-      //     meta,
-      //     isSwap: true,
-      //     handler,
-      //     getSubTxTitle
-      //   })
-
-      //   timeout = window.setTimeout(() => {
-      //     raydium.connection.removeSignatureListener(subId)
-      //   }, TOAST_DURATION)
-
-      //   i++
-      // }
-      // checkSendTx()
-
-      // return { txId: '' }
+      return { txId: '' }
     } catch (e: any) {
       const errorMsg = e.response?.data?.msg
       callback.onError?.()
@@ -572,7 +566,6 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
     shareFeeReceiver,
     configInfo,
     platformFeeRate,
-    onSignTx,
     onSent,
     onConfirmed,
     onError,
@@ -581,7 +574,7 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
     const { raydium, txVersion } = useAppStore.getState()
     if (!raydium) return ''
 
-    const { execute, transaction, extInfo } = await raydium.launchpad.buyToken({
+    const { execute, extInfo } = await raydium.launchpad.buyToken({
       programId,
       mintA: ToPublicKey(mintInfo.mint),
       txVersion,
@@ -612,31 +605,6 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
       }
     })
 
-    const signedTx = await onSignTx!(transaction);
-
-    const isV0Tx = txVersion === TxVersion.V0
-
-    let txId;
-
-    if (isV0Tx) {
-      txId = await raydium.connection.sendTransaction(signedTx as VersionedTransaction, { skipPreflight: true })
-    } else {
-      txId = await raydium.connection.sendRawTransaction(signedTx.serialize(), { skipPreflight: true })
-    }
-
-    txStatusSubject.next({
-      txId,
-      ...meta,
-      signedTx,
-      onSent,
-      onError,
-      onConfirmed: () => {
-        onConfirmed?.()
-        useTokenAccountStore.getState().fetchTokenAccountAct({})
-      }
-    })
-
-    return txId
 
     return execute()
       .then(({ txId, signedTx }) => {
@@ -673,7 +641,6 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
     shareFeeReceiver,
     configInfo,
     platformFeeRate,
-    onSignTx,
     onSent,
     onConfirmed,
     onError,
@@ -682,7 +649,7 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
     const { raydium, txVersion } = useAppStore.getState()
     if (!raydium) return ''
 
-    const { execute, transaction, extInfo } = await raydium.launchpad.sellToken({
+    const { execute, extInfo } = await raydium.launchpad.sellToken({
       programId,
       authProgramId: getPdaLaunchpadAuth(programId).publicKey,
       mintA: ToPublicKey(mintInfo.mint),
@@ -713,32 +680,6 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
         symbolB: symbolB ?? 'SOL'
       }
     })
-
-    const signedTx = await onSignTx!(transaction);
-
-    const isV0Tx = txVersion === TxVersion.V0
-
-    let txId;
-
-    if (isV0Tx) {
-      txId = await raydium.connection.sendTransaction(signedTx as VersionedTransaction, { skipPreflight: true })
-    } else {
-      txId = await raydium.connection.sendRawTransaction(signedTx.serialize(), { skipPreflight: true })
-    }
-
-    txStatusSubject.next({
-      txId,
-      ...meta,
-      signedTx,
-      onSent,
-      onError,
-      onConfirmed: () => {
-        onConfirmed?.()
-        useTokenAccountStore.getState().fetchTokenAccountAct({})
-      }
-    })
-
-    return txId;
 
     return execute()
       .then(({ txId, signedTx }) => {

@@ -20,7 +20,7 @@ import { useDisclosure } from '@/hooks/useDelayDisclosure'
 import { useLaunchpadStore } from '@/store'
 import shallow from 'zustand/shallow'
 import { LaunchpadPoolInfo, Curve, LaunchpadPoolInitParam } from '@raydium-io/raydium-sdk-v2'
-import { Keypair, PublicKey } from '@solana/web3.js'
+import { Keypair } from '@solana/web3.js'
 import BN from 'bn.js'
 import Decimal from 'decimal.js'
 import { useEvent } from '@/hooks/useEvent'
@@ -31,10 +31,10 @@ import Turnstile, { ActionRef } from '@/components/Turnstile'
 import { useLaunchPadShareInfo, useReferrerQuery } from '@/views/Launchpad/utils'
 import { ToLaunchPadConfig } from '@/hooks/launchpad/utils'
 import { usePlatformInfo } from '@/hooks/launchpad/usePlatformInfo'
-import { useWallet } from '@solana/wallet-adapter-react'
+// import { useWallet } from '@solana/wallet-adapter-react'
 
 export const InitialBuyDialog = ({ setIsOpen, configInfo, ...mintData }: DialogProps<InitialBuyDialogProps>) => {
-  const { signTransaction } = useWallet();
+  // const { signTransaction } = useWallet();
   const { colorMode } = useColorMode()
   const isLight = colorMode === 'light'
   const { isOpen: isLoading, onOpen: onLoading, onClose: offLoading } = useDisclosure()
@@ -48,7 +48,7 @@ export const InitialBuyDialog = ({ setIsOpen, configInfo, ...mintData }: DialogP
   const [poolInfo, setPoolInfo] = useState<LaunchpadPoolInfo>()
   const referrerQuery = useReferrerQuery('&')
   const { wallet, shareFeeRate } = useLaunchPadShareInfo()
-  const platformInfo = usePlatformInfo({ platformId: new PublicKey(useLaunchpadStore.getState().platformId) })
+  const platformInfo = usePlatformInfo({ platformId: LaunchpadPoolInitParam.platformId })
 
   const [amount, setAmount] = useState('')
   const amountRef = useRef('')
@@ -78,7 +78,7 @@ export const InitialBuyDialog = ({ setIsOpen, configInfo, ...mintData }: DialogP
   useEffect(() => {
     async function getTempInfo() {
       const { poolInfo } = await createAndBuyAct({
-        pair: Keypair.generate(),
+        mint: Keypair.generate().publicKey.toBase58(),
         symbol: mintData.ticker,
         mintBInfo: configInfo.mintInfoB,
         configInfo: ToLaunchPadConfig(configInfo.key),
@@ -87,7 +87,6 @@ export const InitialBuyDialog = ({ setIsOpen, configInfo, ...mintData }: DialogP
         decimals: 6,
         buyAmount: new BN(1),
         notExecute: true,
-        onSignTx: signTransaction,
         ...mintData
       })
 
@@ -121,7 +120,7 @@ export const InitialBuyDialog = ({ setIsOpen, configInfo, ...mintData }: DialogP
 
       await createAndBuyAct({
         ...mintData,
-        pair,
+        mint: tempMintData.mint,
         uri: tempMintData.metadataLink,
         name: mintData.name,
         symbol: mintData.ticker,
@@ -133,9 +132,8 @@ export const InitialBuyDialog = ({ setIsOpen, configInfo, ...mintData }: DialogP
         slippage: new BN((useLaunchpadStore.getState().slippage * 10000).toFixed(0)),
         migrateType: mintData.migrateType || 'amm',
         shareFeeReceiver: wallet,
-        onSignTx: signTransaction,
         onConfirmed: () => {
-          router.push(`/token?mint=${pair.publicKey.toBase58()}&fromCreate=true${referrerQuery}`)
+          router.push(`/token?mint=${tempMintData.mint}&fromCreate=true${referrerQuery}`)
         }
       })
       setIsOpen(false)
@@ -179,51 +177,20 @@ export const InitialBuyDialog = ({ setIsOpen, configInfo, ...mintData }: DialogP
     }
     try {
       // mint B check
-      const tempMintData = await createRandomMintAct({
-        ...mintData,
-        configId: configInfo.key.pubKey,
-        symbol: mintData.ticker
-      })
-      if (!tempMintData) {
-        toastSubject.next({})
-        return
-      }
-
-      const pair = Keypair.generate()
-
-      await createAndBuyAct({
-        ...mintData,
-        pair,
-        uri: tempMintData.metadataLink,
-        name: mintData.name,
-        symbol: mintData.ticker,
-        decimals: 6,
-        mintBInfo: configInfo.mintInfoB,
-        buyAmount: new BN(0),
-        configInfo: ToLaunchPadConfig(configInfo.key),
-        configId: configInfo.key.pubKey,
-        slippage: new BN((useLaunchpadStore.getState().slippage * 10000).toFixed(0)),
-        migrateType: mintData.migrateType || 'amm',
-        shareFeeReceiver: wallet,
-        onSignTx: signTransaction,
-        onConfirmed: () => {
-          router.push(`/token?mint=${pair.publicKey.toBase58()}&fromCreate=true${referrerQuery}`)
-        }
-      })
       
-      // const mint = await createMintAct({
-      //   ...mintData,
-      //   configId: configInfo.key.pubKey,
-      //   symbol: mintData.ticker,
-      //   cfToken: turnstile
-      // })
+      const mint = await createMintAct({
+        ...mintData,
+        configId: configInfo.key.pubKey,
+        symbol: mintData.ticker,
+        cfToken: turnstile
+      })
 
-      // toastSubject.next({
-      //   status: 'success',
-      //   title: 'Token Initialized',
-      //   description: 'Token init successfully'
-      // })
-      // router.push(`/token?mint=${mint}${referrerQuery}`)
+      toastSubject.next({
+        status: 'success',
+        title: 'Token Initialized',
+        description: 'Token init successfully'
+      })
+      router.push(`/token?mint=${mint}${referrerQuery}`)
 
       setIsOpen(false)
     } catch (e: any) {
@@ -256,12 +223,12 @@ export const InitialBuyDialog = ({ setIsOpen, configInfo, ...mintData }: DialogP
       >
         <Flex justifyContent="space-between" alignItems="center">
           <Text fontSize="xl" fontWeight="medium">
-            You Should Initial Buy.
+            Will You Initial Buy?
           </Text>
           <ModalCloseButton position="static" />
         </Flex>
         <ModalBody mt={8}>
-          <Text color={colors.lightPurple}>Buying a small amount of tokens helps protect your token from snipers. (This is required.)</Text>
+          <Text color={colors.lightPurple}>Buying a small amount of tokens helps protect your token from snipers. (This is optional.)</Text>
           <Grid rowGap={3} mt={7} mb={4}>
             <Flex
               justifyContent="space-between"
@@ -333,7 +300,7 @@ export const InitialBuyDialog = ({ setIsOpen, configInfo, ...mintData }: DialogP
           >
             Create & Buy
           </Button>
-          {/* <Button
+          <Button
             width="100%"
             height="3rem"
             variant="outline"
@@ -344,7 +311,7 @@ export const InitialBuyDialog = ({ setIsOpen, configInfo, ...mintData }: DialogP
             onClick={handleClickInitOnly}
           >
             Just Create
-          </Button> */}
+          </Button>
         </ModalFooter>
       </ModalContent>
     </Modal>

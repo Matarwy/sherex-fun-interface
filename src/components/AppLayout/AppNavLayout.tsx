@@ -128,6 +128,10 @@ function AppNavLayout({
           </HStack>
         </Mobile>
         <Flex gap={[0.5, 2]} align="center">
+          {/* <TorqueButton /> */}
+          <PriorityButton />
+          <SettingsMenu />
+          {/* <EVMWallet />  don't need currently yet*/}
           <SolWallet />
         </Flex>
       </HStack>
@@ -452,8 +456,8 @@ function SettingsMenuModalContent(props: { isOpen: boolean; triggerRef: React.Re
           <VersionedTransactionSettingField />
           <Divider />
           <DefaultExplorerSettingField />
-          <Divider />
-          <ColorThemeSettingField />
+          {/* <Divider />
+          <ColorThemeSettingField /> */}
           <Divider />
           <RPCConnectionSettingField />
         </ModalBody>

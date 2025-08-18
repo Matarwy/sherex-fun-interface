@@ -52,7 +52,7 @@ export default class DataFeed {
       urlConfigs: { BASE_HOST, MINT_INFO_ID }
     } = useAppStore.getState()
     console.log('[resolveSymbol]: Method call birdeye', symbolName)
-    const [mintAAdress, mintBAdress] = symbolName.split('_')
+    const [mintAAdress, mintBAdress, ext] = symbolName.split('_')
     if (!mintAAdress || !mintBAdress) {
       console.log('[resolveSymbol]: cannot resolve symbol', { mintAAdress, mintBAdress })
       onResolveErrorCallback('cannot resolve symbol')
@@ -97,9 +97,11 @@ export default class DataFeed {
 
     const tickerName = `${wSolToSolString(mintA.symbol || encodeStr(mintAAdress, 4))}-${wSolToSolString(
       mintB.symbol || encodeStr(mintBAdress, 4)
-    )}`
+    )}${ext ? ` ${ext}` : ''}`
+    const isMarketCap = ext === 'marketcap' && this._mintInfo
+
     const symbolInfo = {
-      poolId: '',
+      poolId: `${mintAAdress}_${mintBAdress}`,
       mintA: mintAAdress,
       mintB: mintBAdress,
       ticker: tickerName,
@@ -110,7 +112,7 @@ export default class DataFeed {
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone as Timezone,
       exchange: 'birdeye',
       minmov: 1,
-      pricescale: 10 ** Math.max(mintA.decimals!, mintB.decimals!),
+      pricescale: 10 ** (isMarketCap ? 2 : Math.max(mintA.decimals!, mintB.decimals!)),
       has_intraday: true,
       has_no_volume: true,
       has_weekly_and_monthly: false,
@@ -118,7 +120,7 @@ export default class DataFeed {
       volume_precision: 4,
       listed_exchange: 'Raydium',
       format: 'price' as SeriesFormat,
-      decimals: this._mintInfo ? Math.max(mintA.decimals!, mintB.decimals!) : Math.min(mintA.decimals!, mintB.decimals!)
+      decimals: this._mintInfo ? (isMarketCap ? 2 : Math.max(mintA.decimals!, mintB.decimals!)) : Math.min(mintA.decimals!, mintB.decimals!)
     }
     console.log('[resolveSymbol]: Symbol resolved', symbolInfo)
     onSymbolResolvedCallback(symbolInfo)
@@ -136,10 +138,12 @@ export default class DataFeed {
     const timeUnit = ResolutionToSeconds[resolution as keyof typeof ResolutionToSeconds]
     try {
       const frame = timeUnit >= ResolutionToSeconds['1D'] ? resolution : timeUnit <= ResolutionToSeconds['15'] ? `${resolution}m` : '15m'
+      const isMarketCap = symbolInfo.name.includes('marketcap') && this._mintInfo
+      const quoteAddress = isMarketCap ? 'EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v' : solToWSol(symbolInfo.mintB)
       const { data } = await axios.get(
-        `https://birdeye-proxy.raydium.io/defi/ohlcv/base_quote?base_address=${solToWSol(symbolInfo.mintA)}&quote_address=${solToWSol(
-          symbolInfo.mintB
-        )}&type=${frame}&time_from=${from}&time_to=${to}`
+        `https://birdeye-proxy.raydium.io/defi/ohlcv/base_quote?base_address=${solToWSol(
+          symbolInfo.mintA
+        )}&quote_address=${quoteAddress}&type=${frame}&time_from=${from}&time_to=${to}`
       )
 
       if (!data?.items.length) {
@@ -159,14 +163,14 @@ export default class DataFeed {
             bars.push(currentBar)
             currentBar = undefined
           }
-
+          const multiplier = isMarketCap ? this._mintInfo!.supply : 1
           if (!currentBar) {
             currentBar = {
               time: barTime * 1000,
-              low: bar.l,
-              high: bar.h,
-              open: bar.o,
-              close: bar.c,
+               low: bar.l * multiplier,
+              high: bar.h * multiplier,
+              open: bar.o * multiplier,
+              close: bar.c * multiplier,
               volume: bar.vQuote
             }
             return
@@ -174,9 +178,9 @@ export default class DataFeed {
           currentBar = {
             ...currentBar,
             volume: (currentBar.volume || 0) + (bar.vQuote || 0),
-            close: bar.c,
-            low: Math.min(bar.l, currentBar.low),
-            high: Math.max(bar.h, currentBar.high)
+            close: bar.c * multiplier,
+            low: Math.min(bar.l * multiplier, currentBar.low),
+            high: Math.max(bar.h * multiplier, currentBar.high)
           }
         }
       })

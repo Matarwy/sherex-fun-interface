@@ -154,7 +154,7 @@ const appInitState = {
     userAdded: true
   },
   featureDisabled: {},
-  txVersion: TxVersion.V0,
+  txVersion: TxVersion.LEGACY,
   appVersion: 'V3.0.2',
   needRefresh: false,
   tokenAccLoaded: false,

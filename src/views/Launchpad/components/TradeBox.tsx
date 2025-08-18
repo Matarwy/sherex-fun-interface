@@ -225,7 +225,7 @@ export default function TradeBox({
         if (!isMintCreated) {
           const pair = Keypair.generate();
           await createAndBuyAct({
-            pair,
+            mint: mintInfo.mint,
             uri: mintInfo.metadataUrl,
             name: mintInfo.name,
             symbol: mintInfo.symbol,
@@ -240,8 +240,6 @@ export default function TradeBox({
             platformFeeRate: new BN(mintInfo.platformInfo.feeRate),
             totalSellA: new BN(mintInfo.totalSellA),
             totalFundRaisingB: new BN(mintInfo.totalFundRaisingB),
-
-            onSignTx: signTransaction,
 
             onConfirmed,
             onFinally: offLoading
@@ -260,7 +258,6 @@ export default function TradeBox({
 
           configInfo: ToLaunchPadConfig(mintInfo.configInfo),
           platformFeeRate: new BN(mintInfo.platformInfo.feeRate),
-          onSignTx: signTransaction,
           onConfirmed,
           onFinally: offLoading
         })
@@ -276,7 +273,6 @@ export default function TradeBox({
         shareFeeReceiver: wallet,
         configInfo: ToLaunchPadConfig(mintInfo.configInfo),
         platformFeeRate: new BN(mintInfo.platformInfo.feeRate),
-        onSignTx: signTransaction,
         onConfirmed,
         onFinally: offLoading
       })

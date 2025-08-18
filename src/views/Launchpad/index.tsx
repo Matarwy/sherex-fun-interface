@@ -15,16 +15,16 @@ import {
 } from '@chakra-ui/react'
 import Link from 'next/link'
 import { colors } from '@/theme/cssVariables/colors'
-import { SherexCoinList, CoinListActionRef } from './SherexCoinList'
+import { CoinList, CoinListActionRef } from './CoinList'
 import { MetasList } from './components/MetasList'
-// import { SearchInput, OnSearchChangeData } from './components/SearchInput'
-import { SearchInput, OnSearchChangeData } from './components/SherexSearchInput'
+import { SearchInput, OnSearchChangeData } from './components/SearchInput'
+// import { SearchInput, OnSearchChangeData } from './components/SherexSearchInput'
 import { TopSpotCard } from './components/TopSpotCard'
 import { DropdownSelectMenu } from '@/components/DropdownSelectMenu'
 import RefreshIcon from '@/icons/misc/RefreshIcon'
 import UserIcon from '@/icons/misc/UserIcon'
 import SearchIcon from '@/icons/misc/SearchIcon'
-import { MintSortField } from '@/hooks/launchpad/useSherexMintList'
+import { MintSortField } from '@/hooks/launchpad/useMintList'
 import { useRef, useState, ChangeEvent, useCallback } from 'react'
 import { useRouteQuery } from '@/utils/routeTools'
 import { useDisclosure } from '@/hooks/useDelayDisclosure'
@@ -37,7 +37,7 @@ import MoreListControllers from '@/icons/misc/MoreListControllers'
 import { useStateWithUrl } from '@/hooks/useStateWithUrl'
 import useResponsive from '@/hooks/useResponsive'
 import { useEvent } from '@/hooks/useEvent'
-import { MintInfo, SherexMintInfo } from './type'
+import { MintInfo } from './type'
 import { useAppStore } from '@/store'
 import { X } from 'react-feather'
 import { useLocalStorage } from '@/hooks/useLocalStorage'
@@ -46,11 +46,11 @@ import PlatformButton from './components/PlatformButton'
 import { TopMobileCarousel } from './components/TopMobileCarousel'
 
 const DropdownItems = [
-  // { label: 'Featured', value: MintSortField.Featured },
+  { label: 'Featured', value: MintSortField.Featured },
   { label: 'Last Trade', value: MintSortField.LastTrade },
   { label: 'New', value: MintSortField.New },
   { label: 'Market cap', value: MintSortField.MarketCap },
-  // { label: 'Finish Rate', value: MintSortField.FinishRate }
+  { label: 'Finish Rate', value: MintSortField.FinishRate }
 ]
 
 export default function Launchpad() {
@@ -60,7 +60,7 @@ export default function Launchpad() {
   const [sort, setSort] = useState(querySort || MintSortField.LastTrade)
   const [isSearch, setIsSearch] = useState(false)
   const searchInputRef = useRef<HTMLInputElement>(null)
-  const searchResultRef = useRef<SherexMintInfo[]>([])
+  const searchResultRef = useRef<MintInfo[]>([])
   const timeRef = useRef(Date.now())
   const referrerQuery = useReferrerQuery('?')
 
@@ -139,10 +139,10 @@ export default function Launchpad() {
       openMobileSearch()
     }
 
-    if (!!props.searchTerm && props.data !== searchResultRef.current) setSort(MintSortField.MarketCap)
+    if (isSearch && props.data !== searchResultRef.current) setSort(MintSortField.MarketCap)
     searchResultRef.current = props.data
     actionRef.current.onSearchChange({
-      isSearch: !!props.searchTerm,
+      isSearch,
       ...props
     })
   })
@@ -228,7 +228,7 @@ export default function Launchpad() {
         </Box>
       )}
       <Grid gap={[2, 5]}>
-        {/* <Flex justifyContent="space-evenly" alignItems="center">
+        <Flex justifyContent="space-evenly" alignItems="center">
           {(isDesktopMedium || isDesktopLarge) && (
             <AnimatedCardStack
               items={topLastTrade.map((d) => d.mintInfo)}
@@ -293,12 +293,12 @@ export default function Launchpad() {
               />
             </>
           )}
-        </Flex> */}
+        </Flex>
         {isMobile ? (
           <>
-            {/* <TopMobileCarousel indexTopMint={indexTopMint} lastTrade={topLastTrade[0]} /> */}
+            <TopMobileCarousel indexTopMint={indexTopMint} lastTrade={topLastTrade[0]} />
             <Flex direction="column" gap={3}>
-              {/* <Flex justifyContent="space-between" alignItems="center">
+              <Flex justifyContent="space-between" alignItems="center">
                 <DropdownSelectMenu
                   placement="bottom-end"
                   triggerSx={{
@@ -358,7 +358,7 @@ export default function Launchpad() {
                     Launch token
                   </Button>
                 </Link>
-              </Flex> */}
+              </Flex>
               <Flex justifyContent="space-between" alignItems="center">
                 <Flex gap={3}>
                   <DropdownSelectMenu
@@ -393,15 +393,15 @@ export default function Launchpad() {
                     onMetaSelected={(val) => setMeta(val as any)}
                     activeMeta={meta}
                     metas={[
-                      // {
-                      //   word: 'heating',
-                      //   word_with_strength: (
-                      //     <Flex alignItems="center" gap={[0, '10px', '10px']}>
-                      //       {/* <Text fontSize="sm">Heating up</Text> */}
-                      //       🔥
-                      //     </Flex>
-                      //   )
-                      // },
+                      {
+                        word: 'heating',
+                        word_with_strength: (
+                          <Flex alignItems="center" gap={[0, '10px', '10px']}>
+                            {/* <Text fontSize="sm">Heating up</Text> */}
+                            🔥
+                          </Flex>
+                        )
+                      },
                       {
                         word: 'watch_list',
                         word_with_strength: (
@@ -438,7 +438,7 @@ export default function Launchpad() {
                       <SearchIcon color={colors.textQuaternary} opacity={0.5} width="16px" height="16px" />
                     </Button>
                   )}
-                  {/* <Button
+                  <Button
                     onClick={() => {
                       toggleCollapse()
                     }}
@@ -447,7 +447,7 @@ export default function Launchpad() {
                     isActive={isCollapseOpen}
                   >
                     <MoreListControllers color={colors.textSecondary} width={listControllerIconSize} height={listControllerIconSize} />
-                  </Button> */}
+                  </Button>
                 </Flex>
               </Flex>
               {isMobileSearchOpen && (
@@ -509,16 +509,16 @@ export default function Launchpad() {
                   onMetaSelected={(val) => setMeta(val as any)}
                   activeMeta={meta}
                   metas={[
-                    // {
-                    //   word: 'heating',
-                    //   word_with_strength: (
-                    //     <Flex alignItems="center" gap="10px">
-                    //       {isDesktopSmall ? <Text fontSize="sm">Heating up</Text> : null}Heating up
-                    //       🔥
-                    //       {/* Heating up */}
-                    //     </Flex>
-                    //   )
-                    // },
+                    {
+                      word: 'heating',
+                      word_with_strength: (
+                        <Flex alignItems="center" gap="10px">
+                          {isDesktopSmall ? <Text fontSize="sm">Heating up</Text> : null}Heating up
+                          🔥
+                          {/* Heating up */}
+                        </Flex>
+                      )
+                    },
                     {
                       word: 'watch_list',
                       word_with_strength: (
@@ -594,7 +594,7 @@ export default function Launchpad() {
           </Flex>
         </Flex>
       </Collapse>
-      <SherexCoinList
+      <CoinList
         actionRef={actionRef}
         sort={sort}
         meta={meta}

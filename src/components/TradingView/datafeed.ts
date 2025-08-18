@@ -8,6 +8,7 @@ import { NATIVE_MINT } from '@solana/spl-token'
 import { initPoolPriceDecimal } from './utils'
 import { MintInfo } from '@/views/Launchpad/type'
 import { ApiV3Token } from '@raydium-io/raydium-sdk-v2'
+import { wSolToSolString } from '@/utils/token'
 
 interface TradeData {
   c: number
@@ -73,13 +74,14 @@ export default class DataFeed {
     }
     const mintDecimal = Number(this._mintInfo.decimals)
     const decimals = 9 + Math.floor(mintDecimal / 2)
+     const symbolB = wSolToSolString(this._mintBInfo?.symbol ?? 'SOL')
     const symbolInfo = {
       poolId: symbolName,
       mintA: this._mintInfo?.mint ?? 'mintA',
       mintB: this._mintBInfo?.address || NATIVE_MINT.toBase58(),
-      ticker: `${this._mintInfo.symbol}-${this._mintBInfo?.symbol ?? 'SOL'}`,
-      name: `${this._mintInfo.symbol}-${this._mintBInfo?.symbol ?? 'SOL'}`,
-      description: `${this._mintInfo.symbol}-${this._mintBInfo?.symbol ?? 'SOL'} pool`,
+      ticker: `${this._mintInfo.symbol}-${symbolB}`,
+      name: `${this._mintInfo.symbol}-${symbolB}`,
+      description: `${this._mintInfo.symbol}-${symbolB} pool`,
       type: 'Raydium Lauchpad pool',
       session: '24x7',
       timezone: Intl.DateTimeFormat().resolvedOptions().timeZone as Timezone,
