@@ -47,6 +47,7 @@ export interface LaunchpadState {
   historyHost: string
   mintHost: string
   slippage: number
+  platformId: string
 
   refreshPoolMint?: string
   configInfo: Map<string, LaunchpadConfigInfo>
@@ -206,7 +207,7 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
         totalLockedAmount: props.totalLockedAmount ? props.totalLockedAmount.toString() : LaunchpadPoolInitParam.totalLockedAmount,
         cliffPeriod: props.cliffPeriod ? props.cliffPeriod.toString() : LaunchpadPoolInitParam.cliffPeriod,
         unlockPeriod: props.unlockPeriod ? props.unlockPeriod.toString() : LaunchpadPoolInitParam.unlockPeriod,
-        platformId: LaunchpadPoolInitParam.platformId,
+        platformId: get().platformId,
         migrateType: props.migrateType || 'amm',
         description: props.description ?? ''
       },
@@ -263,7 +264,7 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
         totalLockedAmount: props.totalLockedAmount ? props.totalLockedAmount.toString() : LaunchpadPoolInitParam.totalLockedAmount,
         cliffPeriod: props.cliffPeriod ? props.cliffPeriod.toString() : LaunchpadPoolInitParam.cliffPeriod,
         unlockPeriod: props.unlockPeriod ? props.unlockPeriod.toString() : LaunchpadPoolInitParam.unlockPeriod,
-        platformId: LaunchpadPoolInitParam.platformId,
+        platformId: get().platformId,
         migrateType: props.migrateType || 'amm',
         description: props.description ?? ''
       },
@@ -339,7 +340,7 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
       uri,
       migrateType,
       buyAmount,
-      platformId: LaunchpadPoolInitParam.platformId,
+      platformId: new PublicKey(get().platformId),
 
       shareFeeReceiver,
       shareFeeRate: shareFeeReceiver ? defaultShareFeeRate : undefined,

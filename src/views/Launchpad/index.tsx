@@ -361,7 +361,7 @@ export default function Launchpad() {
               </Flex>
               <Flex justifyContent="space-between" alignItems="center">
                 <Flex gap={3}>
-                  <DropdownSelectMenu
+                  {/* <DropdownSelectMenu
                     placement="bottom-end"
                     triggerSx={{
                       width: '8.625rem',
@@ -388,7 +388,7 @@ export default function Launchpad() {
                     ]}
                     value={sort}
                     onValueChange={setSort}
-                  />
+                  /> */}
                   <MetasList
                     onMetaSelected={(val) => setMeta(val as any)}
                     activeMeta={meta}

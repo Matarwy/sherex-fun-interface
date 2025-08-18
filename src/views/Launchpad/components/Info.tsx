@@ -416,7 +416,7 @@ export default function Info({
           <Flex alignItems="center" justifyContent="space-between" gap={1}>
             Platform:
             <Flex alignItems="center" gap="1">
-              <Image width="16px" src="/logo.png" /> Sherex.Fun
+              <Image width="16px" src="logo.png" /> Sherex.Fun
               <a href={`${explorerUrl}/account/${mintInfo.mint}`} target="_blank" rel="noreferrer">
                 <ExternalLink width="14px" height="14px" />
               </a>
