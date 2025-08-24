@@ -132,8 +132,22 @@ export const InitialBuyDialog = ({ setIsOpen, configInfo, ...mintData }: DialogP
 
       const mintKp = Keypair.generate()
       const mint = mintKp.publicKey.toBase58()
+      console.log("mint======>", mint)
+
+      // if (!tempMintData) {
+      //   toastSubject.next({})
+      //   return
+      // }
+
+      // console.log("tempMintData======>", tempMintData)
+
+      
+      console.log("amount======>", amount)
+      // let _amount = 0.0001
 
       const buyAmount = new BN(new Decimal(amount).mul(10 ** 9).toString())
+      console.log("buyAmount======>", buyAmount.toString())
+      console.log("before callilng here..");
       await createAndBuyAct({
         ...mintData,
         mint: mint,
@@ -195,18 +209,16 @@ export const InitialBuyDialog = ({ setIsOpen, configInfo, ...mintData }: DialogP
       return
     }
     try {
-
       const uri =await uploadFile(mintData.file)
-      const mintKp = Keypair.generate()
-      const mint = mintKp.publicKey.toBase58()
-      // mint B check
-      
-      // const mint = await createMintAct({
+      // const tempMintData = await createRandomMintAct({
       //   ...mintData,
       //   configId: configInfo.key.pubKey,
-      //   symbol: mintData.ticker,
-      //   cfToken: turnstile
+      //   symbol: mintData.ticker
       // })
+
+      const mintKp = Keypair.generate()
+      const mint = mintKp.publicKey.toBase58()
+      
       await createAndBuyAct({
         ...mintData,
         mint: mint,
@@ -228,12 +240,12 @@ export const InitialBuyDialog = ({ setIsOpen, configInfo, ...mintData }: DialogP
         }
       })
 
-      toastSubject.next({
-        status: 'success',
-        title: 'Token Initialized',
-        description: 'Token init successfully'
-      })
-      router.push(`/token?mint=${mint}${referrerQuery}`)
+      // toastSubject.next({
+      //   status: 'success',
+      //   title: 'Token Initialized',
+      //   description: 'Token init successfully'
+      // })
+      // router.push(`/token?mint=${mint}${referrerQuery}`)
 
       setIsOpen(false)
     } catch (e: any) {

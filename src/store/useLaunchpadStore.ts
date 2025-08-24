@@ -22,9 +22,7 @@ import {
   DEV_LAUNCHPAD_PROGRAM,
   Raydium,
   printSimulate,
-  LAUNCHPAD_PROGRAM,
-  getPdaLaunchpadPoolId,
-  PlatformConfig
+  LAUNCHPAD_PROGRAM
 } from '@raydium-io/raydium-sdk-v2'
 import axios from '@/api/axios'
 import { ConfigInfo, MintInfo } from '@/views/Launchpad/type'
@@ -361,7 +359,6 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
     cliffPeriod,
     unlockPeriod,
     createOnly,
-
     ...callback
   }) => {
     try {
@@ -391,8 +388,6 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
 
       // const pair = Keypair.generate()
       console.log('platformId', get().platformId)
-
-
 
       const configRes: {
         data: {
@@ -753,37 +748,24 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
     onError,
     onFinally
   }) => {
-    console.log("calling buyAct...")
-    console.log("mintInfo======>", mintInfo)
-    if (!mintB) return '';
-
-    const mintA = new PublicKey(mintInfo.mint)
-    const poolId = getPdaLaunchpadPoolId(programId, mintA, mintB).publicKey
-
     const { raydium, txVersion } = useAppStore.getState()
     if (!raydium) return ''
 
-    const poolInfo = await raydium.launchpad.getRpcPoolInfo({ poolId })
-
-    const data = await raydium.connection.getAccountInfo(poolInfo.platformId)
-    const platformInfo = PlatformConfig.decode(data!.data)
-
-    console.log("11111111")
     const { execute, extInfo } = await raydium.launchpad.buyToken({
       programId,
-      mintA,
-      txVersion: TxVersion.V0,
+      mintA: ToPublicKey(mintInfo.mint),
+      txVersion,
       buyAmount,
       slippage,
       mintB,
       minMintAAmount, // use sdk to get realtime rpc data
       shareFeeReceiver,
       shareFeeRate: shareFeeReceiver ? defaultShareFeeRate : undefined,
-      configInfo: poolInfo.configInfo,
-      platformFeeRate: platformInfo.feeRate,
+      configInfo,
+      platformFeeRate,
       computeBudgetConfig: raydium.cluster === 'devnet' ? undefined : await getComputeBudgetConfig()
     })
-    console.log("22222222")
+
     const meta = getTxMeta({
       action: 'buy',
       values: {
@@ -799,14 +781,12 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
         symbolB: symbolB ?? 'SOL'
       }
     })
-    console.log("33333333")
-    console.log("before calling execute...")
+
+
     const executeWithRetry = async (retryCount = 0): Promise<string> => {
       try {
-        console.log("calling execute...")
         const result = await execute()
         const { txId, signedTx } = result
-        console.log("signedTx======>", signedTx)
         txStatusSubject.next({
           txId,
           ...meta,
