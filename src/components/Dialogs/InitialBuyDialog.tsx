@@ -85,33 +85,33 @@ export const InitialBuyDialog = ({ setIsOpen, configInfo, ...mintData }: DialogP
   })
 
   useEffect(() => {
-    // async function getTempInfo() {
-    //   try {
-    //     const { poolInfo } = await createAndBuyAct({
-    //       mint: Keypair.generate().publicKey.toBase58(),
-    //       symbol: mintData.ticker,
-    //       mintBInfo: configInfo.mintInfoB,
-    //       configInfo: ToLaunchPadConfig(configInfo.key),
-    //       configId: configInfo.key.pubKey,
-    //       uri: 'https://',
-    //       decimals: 6,
-    //       buyAmount: new BN(1),
-    //       notExecute: true,
-    //       ...mintData,
-    //       mintKp: Keypair.generate()
-    //     })
+    async function getTempInfo() {
+      try {
+        const { poolInfo } = await createAndBuyAct({
+          mint: Keypair.generate().publicKey.toBase58(),
+          symbol: mintData.ticker,
+          mintBInfo: configInfo.mintInfoB,
+          configInfo: ToLaunchPadConfig(configInfo.key),
+          configId: configInfo.key.pubKey,
+          uri: 'https://',
+          decimals: 6,
+          buyAmount: new BN(1),
+          notExecute: true,
+          ...mintData,
+          mintKp: Keypair.generate()
+        })
 
-    //     setPoolInfo(poolInfo)
-    //     setTimeout(() => {
-    //       if (amountRef.current && typeof amountRef.current === 'string') {
-    //         handleAmountChange(amountRef.current)
-    //       }
-    //     }, 100)
-    //   } catch (error) {
-    //     console.error('Error getting temp info:', error)
-    //   }
-    // }
-    // getTempInfo()
+        setPoolInfo(poolInfo)
+        setTimeout(() => {
+          if (amountRef.current && typeof amountRef.current === 'string') {
+            handleAmountChange(amountRef.current)
+          }
+        }, 100)
+      } catch (error) {
+        console.error('Error getting temp info:', error)
+      }
+    }
+    getTempInfo()
   }, [mintData.name, configInfo.key.pubKey, mintData.tag])
 
   const handleClickBuy = async () => {
@@ -123,23 +123,23 @@ export const InitialBuyDialog = ({ setIsOpen, configInfo, ...mintData }: DialogP
     }
     try {
       console.log("before callling tempMintData..")
-      const uri =await uploadFile(mintData.file)
-      // const tempMintData = await createRandomMintAct({
-      //   ...mintData,
-      //   configId: configInfo.key.pubKey,
-      //   symbol: mintData.ticker
-      // })
+      // const uri =await uploadFile(mintData.file)
+      const tempMintData = await createRandomMintAct({
+        ...mintData,
+        configId: configInfo.key.pubKey,
+        symbol: mintData.ticker
+      })
 
       const mintKp = Keypair.generate()
       const mint = mintKp.publicKey.toBase58()
       console.log("mint======>", mint)
 
-      // if (!tempMintData) {
-      //   toastSubject.next({})
-      //   return
-      // }
+      if (!tempMintData) {
+        toastSubject.next({})
+        return
+      }
 
-      // console.log("tempMintData======>", tempMintData)
+      console.log("tempMintData======>", tempMintData)
 
       
       console.log("amount======>", amount)
@@ -150,8 +150,8 @@ export const InitialBuyDialog = ({ setIsOpen, configInfo, ...mintData }: DialogP
       console.log("before callilng here..");
       await createAndBuyAct({
         ...mintData,
-        mint: mint,
-        uri: uri,
+        mint: mintKp.publicKey.toBase58(),
+        uri: tempMintData.metadataLink,
         name: mintData.name,
         symbol: mintData.ticker,
         decimals: 6,
@@ -260,7 +260,7 @@ export const InitialBuyDialog = ({ setIsOpen, configInfo, ...mintData }: DialogP
           <ModalCloseButton position="static" />
         </Flex>
         <ModalBody mt={8}>
-          <Text color={colors.lightPurple}>Buying a small amount of tokens helps protect your token from snipers. (This is optional.)</Text>
+          <Text color={colors.lightPurple}>Buying a small amount of tokens helps protect your token from snipers. (required.)</Text>
           <Grid rowGap={3} mt={7} mb={4}>
             <Flex
               justifyContent="space-between"
@@ -333,7 +333,7 @@ export const InitialBuyDialog = ({ setIsOpen, configInfo, ...mintData }: DialogP
           >
             Create & Buy
           </Button>
-          <Button
+          {/* <Button
             width="100%"
             height="3rem"
             variant="outline"
@@ -344,7 +344,7 @@ export const InitialBuyDialog = ({ setIsOpen, configInfo, ...mintData }: DialogP
             onClick={handleClickInitOnly}
           >
             Just Create
-          </Button>
+          </Button> */}
         </ModalFooter>
       </ModalContent>
     </Modal>
