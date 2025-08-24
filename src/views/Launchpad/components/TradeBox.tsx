@@ -218,6 +218,7 @@ export default function TradeBox({
     }))
   })
   const handleClickSubmit = async () => {
+    console.log("calling handleClickSubmit...")
     if (isBuy && !isMintCreated) {
       const r = await checkToken({ checkTime: true })
       if (!r) return
@@ -254,6 +255,7 @@ export default function TradeBox({
           })
           return
         }
+        console.log("buy here...")
         await buyAct({
           mintInfo,
           buyAmount: new BN(new Decimal(amount.amountIn || 0).mul(10 ** mintBDecimal).toFixed(0)),
@@ -269,6 +271,7 @@ export default function TradeBox({
           onConfirmed,
           onFinally: offLoading
         })
+        
         return
       }
       await sellAct({
@@ -291,8 +294,10 @@ export default function TradeBox({
   }
 
   const handleClickSwap = async () => {
+    console.log("calling handleClickSwap...")
     if (!response || !isLanded) return
     onSending()
+    console.log("mintInfo======>", mintInfo)
 
     await swapTokenAct({
       swapResponse: response as ApiSwapV1OutSuccess,

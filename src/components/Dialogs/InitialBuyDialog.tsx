@@ -132,22 +132,8 @@ export const InitialBuyDialog = ({ setIsOpen, configInfo, ...mintData }: DialogP
 
       const mintKp = Keypair.generate()
       const mint = mintKp.publicKey.toBase58()
-      console.log("mint======>", mint)
-
-      // if (!tempMintData) {
-      //   toastSubject.next({})
-      //   return
-      // }
-
-      // console.log("tempMintData======>", tempMintData)
-
-      
-      console.log("amount======>", amount)
-      // let _amount = 0.0001
 
       const buyAmount = new BN(new Decimal(amount).mul(10 ** 9).toString())
-      console.log("buyAmount======>", buyAmount.toString())
-      console.log("before callilng here..");
       await createAndBuyAct({
         ...mintData,
         mint: mint,
@@ -163,6 +149,7 @@ export const InitialBuyDialog = ({ setIsOpen, configInfo, ...mintData }: DialogP
         migrateType: mintData.migrateType || 'amm',
         shareFeeReceiver: wallet,
         mintKp: mintKp,
+        createOnly: false,
         onConfirmed: () => {
           router.push(`/token?mint=${mint}&fromCreate=true${referrerQuery}`)
         }
@@ -208,13 +195,37 @@ export const InitialBuyDialog = ({ setIsOpen, configInfo, ...mintData }: DialogP
       return
     }
     try {
+
+      const uri =await uploadFile(mintData.file)
+      const mintKp = Keypair.generate()
+      const mint = mintKp.publicKey.toBase58()
       // mint B check
       
-      const mint = await createMintAct({
+      // const mint = await createMintAct({
+      //   ...mintData,
+      //   configId: configInfo.key.pubKey,
+      //   symbol: mintData.ticker,
+      //   cfToken: turnstile
+      // })
+      await createAndBuyAct({
         ...mintData,
-        configId: configInfo.key.pubKey,
+        mint: mint,
+        uri: uri,
+        name: mintData.name,
         symbol: mintData.ticker,
-        cfToken: turnstile
+        decimals: 6,
+        mintBInfo: configInfo.mintInfoB,
+        buyAmount: new BN(0),
+        configInfo: ToLaunchPadConfig(configInfo.key),
+        configId: configInfo.key.pubKey,
+        slippage: new BN((useLaunchpadStore.getState().slippage * 10000).toFixed(0)),
+        migrateType: mintData.migrateType || 'amm',
+        shareFeeReceiver: wallet,
+        mintKp: mintKp,
+        createOnly: true,
+        onConfirmed: () => {
+          router.push(`/token?mint=${mint}&fromCreate=true${referrerQuery}`)
+        }
       })
 
       toastSubject.next({

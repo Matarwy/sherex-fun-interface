@@ -22,7 +22,9 @@ import {
   DEV_LAUNCHPAD_PROGRAM,
   Raydium,
   printSimulate,
-  LAUNCHPAD_PROGRAM
+  LAUNCHPAD_PROGRAM,
+  getPdaLaunchpadPoolId,
+  PlatformConfig
 } from '@raydium-io/raydium-sdk-v2'
 import axios from '@/api/axios'
 import { ConfigInfo, MintInfo } from '@/views/Launchpad/type'
@@ -116,6 +118,7 @@ export interface LaunchpadState {
       unlockPeriod?: BN
 
       curveType?: number
+      createOnly?: boolean
     } & TxCallbackProps
   ) => Promise<{ txId: string; poolInfo?: LaunchpadPoolInfo }>
 
@@ -357,6 +360,7 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
     totalLockedAmount,
     cliffPeriod,
     unlockPeriod,
+    createOnly,
 
     ...callback
   }) => {
@@ -464,7 +468,7 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
         txVersion: TxVersion.V0,
         slippage: slippage || new BN(100), // Use the passed slippage or default to 1%
         buyAmount: buyAmount, // Use the actual buy amount passed to the function
-        createOnly: false, // true means create mint only, false will "create and buy together"
+        createOnly, // true means create mint only, false will "create and buy together"
 
         supply: newMintData.supply, // lauchpad mint supply amount, default: LaunchpadPoolInitParam.supply
         totalSellA: newMintData.totalSellA, // lauchpad mint sell amount, default: LaunchpadPoolInitParam.totalSellA
@@ -749,24 +753,37 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
     onError,
     onFinally
   }) => {
+    console.log("calling buyAct...")
+    console.log("mintInfo======>", mintInfo)
+    if (!mintB) return '';
+
+    const mintA = new PublicKey(mintInfo.mint)
+    const poolId = getPdaLaunchpadPoolId(programId, mintA, mintB).publicKey
+
     const { raydium, txVersion } = useAppStore.getState()
     if (!raydium) return ''
 
+    const poolInfo = await raydium.launchpad.getRpcPoolInfo({ poolId })
+
+    const data = await raydium.connection.getAccountInfo(poolInfo.platformId)
+    const platformInfo = PlatformConfig.decode(data!.data)
+
+    console.log("11111111")
     const { execute, extInfo } = await raydium.launchpad.buyToken({
       programId,
-      mintA: ToPublicKey(mintInfo.mint),
-      txVersion,
+      mintA,
+      txVersion: TxVersion.V0,
       buyAmount,
       slippage,
       mintB,
       minMintAAmount, // use sdk to get realtime rpc data
       shareFeeReceiver,
       shareFeeRate: shareFeeReceiver ? defaultShareFeeRate : undefined,
-      configInfo,
-      platformFeeRate,
+      configInfo: poolInfo.configInfo,
+      platformFeeRate: platformInfo.feeRate,
       computeBudgetConfig: raydium.cluster === 'devnet' ? undefined : await getComputeBudgetConfig()
     })
-
+    console.log("22222222")
     const meta = getTxMeta({
       action: 'buy',
       values: {
@@ -782,12 +799,14 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
         symbolB: symbolB ?? 'SOL'
       }
     })
-
-
+    console.log("33333333")
+    console.log("before calling execute...")
     const executeWithRetry = async (retryCount = 0): Promise<string> => {
       try {
+        console.log("calling execute...")
         const result = await execute()
         const { txId, signedTx } = result
+        console.log("signedTx======>", signedTx)
         txStatusSubject.next({
           txId,
           ...meta,
