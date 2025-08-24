@@ -361,9 +361,8 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
     ...callback
   }) => {
     try {
-      console.log("calling createAndBuyAct...")
+      console.log("calling createAndBuyAct!!...")
       const { raydium, txVersion } = useAppStore.getState()
-      console.log("raydium======>", raydium)
       if (!raydium) return { txId: '' }
 
       if (name.length > 32) {
@@ -433,11 +432,6 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
 
       const newMintData = {
         wallet: raydium.ownerPubKey.toBase58(),
-        name: 'testname',
-        symbol: 'test',
-        // website: '',
-        // twitter: '',
-        // telegram: '',
         configId: configId.toString(),
         decimals: LaunchpadPoolInitParam.decimals,
         supply: LaunchpadPoolInitParam.supply, // or custom set up supply
@@ -447,31 +441,25 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
         cliffPeriod: LaunchpadPoolInitParam.cliffPeriod,
         unlockPeriod: LaunchpadPoolInitParam.unlockPeriod,
         // set your platform id, current platform: bonk
-        platformId: new PublicKey('8pCtbn9iatQ8493mDQax4xfEUjhoVBpUWYVQoRU18333'),
+        platformId: new PublicKey('FEkF8SrSckk5GkfbmtcCbuuifpTKkw6mrSNowwB8aQe3'),
         migrateType: 'amm', // or cpmm
         description: 'description',
       }
       const mintBDecimals = mintBInfo.decimals
-      console.log("mintBDecimals======>", mintBDecimals)
-      console.log("mint======>", mint)
-      console.log("before calling createLaunchpad...")
-      console.log("buyAmount======>", buyAmount.toString())
-      console.log("txVersion======>", txVersion)
-
 
       const { execute, transactions, extInfo } = await raydium.launchpad.createLaunchpad({
         programId: LAUNCHPAD_PROGRAM,
         mintA: mintKp.publicKey, // Use the actual mint keypair instead of generating a new one
         decimals: newMintData.decimals,
-        name: newMintData.name,
-        symbol: newMintData.symbol,
+        name: name,
+        symbol: symbol,
         uri,
         migrateType: 'amm',
         configId,
         configInfo,
         mintBDecimals,
 
-        platformId: new PublicKey("8pCtbn9iatQ8493mDQax4xfEUjhoVBpUWYVQoRU18333"),
+        platformId: new PublicKey("FEkF8SrSckk5GkfbmtcCbuuifpTKkw6mrSNowwB8aQe3"),
 
         txVersion: TxVersion.V0,
         slippage: slippage || new BN(100), // Use the passed slippage or default to 1%
@@ -487,6 +475,13 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
         initV2: true,
         extraSigners: [mintKp] // Add the mint keypair as an extra signer
       })
+
+      console.log("extInfo======>", extInfo)
+      const amountA = extInfo.swapInfo.amountA.amount.toString()
+      console.log("amountA======>", amountA)
+      const amountB = extInfo.swapInfo.amountB.toString()
+      console.log("amountB======>", amountB)
+
       const transaction = transactions[0]
       console.log("tx simulation  ", await raydium.connection.simulateTransaction(transaction))
 
@@ -538,13 +533,7 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
 
       // console.log('poolId: ', extInfo)
       // // console.log(sentInfo)
-      // console.log("extInfo======>", extInfo)
-      // const amountA = extInfo.swapInfo.amountA.amount.toString()
-      // console.log("amountA======>", amountA)
-      // const amountB = extInfo.swapInfo.amountB.toString()
-      // console.log("amountB======>", amountB)
-      // const symbolB = wSolToSolString(mintBInfo.symbol)
-      // console.log("symbolB======>", symbolB)
+
 
       // let meta = getTxMeta({
       //   action: 'buy',

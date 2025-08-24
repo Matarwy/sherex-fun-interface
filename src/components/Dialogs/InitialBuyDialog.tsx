@@ -31,6 +31,7 @@ import Turnstile, { ActionRef } from '@/components/Turnstile'
 import { useLaunchPadShareInfo, useReferrerQuery } from '@/views/Launchpad/utils'
 import { ToLaunchPadConfig } from '@/hooks/launchpad/utils'
 import { usePlatformInfo } from '@/hooks/launchpad/usePlatformInfo'
+import { uploadFile } from '@/utils/file/upload'
 // import { useWallet } from '@solana/wallet-adapter-react'
 
 export const InitialBuyDialog = ({ setIsOpen, configInfo, ...mintData }: DialogProps<InitialBuyDialogProps>) => {
@@ -84,29 +85,33 @@ export const InitialBuyDialog = ({ setIsOpen, configInfo, ...mintData }: DialogP
   })
 
   useEffect(() => {
-    async function getTempInfo() {
-      const { poolInfo } = await createAndBuyAct({
-        mint: Keypair.generate().publicKey.toBase58(),
-        symbol: mintData.ticker,
-        mintBInfo: configInfo.mintInfoB,
-        configInfo: ToLaunchPadConfig(configInfo.key),
-        configId: configInfo.key.pubKey,
-        uri: 'https://',
-        decimals: 6,
-        buyAmount: new BN(1),
-        notExecute: true,
-        ...mintData,
-        mintKp: Keypair.generate()
-      })
+    // async function getTempInfo() {
+    //   try {
+    //     const { poolInfo } = await createAndBuyAct({
+    //       mint: Keypair.generate().publicKey.toBase58(),
+    //       symbol: mintData.ticker,
+    //       mintBInfo: configInfo.mintInfoB,
+    //       configInfo: ToLaunchPadConfig(configInfo.key),
+    //       configId: configInfo.key.pubKey,
+    //       uri: 'https://',
+    //       decimals: 6,
+    //       buyAmount: new BN(1),
+    //       notExecute: true,
+    //       ...mintData,
+    //       mintKp: Keypair.generate()
+    //     })
 
-      setPoolInfo(poolInfo)
-      setTimeout(() => {
-        if (amountRef.current && typeof amountRef.current === 'string') {
-          handleAmountChange(amountRef.current)
-        }
-      }, 100)
-    }
-    getTempInfo()
+    //     setPoolInfo(poolInfo)
+    //     setTimeout(() => {
+    //       if (amountRef.current && typeof amountRef.current === 'string') {
+    //         handleAmountChange(amountRef.current)
+    //       }
+    //     }, 100)
+    //   } catch (error) {
+    //     console.error('Error getting temp info:', error)
+    //   }
+    // }
+    // getTempInfo()
   }, [mintData.name, configInfo.key.pubKey, mintData.tag])
 
   const handleClickBuy = async () => {
@@ -118,6 +123,7 @@ export const InitialBuyDialog = ({ setIsOpen, configInfo, ...mintData }: DialogP
     }
     try {
       console.log("before callling tempMintData..")
+      const uri =await uploadFile(mintData.file)
       // const tempMintData = await createRandomMintAct({
       //   ...mintData,
       //   configId: configInfo.key.pubKey,
@@ -127,7 +133,6 @@ export const InitialBuyDialog = ({ setIsOpen, configInfo, ...mintData }: DialogP
       const mintKp = Keypair.generate()
       const mint = mintKp.publicKey.toBase58()
       console.log("mint======>", mint)
-      const uri = "https://"
 
       // if (!tempMintData) {
       //   toastSubject.next({})
@@ -138,10 +143,11 @@ export const InitialBuyDialog = ({ setIsOpen, configInfo, ...mintData }: DialogP
 
       
       console.log("amount======>", amount)
-      let _amount = 0.0001
+      // let _amount = 0.0001
 
-      const buyAmount = new BN(new Decimal(_amount).mul(10 ** 9).toString())
+      const buyAmount = new BN(new Decimal(amount).mul(10 ** 9).toString())
       console.log("buyAmount======>", buyAmount.toString())
+      console.log("before callilng here..");
       await createAndBuyAct({
         ...mintData,
         mint: mint,

@@ -230,6 +230,7 @@ export default function TradeBox({
       if (isBuy) {
         if (!isMintCreated) {
           const pair = Keypair.generate();
+          console.log("before callilng..");
           await createAndBuyAct({
             mint: mintInfo.mint,
             uri: mintInfo.metadataUrl,
