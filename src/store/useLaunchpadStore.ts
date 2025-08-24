@@ -393,17 +393,17 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
 
       const configRes: {
         data: {
+
           data: {
-            data: {
-              key: ConfigInfo
-              mintInfoB: ApiV3Token
-            }[]
-          }
+            key: ConfigInfo
+            mintInfoB: ApiV3Token
+          }[]
+
         }
       } = await axios.get(`${mintHost}/main/configs`)
+      console.log("configRes======>", configRes)
 
-      
-      const configs = configRes.data.data.data[0].key
+      const configs = configRes.data.data[0].key
       const configInfo: ReturnType<typeof LaunchpadConfig.decode> = {
         index: configs.index,
         mintB: new PublicKey(configs.mintB),
@@ -422,9 +422,10 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
         migrateToAmmWallet: new PublicKey(configs.migrateToAmmWallet),
         migrateToCpmmWallet: new PublicKey(configs.migrateToCpmmWallet),
       }
-      
-      const configId = new PublicKey(configRes.data.data.data[0].key.pubKey)
-      const mintBInfo = configRes.data.data.data[0].mintInfoB
+
+      const configId = new PublicKey(configRes.data.data[0].key.pubKey)
+
+      const mintBInfo = configRes?.data?.data[0]?.mintInfoB
 
       console.log("configInfo", configInfo)
       console.log("configId", configId)
@@ -460,7 +461,7 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
 
       const { execute, transactions, extInfo } = await raydium.launchpad.createLaunchpad({
         programId: LAUNCHPAD_PROGRAM,
-        mintA: Keypair.generate().publicKey,
+        mintA: mintKp.publicKey, // Use the actual mint keypair instead of generating a new one
         decimals: newMintData.decimals,
         name: newMintData.name,
         symbol: newMintData.symbol,
@@ -473,9 +474,9 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
         platformId: new PublicKey("8pCtbn9iatQ8493mDQax4xfEUjhoVBpUWYVQoRU18333"),
 
         txVersion: TxVersion.V0,
-        slippage: new BN(100), // means 1%
-        buyAmount: new BN(0),
-        createOnly: true, // true means create mint only, false will "create and buy together"
+        slippage: slippage || new BN(100), // Use the passed slippage or default to 1%
+        buyAmount: buyAmount, // Use the actual buy amount passed to the function
+        createOnly: false, // true means create mint only, false will "create and buy together"
 
         supply: newMintData.supply, // lauchpad mint supply amount, default: LaunchpadPoolInitParam.supply
         totalSellA: newMintData.totalSellA, // lauchpad mint sell amount, default: LaunchpadPoolInitParam.totalSellA
@@ -484,224 +485,257 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
         cliffPeriod: newMintData.cliffPeriod, // unit: seconds, default 0
         unlockPeriod: newMintData.unlockPeriod, // unit: seconds, default 0
         initV2: true,
+        extraSigners: [mintKp] // Add the mint keypair as an extra signer
       })
       const transaction = transactions[0]
       console.log("tx simulation  ", await raydium.connection.simulateTransaction(transaction))
-      // const { data } = await axios.post(`${mintHost}/create/sendTransaction`, {
-      //   txs: [txToBase64(transaction)],
-      // })
 
-      // console.log('simulate tx:\n', data.data.tx)
-
-
-
-      // printSimulate(transactions)
-      // if (notExecute) {
-      //   return {
-      //     txId: '',
-      //     poolInfo: extInfo.address
-      //   }
-      // }
-
-      // const sentInfo = await execute({ notSendToRpc: false, sequentially: true })
-
-      console.log('poolId: ', extInfo)
-      // console.log(sentInfo)
-      console.log("extInfo======>", extInfo)
-      const amountA = extInfo.swapInfo.amountA.amount.toString()
-      console.log("amountA======>", amountA)
-      const amountB = extInfo.swapInfo.amountB.toString()
-      console.log("amountB======>", amountB)
-      const symbolB = wSolToSolString(mintBInfo.symbol)
-      console.log("symbolB======>", symbolB)
-
-      let meta = getTxMeta({
-        action: 'buy',
-        values: {
-          amountA: new Decimal(amountA)
-            .div(10 ** decimals)
-            .toDecimalPlaces(decimals)
-            .toString(),
-          symbolA: symbol || encodeStr(mint, 5),
-          amountB: new Decimal(buyAmount.toString())
-            .div(10 ** mintBInfo.decimals)
-            .toDecimalPlaces(mintBInfo.decimals)
-            .toString(),
-          symbolB: symbolB
-        }
-      })
-
-      let txId = ''
-      const isV0Tx = txVersion === TxVersion.V0
+      // Execute the transaction (this will handle signing and sending)
       try {
-        // const txSignature = await connection
-        console.log("calling execute...")
+        console.log("Executing transaction...")
+        // Get the connected wallet's keypair
+        const { publicKey } = useAppStore.getState()
+        if (!publicKey) {
+          throw new Error("No connected wallet")
+        }
+
+        // Use the execute function which handles signing properly
         const { signedTxs } = await execute({ notSendToRpc: false, sequentially: true })
         console.log("signedTxs======>", signedTxs)
-        const { data } = await axios.post(
-          `${get().mintHost}/create/sendTransaction`,
-          { txs: [txToBase64(signedTxs[0])] },
-          { skipError: true }
-        )
-        console.log("data======>", data)
-        const txBuf = Buffer.from(data.tx, 'base64')
-        const bothSignedTx = VersionedTransaction.deserialize(txBuf as any)
 
-        if (signedTxs.length < 2) {
-          if (isV0Tx) {
-            txId = await raydium.connection.sendTransaction(bothSignedTx as VersionedTransaction, { skipPreflight: true })
-          } else {
-            txId = await raydium.connection.sendRawTransaction(bothSignedTx.serialize(), { skipPreflight: true })
-          }
-          txStatusSubject.next({
-            txId,
-            ...callback,
-            ...meta,
-            signedTx: signedTxs[0],
-            onConfirmed: () => {
-              callback.onConfirmed?.()
-              useTokenAccountStore.getState().fetchTokenAccountAct({})
-              setTimeout(() => {
-                set({ refreshPoolMint: mint })
-                refreshChartSubject.next(mint)
-              }, 1000)
-            }
-          })
-          return { txId, poolInfo: extInfo.address }
-        }
+        // Send the signed transaction
+        const signature = await raydium.connection.sendTransaction(signedTxs[0])
+        console.log("signature", signature)
 
+        const confirmation = await raydium.connection.confirmTransaction(signature)
+        console.log("confirmation", confirmation);
 
+        // Get the transaction ID from the signature
+        const txId = signature
 
-        signedTxs[0] = bothSignedTx
-        console.log('simulate tx string:', signedTxs.map(txToBase64))
-
-        const txLength = signedTxs.length
-        const { toastId, handler } = getDefaultToastData({
-          txLength,
+        // Update UI and callbacks
+        txStatusSubject.next({
+          txId,
           ...callback,
+          signedTx: transaction,
           onConfirmed: () => {
-            setTimeout(() => {
-              callback.onConfirmed?.()
-            }, 1500)
-
+            callback.onConfirmed?.()
             useTokenAccountStore.getState().fetchTokenAccountAct({})
             setTimeout(() => {
               set({ refreshPoolMint: mint })
               refreshChartSubject.next(mint)
-            }, 2000)
+            }, 1000)
           }
         })
 
-        meta = getTxMeta({
-          action: 'launchBuy',
-          values: {
-            amountA: new Decimal(extInfo.swapInfo.decimalOutAmount.toString())
-              .div(10 ** decimals)
-              .toDecimalPlaces(decimals)
-              .toString(),
-            symbolA: symbol || encodeStr(mint, 5),
-            amountB: new Decimal(buyAmount.toString())
-              .div(10 ** mintBInfo.decimals)
-              .toDecimalPlaces(mintBInfo.decimals)
-              .toString(),
-            symbolB: wSolToSolString(mintBInfo.symbol)
-          }
-        })
-
-        const processedId: {
-          txId: string
-          status: 'success' | 'error' | 'sent'
-          signedTx: Transaction | VersionedTransaction
-        }[] = []
-
-        const getSubTxTitle = (idx: number) => {
-          return idx === 0 ? 'launchpad.create_token' : 'launchpad.buy_token_title'
-        }
-
-        let i = 0
-        const checkSendTx = async (): Promise<void> => {
-          if (!signedTxs[i]) return
-          const tx = signedTxs[i]
-          const txId = !isV0Tx
-            ? await raydium.connection.sendRawTransaction(tx.serialize(), { skipPreflight: true, maxRetries: 0 })
-            : await raydium.connection.sendTransaction(tx as VersionedTransaction, { skipPreflight: true, maxRetries: 0 })
-          processedId.push({ txId, signedTx: tx, status: 'sent' })
-
-          let timeout = 0
-          let intervalId = 0
-          let intervalCount = 0
-
-          const cbk = (signatureResult: SignatureResult) => {
-            window.clearTimeout(timeout)
-            window.clearInterval(intervalId)
-            const targetTxIdx = processedId.findIndex((tx) => tx.txId === txId)
-            if (targetTxIdx > -1) processedId[targetTxIdx].status = signatureResult.err ? 'error' : 'success'
-            handleMultiTxRetry(processedId)
-            handleMultiTxToast({
-              toastId,
-              processedId: processedId.map((p) => ({ ...p, status: p.status === 'sent' ? 'info' : p.status })),
-              txLength,
-              meta,
-              isSwap: true,
-              handler,
-              getSubTxTitle
-            })
-            if (!signatureResult.err) checkSendTx()
-          }
-
-          const subId = raydium.connection.onSignature(txId, cbk, 'processed')
-          raydium.connection.getSignatureStatuses([txId])
-
-          intervalId = window.setInterval(async () => {
-            const targetTxIdx = processedId.findIndex((tx) => tx.txId === txId)
-            if (intervalCount++ > TOAST_DURATION / 2000 || processedId[targetTxIdx].status !== 'sent') {
-              window.clearInterval(intervalId)
-              return
-            }
-            try {
-              const r = await raydium.connection.getTransaction(txId, {
-                commitment: 'confirmed',
-                maxSupportedTransactionVersion: TxVersion.V0
-              })
-              if (r) {
-                console.log('tx status from getTransaction:', txId)
-                cbk({ err: r.meta?.err || null })
-                window.clearInterval(intervalId)
-                useTokenAccountStore.getState().fetchTokenAccountAct({ commitment: useAppStore.getState().commitment })
-              }
-            } catch (e) {
-              console.error('getTransaction timeout:', e, txId)
-              window.clearInterval(intervalId)
-            }
-          }, 2000)
-
-          handleMultiTxRetry(processedId)
-          handleMultiTxToast({
-            toastId,
-            processedId: processedId.map((p) => ({ ...p, status: p.status === 'sent' ? 'info' : p.status })),
-            txLength,
-            meta,
-            isSwap: true,
-            handler,
-            getSubTxTitle
-          })
-
-          timeout = window.setTimeout(() => {
-            raydium.connection.removeSignatureListener(subId)
-          }, TOAST_DURATION)
-
-          i++
-        }
-        checkSendTx()
-
-        return { txId: '' }
-      } catch (e: any) {
-        const errorMsg = e.response?.data?.msg
+        return { txId, poolInfo: extInfo.address }
+      } catch (error: any) {
+        console.error("Transaction failed:", error)
         callback.onError?.()
-        toastSubject.next({ status: 'error', ...meta, description: errorMsg || undefined, txError: errorMsg ? undefined : e })
-      } finally {
-        callback.onFinally?.()
+        toastSubject.next({ status: 'error', description: 'Transaction failed', txError: error })
+        return { txId: '' }
       }
+
+      // console.log('poolId: ', extInfo)
+      // // console.log(sentInfo)
+      // console.log("extInfo======>", extInfo)
+      // const amountA = extInfo.swapInfo.amountA.amount.toString()
+      // console.log("amountA======>", amountA)
+      // const amountB = extInfo.swapInfo.amountB.toString()
+      // console.log("amountB======>", amountB)
+      // const symbolB = wSolToSolString(mintBInfo.symbol)
+      // console.log("symbolB======>", symbolB)
+
+      // let meta = getTxMeta({
+      //   action: 'buy',
+      //   values: {
+      //     amountA: new Decimal(amountA)
+      //       .div(10 ** decimals)
+      //       .toDecimalPlaces(decimals)
+      //       .toString(),
+      //     symbolA: symbol || encodeStr(mint, 5),
+      //     amountB: new Decimal(buyAmount.toString())
+      //       .div(10 ** mintBInfo.decimals)
+      //       .toDecimalPlaces(mintBInfo.decimals)
+      //       .toString(),
+      //     symbolB: symbolB
+      //   }
+      // })
+
+      // let txId = ''
+      // const isV0Tx = txVersion === TxVersion.V0
+      // try {
+      //   // const txSignature = await connection
+      //   console.log("calling execute...")
+      //   const { signedTxs } = await execute({ notSendToRpc: false, sequentially: true })
+      //   console.log("signedTxs======>", signedTxs)
+
+
+
+      //   const { data } = await axios.post(
+      //     `${get().mintHost}/create/sendTransaction`,
+      //     { txs: [txToBase64(signedTxs[0])] },
+      //     { skipError: true }
+      //   )
+      //   console.log("data======>", data)
+      //   const txBuf = Buffer.from(data.tx, 'base64')
+      //   const bothSignedTx = VersionedTransaction.deserialize(txBuf as any)
+
+      //   if (signedTxs.length < 2) {
+      //     if (isV0Tx) {
+      //       txId = await raydium.connection.sendTransaction(bothSignedTx as VersionedTransaction, { skipPreflight: true })
+      //     } else {
+      //       txId = await raydium.connection.sendRawTransaction(bothSignedTx.serialize(), { skipPreflight: true })
+      //     }
+      //     txStatusSubject.next({
+      //       txId,
+      //       ...callback,
+      //       ...meta,
+      //       signedTx: signedTxs[0],
+      //       onConfirmed: () => {
+      //         callback.onConfirmed?.()
+      //         useTokenAccountStore.getState().fetchTokenAccountAct({})
+      //         setTimeout(() => {
+      //           set({ refreshPoolMint: mint })
+      //           refreshChartSubject.next(mint)
+      //         }, 1000)
+      //       }
+      //     })
+      //     return { txId, poolInfo: extInfo.address }
+      //   }
+
+
+
+      //   signedTxs[0] = bothSignedTx
+      //   console.log('simulate tx string:', signedTxs.map(txToBase64))
+
+      //   const txLength = signedTxs.length
+      //   const { toastId, handler } = getDefaultToastData({
+      //     txLength,
+      //     ...callback,
+      //     onConfirmed: () => {
+      //       setTimeout(() => {
+      //         callback.onConfirmed?.()
+      //       }, 1500)
+
+      //       useTokenAccountStore.getState().fetchTokenAccountAct({})
+      //       setTimeout(() => {
+      //         set({ refreshPoolMint: mint })
+      //         refreshChartSubject.next(mint)
+      //       }, 2000)
+      //     }
+      //   })
+
+      //   meta = getTxMeta({
+      //     action: 'launchBuy',
+      //     values: {
+      //       amountA: new Decimal(extInfo.swapInfo.decimalOutAmount.toString())
+      //         .div(10 ** decimals)
+      //         .toDecimalPlaces(decimals)
+      //         .toString(),
+      //       symbolA: symbol || encodeStr(mint, 5),
+      //       amountB: new Decimal(buyAmount.toString())
+      //         .div(10 ** mintBInfo.decimals)
+      //         .toDecimalPlaces(mintBInfo.decimals)
+      //         .toString(),
+      //       symbolB: wSolToSolString(mintBInfo.symbol)
+      //     }
+      //   })
+
+      //   const processedId: {
+      //     txId: string
+      //     status: 'success' | 'error' | 'sent'
+      //     signedTx: Transaction | VersionedTransaction
+      //   }[] = []
+
+      //   const getSubTxTitle = (idx: number) => {
+      //     return idx === 0 ? 'launchpad.create_token' : 'launchpad.buy_token_title'
+      //   }
+
+      //   let i = 0
+      //   const checkSendTx = async (): Promise<void> => {
+      //     if (!signedTxs[i]) return
+      //     const tx = signedTxs[i]
+      //     const txId = !isV0Tx
+      //       ? await raydium.connection.sendRawTransaction(tx.serialize(), { skipPreflight: true, maxRetries: 0 })
+      //       : await raydium.connection.sendTransaction(tx as VersionedTransaction, { skipPreflight: true, maxRetries: 0 })
+      //     processedId.push({ txId, signedTx: tx, status: 'sent' })
+
+      //     let timeout = 0
+      //     let intervalId = 0
+      //     let intervalCount = 0
+
+      //     const cbk = (signatureResult: SignatureResult) => {
+      //       window.clearTimeout(timeout)
+      //       window.clearInterval(intervalId)
+      //       const targetTxIdx = processedId.findIndex((tx) => tx.txId === txId)
+      //       if (targetTxIdx > -1) processedId[targetTxIdx].status = signatureResult.err ? 'error' : 'success'
+      //       handleMultiTxRetry(processedId)
+      //       handleMultiTxToast({
+      //         toastId,
+      //         processedId: processedId.map((p) => ({ ...p, status: p.status === 'sent' ? 'info' : p.status })),
+      //         txLength,
+      //         meta,
+      //         isSwap: true,
+      //         handler,
+      //         getSubTxTitle
+      //       })
+      //       if (!signatureResult.err) checkSendTx()
+      //     }
+
+      //     const subId = raydium.connection.onSignature(txId, cbk, 'processed')
+      //     raydium.connection.getSignatureStatuses([txId])
+
+      //     intervalId = window.setInterval(async () => {
+      //       const targetTxIdx = processedId.findIndex((tx) => tx.txId === txId)
+      //       if (intervalCount++ > TOAST_DURATION / 2000 || processedId[targetTxIdx].status !== 'sent') {
+      //         window.clearInterval(intervalId)
+      //         return
+      //       }
+      //       try {
+      //         const r = await raydium.connection.getTransaction(txId, {
+      //           commitment: 'confirmed',
+      //           maxSupportedTransactionVersion: TxVersion.V0
+      //         })
+      //         if (r) {
+      //           console.log('tx status from getTransaction:', txId)
+      //           cbk({ err: r.meta?.err || null })
+      //           window.clearInterval(intervalId)
+      //           useTokenAccountStore.getState().fetchTokenAccountAct({ commitment: useAppStore.getState().commitment })
+      //         }
+      //       } catch (e) {
+      //         console.error('getTransaction timeout:', e, txId)
+      //         window.clearInterval(intervalId)
+      //       }
+      //     }, 2000)
+
+      //     handleMultiTxRetry(processedId)
+      //     handleMultiTxToast({
+      //       toastId,
+      //       processedId: processedId.map((p) => ({ ...p, status: p.status === 'sent' ? 'info' : p.status })),
+      //       txLength,
+      //       meta,
+      //       isSwap: true,
+      //       handler,
+      //       getSubTxTitle
+      //     })
+
+      //     timeout = window.setTimeout(() => {
+      //       raydium.connection.removeSignatureListener(subId)
+      //     }, TOAST_DURATION)
+
+      //     i++
+      //   }
+      //   checkSendTx()
+
+      //   return { txId: '' }
+      // } catch (e: any) {
+      //   const errorMsg = e.response?.data?.msg
+      //   callback.onError?.()
+      //   toastSubject.next({ status: 'error', ...meta, description: errorMsg || undefined, txError: errorMsg ? undefined : e })
+      // } finally {
+      //   callback.onFinally?.()
+      // }
 
       return { txId: '' }
     } catch (err) {

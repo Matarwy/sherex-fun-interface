@@ -20,10 +20,10 @@ export const useTradingViewStore = createStore<TradingViewState>(
     (set) => ({
       ...initialState,
       updateChartConfig: (config: object) => {
-        set({ chartConfig: config }, false, { type: 'updateChartConfig' })
+        set({ chartConfig: config })
       },
       updateBirdeyeChartConfig: (config: object) => {
-        set({ birdeyeChartConfig: config }, false, { type: 'updateChartConfig' })
+        set({ birdeyeChartConfig: config })
       }
     }),
     {

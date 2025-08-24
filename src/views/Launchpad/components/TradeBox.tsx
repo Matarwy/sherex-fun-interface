@@ -163,10 +163,10 @@ export default function TradeBox({
       })
 
       return {
-        amount: trimTrailZero(new Decimal(result.amountA.toString()).div(10 ** mintADecimal).toFixed(mintADecimal)) ?? '',
+        amount: trimTrailZero(new Decimal(result.amountA.amount.toString()).div(10 ** mintADecimal).toFixed(mintADecimal)) ?? '',
         mintAmount:
           trimTrailZero(
-            new Decimal(result.amountA.toString())
+            new Decimal(result.amountA.amount.toString())
               .div(10 ** mintADecimal)
               .mul(1 - slippage)
               .toFixed(mintADecimal)
