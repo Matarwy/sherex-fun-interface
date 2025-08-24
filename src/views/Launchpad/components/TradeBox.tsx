@@ -236,6 +236,7 @@ export default function TradeBox({
             name: mintInfo.name,
             symbol: mintInfo.symbol,
             decimals: Number(mintInfo.decimals),
+            mintKp: pair,
             mintBInfo: mintInfo.mintB,
             buyAmount: new BN(new Decimal(amount.amountIn || 0).mul(10 ** mintBDecimal).toFixed(0)),
             slippage: new BN((slippage * 10000).toFixed(0)),

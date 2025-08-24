@@ -8,8 +8,6 @@ import Decimal from 'decimal.js'
 
 
 import '@/components/Toast/toast.css'
-// import '@/components/LandingPage/components/tvl.css'
-// import '@/components/LandingPage/liquidity.css'
 import 'react-day-picker/dist/style.css'
 import { GoogleAnalytics } from '@next/third-parties/google'
 import { OnboardingDialog } from '@/components/Dialogs/OnboardingDialog'

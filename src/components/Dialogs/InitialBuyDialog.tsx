@@ -58,24 +58,29 @@ export const InitialBuyDialog = ({ setIsOpen, configInfo, ...mintData }: DialogP
   const turnstileRef = useRef<ActionRef>(null)
 
   const handleAmountChange = useEvent((val: string) => {
-    if (!poolInfo || !val) return ''
-    return trimTrailZero(
-      new Decimal(
-        Curve.buyExactIn({
-          poolInfo,
-          amountB: new BN(new Decimal(val).mul(10 ** (configInfo.mintInfoB?.decimals ?? 9)).toFixed(0)),
-          protocolFeeRate: new BN(configInfo.key.tradeFeeRate),
-          platformFeeRate: platformInfo?.feeRate ?? new BN(7500),
-          curveType: configInfo.key.curveType,
-          shareFeeRate,
-          creatorFeeRate: new BN(0), // or use the correct value if available
-          transferFeeConfigA: undefined, // or use the correct value if available
-          slot: 0 // or use the correct value if available
-        }).amountA.toString()
+    if (!poolInfo || !val || typeof val !== 'string') return ''
+    try {
+      const buyResult = Curve.buyExactIn({
+        poolInfo,
+        amountB: new BN(new Decimal(val || '0').mul(10 ** (configInfo.mintInfoB?.decimals ?? 9)).toFixed(0)),
+        protocolFeeRate: new BN(configInfo.key.tradeFeeRate),
+        platformFeeRate: platformInfo?.feeRate ?? new BN(7500),
+        curveType: configInfo.key.curveType,
+        shareFeeRate,
+        creatorFeeRate: new BN(0), // or use the correct value if available
+        transferFeeConfigA: undefined, // or use the correct value if available
+        slot: 0 // or use the correct value if available
+      })
+      
+      return trimTrailZero(
+        new Decimal(buyResult.amountA.toString())
+          .div(10 ** poolInfo.mintDecimalsA)
+          .toFixed(poolInfo.mintDecimalsA)
       )
-        .div(10 ** poolInfo.mintDecimalsA)
-        .toFixed(poolInfo.mintDecimalsA)
-    )
+    } catch (error) {
+      console.error('Error in handleAmountChange:', error)
+      return ''
+    }
   })
 
   useEffect(() => {
@@ -90,13 +95,16 @@ export const InitialBuyDialog = ({ setIsOpen, configInfo, ...mintData }: DialogP
         decimals: 6,
         buyAmount: new BN(1),
         notExecute: true,
-        ...mintData
+        ...mintData,
+        mintKp: Keypair.generate()
       })
 
       setPoolInfo(poolInfo)
       setTimeout(() => {
-        handleAmountChange(amountRef.current)
-      })
+        if (amountRef.current && typeof amountRef.current === 'string') {
+          handleAmountChange(amountRef.current)
+        }
+      }, 100)
     }
     getTempInfo()
   }, [mintData.name, configInfo.key.pubKey, mintData.tag])
@@ -109,38 +117,53 @@ export const InitialBuyDialog = ({ setIsOpen, configInfo, ...mintData }: DialogP
       return
     }
     try {
-      const tempMintData = await createRandomMintAct({
-        ...mintData,
-        configId: configInfo.key.pubKey,
-        symbol: mintData.ticker
-      })
-      if (!tempMintData) {
-        toastSubject.next({})
-        return
-      }
+      console.log("before callling tempMintData..")
+      // const tempMintData = await createRandomMintAct({
+      //   ...mintData,
+      //   configId: configInfo.key.pubKey,
+      //   symbol: mintData.ticker
+      // })
 
-      const pair = Keypair.generate()
+      const mintKp = Keypair.generate()
+      const mint = mintKp.publicKey.toBase58()
+      console.log("mint======>", mint)
+      const uri = "https://"
 
+      // if (!tempMintData) {
+      //   toastSubject.next({})
+      //   return
+      // }
+
+      // console.log("tempMintData======>", tempMintData)
+
+      
+      console.log("amount======>", amount)
+      let _amount = 0.0001
+
+      const buyAmount = new BN(new Decimal(_amount).mul(10 ** 9).toString())
+      console.log("buyAmount======>", buyAmount.toString())
       await createAndBuyAct({
         ...mintData,
-        mint: tempMintData.mint,
-        uri: tempMintData.metadataLink,
+        mint: mint,
+        uri: uri,
         name: mintData.name,
         symbol: mintData.ticker,
         decimals: 6,
         mintBInfo: configInfo.mintInfoB,
-        buyAmount: new BN(new Decimal(amount).mul(10 ** 9).toString()),
+        buyAmount: buyAmount,
         configInfo: ToLaunchPadConfig(configInfo.key),
         configId: configInfo.key.pubKey,
         slippage: new BN((useLaunchpadStore.getState().slippage * 10000).toFixed(0)),
         migrateType: mintData.migrateType || 'amm',
         shareFeeReceiver: wallet,
+        mintKp: mintKp,
         onConfirmed: () => {
-          router.push(`/token?mint=${tempMintData.mint}&fromCreate=true${referrerQuery}`)
+          router.push(`/token?mint=${mint}&fromCreate=true${referrerQuery}`)
         }
       })
       setIsOpen(false)
     } catch (e: any) {
+      console.log("error======>", e)
       toastSubject.next({
         status: 'error',
         title: 'Create and Buy Token Error',
@@ -252,9 +275,10 @@ export const InitialBuyDialog = ({ setIsOpen, configInfo, ...mintData }: DialogP
                 min={0}
                 // onChange={(e: React.ChangeEvent<HTMLInputElement>) => {}}
                 onValueChange={(data: { value: string; formattedValue: string }) => {
-                  setAmount(data.value)
-                  amountRef.current = data.value
-                  setOutAmount(handleAmountChange?.(data.value) ?? '')
+                  const value = data.value || ''
+                  setAmount(value)
+                  amountRef.current = value
+                  setOutAmount(handleAmountChange?.(value) ?? '')
                 }}
                 decimalSeparator={detectedSeparator}
                 thousandSeparator={thousandSeparator}
@@ -296,7 +320,7 @@ export const InitialBuyDialog = ({ setIsOpen, configInfo, ...mintData }: DialogP
             width="100%"
             height="3rem"
             lineHeight="24px"
-            isDisabled={isCreateLoading || !amount || new Decimal(amount || 0).lte(0)}
+            isDisabled={isCreateLoading || !amount || (amount ? new Decimal(amount).lte(0) : false)}
             isLoading={isLoading}
             loadingText="Buying..."
             onClick={handleClickBuy}

@@ -176,6 +176,7 @@ export const useAppStore = createStore<AppState>(
   (set, get) => ({
     ...appInitState,
     initRaydiumAct: async (payload) => {
+      console.log("calling initRaydiumAct...")
       const action = { type: 'initRaydiumAct' }
       const { initialing, urlConfigs, rpcNodeUrl, jupTokenType, displayTokenSettings } = get()
       if (initialing || !rpcNodeUrl) return
@@ -198,6 +199,7 @@ export const useAppStore = createStore<AppState>(
         cluster: connection.rpcEndpoint === clusterApiUrl('devnet') ? 'devnet' : 'mainnet',
         apiRequestTimeout: 20 * 1000
       })
+      console.log("raydium here======>", raydium)
       useTokenStore.getState().extraLoadedTokenList.forEach((t) => {
         const existed = raydium.token.tokenMap.has(t.address)
         if (!existed) {

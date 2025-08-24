@@ -30,7 +30,7 @@ import EraserIcon from '@/icons/misc/EraserIcon'
 import CurvePreviewIcon from '@/icons/misc/CurvePreviewIcon'
 import { colors } from '@/theme/cssVariables/colors'
 import ImageUploader from '@/components/ImageUploader'
-import { useDialogsStore } from '@/store'
+import { useAppStore, useDialogsStore } from '@/store'
 import { DialogTypes } from '@/constants/dialogs'
 import { Formik } from 'formik'
 import * as yup from 'yup'
@@ -42,7 +42,7 @@ import { useReferrerQuery } from './utils'
 import { DropdownSelectMenu } from '@/components/DropdownSelectMenu'
 import useConfigs, { ConfigApiData } from '@/hooks/launchpad/useConfigs'
 import { usePlatformInfo } from '@/hooks/launchpad/usePlatformInfo'
-import { LaunchpadPoolInitParam, FEE_RATE_DENOMINATOR_VALUE, Curve } from '@raydium-io/raydium-sdk-v2'
+import { LaunchpadPoolInitParam, FEE_RATE_DENOMINATOR_VALUE, Curve, TxVersion, DEV_LAUNCHPAD_PROGRAM, Raydium } from '@raydium-io/raydium-sdk-v2'
 import { encodeStr } from '@/utils/common'
 import Tabs from '@/components/Tabs'
 import { CurveAreaChart } from './components/Charts/CurveAreaChart'
@@ -59,7 +59,10 @@ import useResponsive from '@/hooks/useResponsive'
 import { useLocalStorage } from '@/hooks/useLocalStorage'
 import { LocalStorageKey } from '@/constants/localStorage'
 import  i18n  from '@/i18n'
+import { Connection, Keypair, PublicKey } from '@solana/web3.js'
 const supplyList = ['100000000', '1000000000', '10000000000']
+
+
 interface CreateMintFormValue {
   name: string
   description?: string
@@ -105,6 +108,7 @@ enum CreateTokenSteps {
 
 export default function TokenCreate() {
   const [value, setValue] = useState(Tab.JustSendIt)
+  const { raydium, txVersion } = useAppStore((s) => ({ raydium: s.raydium, txVersion: s.txVersion }))
   const referrerQuery = useReferrerQuery('?')
   const { colorMode } = useColorMode()
   const isLight = colorMode === 'light'
@@ -113,10 +117,13 @@ export default function TokenCreate() {
     defaultValue: true
   })
 
+  // Handle raydium loading gracefully without blocking the page
+
+
   const panelItems = useMemo(() => {
     return [
       {
-        content: <JustSendIt />,
+        content: raydium ? <JustSendIt /> : <Flex justifyContent="center" p={8}><Text>Loading...</Text></Flex>,
         label: (
           <Flex alignItems="center" gap={1}>
             <Text>JustSendIt</Text>
@@ -126,7 +133,7 @@ export default function TokenCreate() {
         value: Tab.JustSendIt
       },
       {
-        content: <LaunchLabForm />,
+        content: raydium ? <LaunchLabForm /> : <Flex justifyContent="center" p={8}><Text>Loading...</Text></Flex>,
         label: (
           <Flex alignItems="center" gap={1}>
             <Text>Advanced</Text>
@@ -136,7 +143,17 @@ export default function TokenCreate() {
         value: Tab.LaunchLab
       }
     ]
-  }, [value])
+  }, [value, raydium])
+
+  useEffect(() => {
+    handle();
+  }, [raydium])
+
+  const handle = async () => {
+    console.log("raydium======>", raydium)
+
+  }
+
 
   return (
     <Grid
@@ -183,9 +200,16 @@ export default function TokenCreate() {
         </Flex>
       </GridItem>
       <GridItem area="panel">
-        <Text color={colors.lightPurple} fontSize="xl" fontWeight="medium" textAlign="center" mb={7}>
-          Launch New
-        </Text>
+        <Flex justifyContent="center" alignItems="center" gap={2} mb={7}>
+          <Text color={colors.lightPurple} fontSize="xl" fontWeight="medium" textAlign="center">
+            Launch New
+          </Text>
+          {!raydium && (
+            <Text color={colors.textSecondary} fontSize="sm">
+              (Loading SDK...)
+            </Text>
+          )}
+        </Flex>
         <Flex background="#22D1F833" alignItems="center" px={4} py="10px" gap={2} borderRadius="8px" mt={6}>
       <Box>
         <Info width="18px" height="18px" color={colors.textLaunchpadLink} />
@@ -252,7 +276,7 @@ const JustSendIt = () => {
   }
 
   const handleCreateMint = async (values: CreateMintFormValue) => {
-    // console.log('post create', values)
+    console.log('post create', values)
     if (!configInfo) {
       toastSubject.next({
         status: 'warning',
