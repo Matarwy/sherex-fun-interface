@@ -402,8 +402,8 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
         }
       } = await axios.get(`${mintHost}/main/configs`)
 
-      // @ts-ignore
-      const configs = configRes.data.data[0].key
+      
+      const configs = configRes.data.data.data[0].key
       const configInfo: ReturnType<typeof LaunchpadConfig.decode> = {
         index: configs.index,
         mintB: new PublicKey(configs.mintB),
@@ -422,10 +422,9 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
         migrateToAmmWallet: new PublicKey(configs.migrateToAmmWallet),
         migrateToCpmmWallet: new PublicKey(configs.migrateToCpmmWallet),
       }
-      // @ts-ignore
-      const configId = new PublicKey(configRes.data.data[0].key.pubKey)
-      // @ts-ignore
-      const mintBInfo = configRes.data.data[0].mintInfoB
+      
+      const configId = new PublicKey(configRes.data.data.data[0].key.pubKey)
+      const mintBInfo = configRes.data.data.data[0].mintInfoB
 
       console.log("configInfo", configInfo)
       console.log("configId", configId)

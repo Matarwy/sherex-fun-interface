@@ -110,8 +110,8 @@ const App: FC<PropsWithChildren<any>> = ({ children }) => {
       new ExodusWalletAdapter({ endpoint }),
       // new TipLinkWalletAdapter({
       //   clientId: process.env.NEXT_PUBLIC_WALLET_TIP_WALLET_KEY ?? '',
-      //   title: 'Raydium',
-      //   theme: 'system'
+      //   title: 'Queen Sherex',
+      //   theme: 'system',
       // }) as unknown as Adapter
     ],
     [network, endpoint]
