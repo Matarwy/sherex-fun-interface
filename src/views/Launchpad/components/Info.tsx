@@ -28,7 +28,8 @@ export default function Info({
   marketCap,
   mintBPrice,
   isLanded,
-  refreshMintInfo
+  refreshMintInfo,
+  imgUri
 }: {
   poolInfo?: LaunchpadPoolInfo
   mintInfo?: MintInfo
@@ -39,6 +40,7 @@ export default function Info({
   mintBPrice?: number
   isLanded: boolean
   refreshMintInfo?: () => void
+  imgUri?: string
 }) {
   const [finishRate, setFinishRate] = useState(mintInfo?.finishingRate ?? 0)
   const { colorMode } = useColorMode()
@@ -171,7 +173,7 @@ export default function Info({
       >
         <Grid templateColumns="auto 1fr auto" gap={4} alignItems="center">
           <Image
-            src={mintInfo ? getImgProxyUrl(mintInfo.imgUrl, 50) : undefined}
+            src={imgUri ? imgUri : undefined}
             fallbackSrc={mintInfo?.imgUrl}
             borderRadius="50%"
             width="50px"

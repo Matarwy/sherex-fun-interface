@@ -145,15 +145,6 @@ export default function TokenCreate() {
     ]
   }, [value, raydium])
 
-  useEffect(() => {
-    handle();
-  }, [raydium])
-
-  const handle = async () => {
-    console.log("raydium======>", raydium)
-
-  }
-
 
   return (
     <Grid

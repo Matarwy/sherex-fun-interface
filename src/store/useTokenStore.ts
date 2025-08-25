@@ -5,6 +5,7 @@ import createStore from './createStore'
 import { useAppStore } from './useAppStore'
 import { getStorageItem, setStorageItem } from '@/utils/localStorage'
 import logMessage from '@/utils/log'
+import { getTokenMetadataURL } from '@/utils/token'
 export const EXTRA_TOKEN_KEY = '_sherex_cus_t_'
 
 export interface TokenPrice {
@@ -123,7 +124,15 @@ export const useTokenStore = createStore<TokenStore>(
           })
           .map((t) => {
             if (t.type === 'jupiter') {
-              const newInfo = { ...t, logoURI: t.logoURI ? `https://wsrv.nl/?fit=cover&w=48&h=48&url=${t.logoURI}` : t.logoURI }
+              // const newInfo = { ...t, logoURI: t.logoURI ? `https://wsrv.nl/?fit=cover&w=48&h=48&url=${t.logoURI}` : t.logoURI }
+              // tokenMap.set(t.address, newInfo)
+              // return newInfo
+
+              // const uri: any = await getTokenMetadataURL
+              
+              
+              // (raydium.connection, t.address)
+              const newInfo = { ...t, logoURI: t.logoURI ? "uri" : t.logoURI }
               tokenMap.set(t.address, newInfo)
               return newInfo
             }

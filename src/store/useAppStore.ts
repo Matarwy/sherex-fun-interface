@@ -24,6 +24,7 @@ import { setStorageItem, getStorageItem } from '@/utils/localStorage'
 import { retry, isProdEnv } from '@/utils/common'
 import { compare } from 'compare-versions'
 import { SHEREX } from './configs/constants'
+import { getTokenMetadataURL } from '@/utils/token'
 
 export const defaultNetWork = WalletAdapterNetwork.Mainnet // Can be set to 'devnet', 'testnet', or 'mainnet-beta'
 export const defaultEndpoint = clusterApiUrl(defaultNetWork) // You can also provide a custom RPC endpoint
@@ -210,7 +211,7 @@ export const useAppStore = createStore<AppState>(
         }
       })
       const tokenMap = new Map(Array.from(raydium.token.tokenMap))
-      const tokenList = (JSON.parse(JSON.stringify(raydium.token.tokenList)) as TokenInfo[])
+      const filteredTokens = (JSON.parse(JSON.stringify(raydium.token.tokenList)) as TokenInfo[])
         .filter((t) => {
           if (blackJupMintSet.has(t.address)) {
             tokenMap.delete(t.address)
@@ -220,14 +221,24 @@ export const useAppStore = createStore<AppState>(
           }
           return true
         })
-        .map((t) => {
+      
+      // Process tokens with metadata
+      const tokenList = await Promise.all(
+        filteredTokens.map(async (t) => {
           if (t.type === 'jupiter') {
-            const newInfo = { ...t, logoURI: t.logoURI ? `https://wsrv.nl/?fit=cover&w=48&h=48&url=${t.logoURI}` : t.logoURI }
-            tokenMap.set(t.address, newInfo)
-            return newInfo
+            try {
+              // const uri: any = await getTokenMetadataURL(connection, t.address)
+              const newInfo = { ...t, logoURI: t.logoURI ? "uri" : t.logoURI }
+              tokenMap.set(t.address, newInfo)
+              return newInfo
+            } catch (error) {
+              console.warn('Failed to get token metadata for', t.address, error)
+              return t
+            }
           }
           return t
         })
+      )
       useTokenStore.setState(
         {
           tokenList: [SHEREX, ...tokenList],

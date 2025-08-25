@@ -7,11 +7,29 @@ export const wSolToSol = (key?: string): string | undefined => (key === WSOLMint
 export const solToWSol = (key?: string): string | undefined => (key === SOLMint.toBase58() ? WSOLMint.toBase58() : key)
 export const wSolToSolString = (name?: string) => (name ? name.replace(/WSOL/gi, 'SOL') : '')
 export const solToWsolString = (name?: string) => (name ? name.replace(/^SOL/gi, 'WSOL') : '')
-
+import { Metaplex } from "@metaplex-foundation/js";
 export const isSolWSol = (mint?: string | PublicKey) => {
   if (!mint) return false
   return mint.toString() === TOKEN_WSOL.address || mint.toString() === SOL_INFO.address
 }
+
+export async function getTokenMetadataURL(connection: Connection, mintAddress: string) {
+  console.log("Calling getTokenMetadata..")
+  try {
+    const metaplex = Metaplex.make(connection);
+    const mint = new PublicKey(mintAddress);
+    const metadata = await metaplex.nfts().findByMint({ mintAddress: mint });
+    console.log("metadata", metadata)
+    console.log(`Token Name: ${metadata.name}`);
+    console.log(`Token Symbol: ${metadata.symbol}`);
+    return metadata.uri
+
+  } catch (error) {
+    console.log("Error fetching token metadata:", error);
+    return ''
+  }
+}
+
 
 export const solToWSolToken = (token: ApiV3Token): ApiV3Token => {
   if (token.address === SOLMint.toBase58()) {

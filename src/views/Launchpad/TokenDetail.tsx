@@ -29,7 +29,7 @@ import Decimal from 'decimal.js'
 import { createTimeDiff, useReferrerQuery } from './utils'
 import { addPoolListener, removePoolListener } from '@/components/TradingView/streaming'
 import NextLink from 'next/link'
-import { wsolToSolToken } from '@/utils/token'
+import { getTokenMetadataURL, wsolToSolToken } from '@/utils/token'
 import { ToLaunchPadConfig } from '@/hooks/launchpad/utils'
 import { CopyButton } from '@/components/CopyButton'
 import { useLocalStorage } from '@/hooks/useLocalStorage'
@@ -57,6 +57,7 @@ type TabItem<T = Tab> = {
 }
 
 const TokenDetail = () => {
+  const [imgUri, setImgUri] = useState<string | undefined>(undefined)
   const { checkToken } = useCheckToken()
   const router = useRouter()
   const { isMobile, isDesktopSmall, isDesktopMedium, isDesktopLarge } = useResponsive()
@@ -64,6 +65,7 @@ const TokenDetail = () => {
   const programId = useAppStore((s) => s.programIdConfig.LAUNCHPAD_PROGRAM)
   const publicKey = useAppStore((s) => s.publicKey)
   const connected = useAppStore((s) => s.connected)
+  const { raydium } = useAppStore((s) => ({ raydium: s.raydium }))
   const { mint: id, fromCreate } = router.query
   const referrerQuery = useReferrerQuery('?')
 
@@ -95,6 +97,8 @@ const TokenDetail = () => {
       return
     }
   }, [id])
+
+  console.log("mint ==>", mint)
 
   const { data: mintData, mutate, isEmptyResult } = useMintInfo({ mints: [mint] })
   const mintInfo = mintData.find((m) => m.mint === mint)
@@ -139,6 +143,22 @@ const TokenDetail = () => {
     return () => window.clearTimeout(id)
   }, [isEmptyResult, mutate])
 
+  useEffect(() => {
+    console.log("hey", raydium)
+    if (raydium && raydium.connection && mint) {
+      fetchImgUri()
+    }
+  }, [raydium, mint])
+
+  const fetchImgUri = async () => {
+    console.log("fetchImgUri ==>")
+    if (raydium && raydium.connection && mint) {
+      const uri = await getTokenMetadataURL(raydium.connection, mint)
+      console.log("uri ==>", uri)
+      setImgUri(uri)
+    }
+  }
+
   const {
     data: poolInfo,
     configInfo: rpcConfigInfo,
@@ -176,10 +196,10 @@ const TokenDetail = () => {
   const marketCap =
     poolInfo && mintInfo && mintB && data[mintB]
       ? getMarketCapData({
-          poolInfo,
-          mintInfo,
-          mintBPrice: new Decimal(data[mintB].value)
-        })
+        poolInfo,
+        mintInfo,
+        mintBPrice: new Decimal(data[mintB].value)
+      })
       : undefined
 
   const creator = mintInfo?.creator
@@ -193,7 +213,7 @@ const TokenDetail = () => {
 
   const defaultTab = useMemo(() => (isMobile ? Tab.Info : Tab.Comments), [])
   const [value, setValue] = useState(defaultTab)
-  const commentRef = useRef<CommentAction>({ loadNewComments: () => {} })
+  const commentRef = useRef<CommentAction>({ loadNewComments: () => { } })
 
   const panelItems = useMemo(() => {
     const baseItems = [
@@ -412,8 +432,8 @@ const TokenDetail = () => {
             >
               <Flex alignItems="center" gap={1}>
                 <Image
-                  src={mintInfo ? getImgProxyUrl(mintInfo.imgUrl, 20) : undefined}
-                  fallbackSrc={mintInfo?.imgUrl}
+                  src={imgUri ? imgUri : undefined}
+                  fallbackSrc={imgUri ? imgUri : undefined}
                   borderRadius="50%"
                   width="20px"
                   height="20px"
@@ -461,15 +481,15 @@ const TokenDetail = () => {
             sx={
               isLight
                 ? {
-                    border: '1px solid #ffdebf80'
-                  }
+                  border: '1px solid #ffdebf80'
+                }
                 : {}
             }
           >
             <Flex alignItems="center" gap={1}>
               <Image
-                src={mintInfo ? getImgProxyUrl(mintInfo.imgUrl, 28) : undefined}
-                fallbackSrc={mintInfo?.imgUrl}
+                src={imgUri ? imgUri : undefined}
+                fallbackSrc={imgUri ? imgUri : undefined}
                 width="28px"
                 height="28px"
                 borderRadius="50%"
@@ -510,18 +530,18 @@ const TokenDetail = () => {
         sx={
           isMobile
             ? {
-                '.chakra-tabs ': {
-                  borderRadius: '4px'
-                },
-                button: {
-                  px: 3
-                }
+              '.chakra-tabs ': {
+                borderRadius: '4px'
+              },
+              button: {
+                px: 3
               }
+            }
             : isLight
-            ? {
+              ? {
                 border: '1px solid #ffdebf80'
               }
-            : {}
+              : {}
         }
       >
         {isMobile ? (
@@ -674,6 +694,7 @@ const TokenDetail = () => {
             mintBPrice={mintB && data[mintB] ? new Decimal(data[mintB].value).toNumber() : undefined}
             isLanded={isLanded}
             refreshMintInfo={mutate}
+            imgUri={imgUri}
           />
         </Grid>
       </GridItem>
