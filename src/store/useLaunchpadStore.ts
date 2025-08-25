@@ -1,4 +1,4 @@
-import { Connection, Keypair, PublicKey, SignatureResult, Transaction, VersionedTransaction } from '@solana/web3.js'
+import { ComputeBudgetProgram, Connection, Keypair, PublicKey, SignatureResult, SystemProgram, Transaction, TransactionMessage, VersionedTransaction } from '@solana/web3.js'
 import createStore from './createStore'
 import { useAppStore } from './useAppStore'
 import ToPublicKey from '@/utils/publicKey'
@@ -22,7 +22,16 @@ import {
   DEV_LAUNCHPAD_PROGRAM,
   Raydium,
   printSimulate,
-  LAUNCHPAD_PROGRAM
+  LAUNCHPAD_PROGRAM,
+  getPdaLaunchpadConfigId,
+  getPdaLaunchpadPoolId,
+  getPdaLaunchpadVaultId,
+  getPdaPlatformVault,
+  getPdaCreatorVault,
+  LaunchpadPool,
+  buyExactInInstruction,
+  getATAAddress,
+  sellExactInInstruction
 } from '@raydium-io/raydium-sdk-v2'
 import axios from '@/api/axios'
 import { ConfigInfo, MintInfo } from '@/views/Launchpad/type'
@@ -31,7 +40,17 @@ import { LaunchpadConfigInfo } from '@/hooks/launchpad/usePoolRpcInfo'
 import { useTokenAccountStore } from './useTokenAccountStore'
 import { getDefaultToastData, handleMultiTxToast } from '@/hooks/toast/multiToastUtil'
 import { handleMultiTxRetry } from '@/hooks/toast/retryTx'
-import { wSolToSolString } from '@/utils/token'
+import { getOrCreateATAInstruction, wSolToSolString } from '@/utils/token'
+import {
+  createSyncNativeInstruction,
+  getAssociatedTokenAddress,
+  createAssociatedTokenAccountInstruction,
+  createAssociatedTokenAccountIdempotentInstruction,
+  getAssociatedTokenAddressSync,
+  NATIVE_MINT,
+  TOKEN_PROGRAM_ID,
+
+} from '@solana/spl-token'
 
 export const LAUNCHPAD_SLIPPAGE_KEY = '_sherex_lau_slp_'
 
@@ -732,7 +751,7 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
     }
   },
   buyAct: async ({
-    programId = useAppStore.getState().programIdConfig.LAUNCHPAD_PROGRAM,
+    programId = LAUNCHPAD_PROGRAM,
     mintInfo,
     buyAmount,
     minMintAAmount,
@@ -748,86 +767,212 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
     onError,
     onFinally
   }) => {
-    const { raydium, txVersion } = useAppStore.getState()
-    if (!raydium) return ''
+    const { raydium, connection, publicKey } = useAppStore.getState()
+    if (!raydium || !connection || !publicKey) return ''
 
-    const { execute, extInfo } = await raydium.launchpad.buyToken({
-      programId,
-      mintA: ToPublicKey(mintInfo.mint),
-      txVersion,
-      buyAmount,
-      slippage,
-      mintB,
-      minMintAAmount, // use sdk to get realtime rpc data
-      shareFeeReceiver,
-      shareFeeRate: shareFeeReceiver ? defaultShareFeeRate : undefined,
-      configInfo,
-      platformFeeRate,
-      computeBudgetConfig: raydium.cluster === 'devnet' ? undefined : await getComputeBudgetConfig()
-    })
+    try {
 
-    const meta = getTxMeta({
-      action: 'buy',
-      values: {
-        amountA: new Decimal((minMintAAmount ?? extInfo.decimalOutAmount).toString())
-          .div(10 ** Number(mintInfo.decimals))
-          .toDecimalPlaces(Number(mintInfo.decimals))
-          .toString(),
-        symbolA: mintInfo.symbol ?? encodeStr(mintInfo.mint, 5),
-        amountB: new Decimal(buyAmount.toString())
-          .div(10 ** mintBDecimals)
-          .toDecimalPlaces(mintBDecimals)
-          .toString(),
-        symbolB: symbolB ?? 'SOL'
+      const instructions: any[] = [
+        ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 100_000 }),
+        ComputeBudgetProgram.setComputeUnitLimit({ units: 1000_000 })
+      ]
+
+      const mintA = new PublicKey(mintInfo.mint)
+      const mintBKey = mintB || NATIVE_MINT
+
+      const [
+        { ataPubkey: userTokenVault, ix: createTokenAccountIx },
+        { ataPubkey: userWsolVault, ix: createWsolAccountIx },
+        blockhash
+      ] = await Promise.all([
+        getOrCreateATAInstruction(
+          connection,
+          mintA,
+          publicKey,
+          publicKey,
+          true,
+          TOKEN_PROGRAM_ID
+        ),
+        getOrCreateATAInstruction(
+          connection,
+          NATIVE_MINT,
+          publicKey,
+          publicKey,
+          true,
+          TOKEN_PROGRAM_ID
+        ),
+        connection.getLatestBlockhash()
+      ]);
+
+      createTokenAccountIx && instructions.push(createTokenAccountIx)
+      createWsolAccountIx && instructions.push(createWsolAccountIx)
+
+
+
+      const maxSolSpendLamports = buyAmount;
+      const transferSolIx = SystemProgram.transfer({
+        fromPubkey: publicKey,
+        toPubkey: userWsolVault,
+        lamports: maxSolSpendLamports.toNumber(),
+      });
+
+      instructions.push(transferSolIx)
+      const syncNativeIx = createSyncNativeInstruction(userWsolVault);
+      instructions.push(syncNativeIx)
+
+      const authProgramId = getPdaLaunchpadAuth(programId).publicKey;
+      const configId = getPdaLaunchpadConfigId(programId, NATIVE_MINT, 0, 0).publicKey;
+
+      const poolId = getPdaLaunchpadPoolId(programId, mintA, mintBKey).publicKey;
+
+
+      const vaultA = getPdaLaunchpadVaultId(programId, poolId, mintA).publicKey;
+      const vaultB = getPdaLaunchpadVaultId(programId, poolId, mintBKey).publicKey;
+
+      console.log("Account addresses:")
+      console.log("- authProgramId:", authProgramId.toBase58())
+      console.log("- configId:", configId.toBase58())
+      console.log("- poolId:", poolId.toBase58())
+      console.log("- vaultA:", vaultA.toBase58())
+      console.log("- vaultB:", vaultB.toBase58())
+      console.log("- userTokenAccountA:", userTokenVault.toBase58())
+      console.log("- userTokenAccountB:", userWsolVault.toBase58())
+
+      console.log("poolId======>", poolId.toBase58())
+
+      const poolData = await connection.getAccountInfo(poolId, { commitment: "confirmed" });
+      if (!poolData) {
+        throw new Error(`Pool not found: ${poolId.toBase58()}. The token may not be listed on the launchpad yet.`)
       }
-    })
+
+      console.log("All critical accounts found, fetching pool info...")
+      const poolInfo = await raydium.launchpad.getRpcPoolInfo({ poolId })
+
+      // Check platform and creator vault accounts
+      const platformVault = getPdaPlatformVault(programId, poolInfo.platformId, mintBKey).publicKey;
+      const creatorVault = getPdaCreatorVault(programId, poolInfo.creator, mintBKey).publicKey;
 
 
-    const executeWithRetry = async (retryCount = 0): Promise<string> => {
-      try {
-        const result = await execute()
-        const { txId, signedTx } = result
-        txStatusSubject.next({
-          txId,
-          ...meta,
-          signedTx,
-          onSent,
-          onError,
-          onConfirmed: () => {
-            onConfirmed?.()
-            useTokenAccountStore.getState().fetchTokenAccountAct({})
-          }
-        })
-        return txId
-      } catch (e: any) {
-        console.error("Buy token error:", e)
+      console.log("Platform vault:", platformVault.toBase58())
+      console.log("Creator vault:", creatorVault.toBase58())
 
-        // Check if this is the specific error about keypair or expired mint
-        const errorMessage = e.message || e.toString()
-        const isKeypairError = errorMessage.includes('can not sign keypair') ||
-          errorMessage.includes('temporary mint has expired') ||
-          errorMessage.includes('please regenerate')
+      const minMintAAmountValue = minMintAAmount || new BN(0);
+      // const shareATA = getAssociatedTokenAddressSync(mintBKey, publicKey);
+      const shareATA = getATAAddress(publicKey, mintBKey).publicKey;
 
-        // Retry once if it's a keypair/expired mint error
-        if (isKeypairError && retryCount === 0) {
-          console.log("Retrying buy token transaction due to keypair/expired mint error...")
-          // Wait a bit before retrying
-          await new Promise(resolve => setTimeout(resolve, 1000))
-          return executeWithRetry(retryCount + 1)
+      console.log(
+        programId.toBase58(),
+        publicKey.toBase58(),
+        authProgramId.toBase58(),
+        configId.toBase58(),
+        new PublicKey("FEkF8SrSckk5GkfbmtcCbuuifpTKkw6mrSNowwB8aQe3").toBase58(),
+        poolId.toBase58(),
+        userTokenVault.toBase58(),
+        userWsolVault.toBase58(),
+        vaultA.toBase58(),
+        vaultB.toBase58(),
+        mintA.toBase58(),
+        mintBKey.toBase58(),
+        TOKEN_PROGRAM_ID.toBase58(),
+        TOKEN_PROGRAM_ID.toBase58(),
+        platformVault.toBase58(),
+        creatorVault.toBase58(),
+        buyAmount.toString(),
+        minMintAAmountValue.toString(),
+        new BN(10000).toString(),
+        shareATA
+      )
+
+      const buyIx = buyExactInInstruction(
+        programId,
+        publicKey,
+        authProgramId,
+        configId,
+        new PublicKey("FEkF8SrSckk5GkfbmtcCbuuifpTKkw6mrSNowwB8aQe3"),
+        poolId,
+        userTokenVault,
+        userWsolVault,
+        vaultA,
+        vaultB,
+        mintA,
+        mintBKey,
+        TOKEN_PROGRAM_ID,
+        TOKEN_PROGRAM_ID,
+        platformVault,
+        creatorVault,
+        buyAmount,
+        minMintAAmountValue,
+        new BN(10000),
+        shareATA
+      )
+      instructions.push(buyIx)
+
+      const messageV0 = new TransactionMessage({
+        payerKey: publicKey,
+        recentBlockhash: blockhash.blockhash,
+        instructions: instructions
+      }).compileToV0Message();
+
+      const tx = new VersionedTransaction(messageV0);
+
+      // Sign with connected wallet
+      const signedTxs = await raydium.signAllTransactions!([tx])
+      const signedTx = signedTxs[0]
+
+      console.log("Simulating transaction...", await connection.simulateTransaction(signedTx))
+
+      const signature = await connection.sendTransaction(signedTx, {
+        skipPreflight: true,
+      })
+
+      console.log("Transaction signature:", signature)
+
+      const meta = getTxMeta({
+        action: 'buy',
+        values: {
+          amountA: new Decimal((minMintAAmountValue).toString())
+            .div(10 ** Number(mintInfo.decimals))
+            .toDecimalPlaces(Number(mintInfo.decimals))
+            .toString(),
+          symbolA: mintInfo.symbol ?? encodeStr(mintInfo.mint, 5),
+          amountB: new Decimal(buyAmount.toString())
+            .div(10 ** mintBDecimals)
+            .toDecimalPlaces(mintBDecimals)
+            .toString(),
+          symbolB: symbolB ?? 'SOL'
         }
+      })
 
-        onError?.()
-        toastSubject.next({ ...meta, txError: e })
-        return ''
-      }
+      txStatusSubject.next({
+        txId: signature,
+        ...meta,
+        signedTx,
+        onSent,
+        onError,
+        onConfirmed: () => {
+          onConfirmed?.()
+          useTokenAccountStore.getState().fetchTokenAccountAct({})
+        }
+      })
+
+      return signature
+    } catch (e: any) {
+      console.error("Buy token error:", e)
+      onError?.()
+      toastSubject.next({
+        status: 'error',
+        title: 'Buy Error',
+        description: e.message || 'Buy transaction failed',
+        txError: e
+      })
+      return ''
+    } finally {
+      onFinally?.()
     }
-
-    return executeWithRetry()
-      .finally(onFinally)
   },
 
   sellAct: async ({
-    programId = useAppStore.getState().programIdConfig.LAUNCHPAD_PROGRAM,
+    programId = LAUNCHPAD_PROGRAM,
     mintInfo,
     sellAmount,
     minAmountB,
@@ -843,62 +988,177 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
     onError,
     onFinally
   }) => {
-    const { raydium, txVersion } = useAppStore.getState()
-    if (!raydium) return ''
+    const { raydium, connection, publicKey } = useAppStore.getState()
+    if (!raydium || !connection || !publicKey) return ''
+    try {
+      const instructions: any[] = [
+        ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 100_000 }),
+        ComputeBudgetProgram.setComputeUnitLimit({ units: 1000_000 })
+      ]
+      const mintA = new PublicKey(mintInfo.mint)
+      const mintBKey = mintB || NATIVE_MINT
 
-    const { execute, extInfo } = await raydium.launchpad.sellToken({
-      programId,
-      authProgramId: getPdaLaunchpadAuth(programId).publicKey,
-      mintA: ToPublicKey(mintInfo.mint),
-      txVersion,
-      sellAmount,
-      slippage,
-      mintB,
-      minAmountB,
-      configInfo,
-      platformFeeRate,
-      shareFeeReceiver,
-      shareFeeRate: shareFeeReceiver ? defaultShareFeeRate : undefined,
-      computeBudgetConfig: raydium.cluster === 'devnet' ? undefined : await getComputeBudgetConfig()
-    })
-    const decimals = Number(mintInfo.decimals)
-    const meta = getTxMeta({
-      action: 'sell',
-      values: {
-        amountA: new Decimal(sellAmount.toString())
-          .div(10 ** decimals)
-          .toDecimalPlaces(decimals)
-          .toString(),
-        symbolA: mintInfo.symbol ?? encodeStr(mintInfo.mint, 5),
-        amountB: new Decimal((minAmountB ?? extInfo.outAmount).toString())
-          .div(10 ** mintBDecimals)
-          .toDecimalPlaces(mintBDecimals)
-          .toString(),
-        symbolB: symbolB ?? 'SOL'
-      }
-    })
+      const [
+        { ataPubkey: userTokenVault, ix: createTokenAccountIx },
+        { ataPubkey: userWsolVault, ix: createWsolAccountIx },
+        blockhash
+      ] = await Promise.all([
+        getOrCreateATAInstruction(
+          connection,
+          mintA,
+          publicKey,
+          publicKey,
+          true,
+          TOKEN_PROGRAM_ID
+        ),
+        getOrCreateATAInstruction(
+          connection,
+          NATIVE_MINT,
+          publicKey,
+          publicKey,
+          true,
+          TOKEN_PROGRAM_ID
+        ),
+        connection.getLatestBlockhash()
+      ]);
 
-    return execute()
-      .then(({ txId, signedTx }) => {
-        txStatusSubject.next({
-          txId,
-          ...meta,
-          signedTx,
-          onSent,
-          onError,
-          onConfirmed: () => {
-            onConfirmed?.()
-            useTokenAccountStore.getState().fetchTokenAccountAct({})
-          }
-        })
-        return txId
+      createTokenAccountIx && instructions.push(createTokenAccountIx)
+
+      // const [userTokenVault, userWsolVault, blockhash] = await Promise.all([
+      //   getAssociatedTokenAddress(mintA, publicKey),
+      //   getAssociatedTokenAddress(NATIVE_MINT, publicKey),
+      //   connection.getLatestBlockhash()
+      // ]);
+      // const [createTokenAccountIx] = await Promise.all([
+      //   createAssociatedTokenAccountInstruction(
+      //     publicKey,
+      //     userTokenVault,
+      //     publicKey,
+      //     mintA
+      //   )
+      // ]);
+      // instructions.push(createTokenAccountIx)
+
+      const authProgramId = getPdaLaunchpadAuth(programId).publicKey;
+      const configId = getPdaLaunchpadConfigId(programId, NATIVE_MINT, 0, 0).publicKey;
+
+      const poolId = getPdaLaunchpadPoolId(programId, mintA, mintBKey).publicKey;
+
+
+      const vaultA = getPdaLaunchpadVaultId(programId, poolId, mintA).publicKey;
+      const vaultB = getPdaLaunchpadVaultId(programId, poolId, mintBKey).publicKey;
+      const poolData = await connection.getAccountInfo(poolId, { commitment: "confirmed" });
+      const poolInfo = await raydium.launchpad.getRpcPoolInfo({ poolId })
+      const platformVault = getPdaPlatformVault(programId, poolInfo.platformId, mintBKey).publicKey;
+      const creatorVault = getPdaCreatorVault(programId, poolInfo.creator, mintBKey).publicKey;
+
+      const minMintAAmountValue = new BN(0);
+      // const shareATA = getAssociatedTokenAddressSync(mintBKey, publicKey);
+      const shareATA = getATAAddress(publicKey, mintBKey).publicKey;
+      console.log(
+        programId.toBase58(),
+        publicKey.toBase58(),
+        authProgramId.toBase58(),
+        configId.toBase58(),
+        new PublicKey("FEkF8SrSckk5GkfbmtcCbuuifpTKkw6mrSNowwB8aQe3"),
+        poolId.toBase58(),
+        userTokenVault.toBase58(),
+        userWsolVault.toBase58(),
+        vaultA.toBase58(),
+        vaultB.toBase58(),
+        mintA.toBase58(),
+        mintBKey.toBase58(),
+        TOKEN_PROGRAM_ID.toBase58(),
+        TOKEN_PROGRAM_ID.toBase58(),
+        getPdaPlatformVault(programId, poolInfo.platformId, mintBKey).publicKey.toBase58(),
+        getPdaCreatorVault(programId, poolInfo.creator, mintBKey).publicKey.toBase58(),
+
+        sellAmount.toString(),
+        minMintAAmountValue.toString(),
+        new BN(10000).toString(),
+        shareATA.toBase58(),
+      )
+      const sellIx = sellExactInInstruction(
+        programId,
+        publicKey,
+        authProgramId,
+        configId,
+        new PublicKey("FEkF8SrSckk5GkfbmtcCbuuifpTKkw6mrSNowwB8aQe3"),
+        poolId,
+        userTokenVault,
+        userWsolVault,
+        vaultA,
+        vaultB,
+        mintA,
+        mintBKey,
+        TOKEN_PROGRAM_ID,
+        TOKEN_PROGRAM_ID,
+        getPdaPlatformVault(programId, poolInfo.platformId, mintBKey).publicKey,
+        getPdaCreatorVault(programId, poolInfo.creator, mintBKey).publicKey,
+        sellAmount,
+        minMintAAmountValue,
+        new BN(10000),
+        shareATA,
+      )
+      instructions.push(sellIx)
+      const messageV0 = new TransactionMessage({
+        payerKey: publicKey,
+        recentBlockhash: blockhash.blockhash,
+        instructions: instructions
+      }).compileToV0Message();
+      const tx = new VersionedTransaction(messageV0);
+
+      // Sign with connected wallet
+      const signedTxs = await raydium.signAllTransactions!([tx])
+      const signedTx = signedTxs[0]
+
+      console.log("Simulating transaction...", await connection.simulateTransaction(signedTx))
+      const signature = await connection.sendTransaction(signedTx, {
+        skipPreflight: true,
       })
-      .catch((e) => {
-        onError?.()
-        toastSubject.next({ ...meta, txError: e })
-        return ''
+
+      console.log("Transaction signature:", signature)
+             const meta = getTxMeta({
+         action: 'sell',
+         values: {
+           amountA: new Decimal(sellAmount.toString())
+             .div(10 ** Number(mintInfo.decimals))
+             .toDecimalPlaces(Number(mintInfo.decimals))
+             .toString(),
+           symbolA: mintInfo.symbol ?? encodeStr(mintInfo.mint, 5),
+           amountB: new Decimal((minMintAAmountValue).toString())
+             .div(10 ** mintBDecimals)
+             .toDecimalPlaces(mintBDecimals)
+             .toString(),
+           symbolB: symbolB ?? 'SOL'
+         }
+       })
+
+      txStatusSubject.next({
+        txId: signature,
+        ...meta,
+        signedTx,
+        onSent,
+        onError,
+        onConfirmed: () => {
+          onConfirmed?.()
+          useTokenAccountStore.getState().fetchTokenAccountAct({})
+        }
       })
-      .finally(onFinally)
+      return signature
+    } catch (e: any) {
+      console.log("sellAct error======>", e)
+      onError?.()
+      toastSubject.next({
+        status: 'error',
+        title: 'Sell Error',
+        description: e.message || 'Sell transaction failed',
+        txError: e
+      })
+      return ''
+    } finally {
+      onFinally?.()
+    }
   },
   getConfigInfo: async (configId) => {
     const { connection } = useAppStore.getState()

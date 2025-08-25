@@ -179,6 +179,7 @@ export const useAppStore = createStore<AppState>(
       console.log("calling initRaydiumAct...")
       const action = { type: 'initRaydiumAct' }
       const { initialing, urlConfigs, rpcNodeUrl, jupTokenType, displayTokenSettings } = get()
+      console.log("rpcNodeUrl======>", rpcNodeUrl)
       if (initialing || !rpcNodeUrl) return
       const connection = payload.connection || new Connection(rpcNodeUrl)
       set({ initialing: true }, false, action)
