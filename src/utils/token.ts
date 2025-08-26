@@ -16,7 +16,7 @@ export const isSolWSol = (mint?: string | PublicKey) => {
 export async function getTokenMetadataURL(connection: Connection, mintAddress: string) {
   console.log("Calling getTokenMetadata..")
   try {
-    const metaplex = Metaplex.make(connection);
+    const metaplex = Metaplex.make(connection as any);
     const mint = new PublicKey(mintAddress);
     const metadata = await metaplex.nfts().findByMint({ mintAddress: mint });
     console.log("metadata", metadata)
@@ -62,17 +62,17 @@ export const getMintName = ({ mint }: { mint: ApiV3Token }) => mint.name || mint
 
 export const RAY_TOKEN_INFO = {
   chainId: 101,
-  address: '4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R',
-  programId: 'TokenkegQfeZyiNwAJbNbGKPFXCWuBvf9Ss623VQ5DA',
-  logoURI: 'https://img-v1.raydium.io/icon/4k3Dyjzvzp8eMZWUXbBCjEvwSkkk59S5iCNLY3QrkX6R.png',
-  symbol: 'RAY',
-  name: 'Raydium',
+  address: 'FWaRpuDUhNbDxKgacKBht4mP85LVaohty6V2WD1XShrX',
+  programId: 'FEkF8SrSckk5GkfbmtcCbuuifpTKkw6mrSNowwB8aQe3',
+  logoURI: 'https://sherex.fun/logo.png',
+  symbol: 'QSHX',
+  name: 'Queen Sherex',
   decimals: 6,
   tags: [],
   extensions: {
-    coingeckoId: 'raydium'
+    coingeckoId: 'queen-sherex'
   },
-  type: 'raydium',
+  type: 'queen-sherex',
   priority: 2
 }
 

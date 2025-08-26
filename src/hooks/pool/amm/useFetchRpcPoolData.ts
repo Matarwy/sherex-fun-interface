@@ -39,8 +39,8 @@ const fetcher = async (url: string) => {
 const poolDataFetcher = async ([connection, poolKeys]: [connection: Connection, poolKeys: AmmV4Keys | AmmV5Keys]) => {
   try {
     const data = await fetchMultipleInfo({
-      connection,
-      poolKeysList: [poolKeys].filter((d) => !!d),
+      connection: connection as any, // bridge across the two web3 copies
+      poolKeysList: [poolKeys].filter(Boolean),
       config: undefined
     })
     return data[0]

@@ -11,7 +11,8 @@ import {
   WalletNotReadyError,
   WalletPublicKeyError,
   WalletReadyState,
-  WalletSignTransactionError
+  WalletSignTransactionError,
+  TransactionOrVersionedTransaction
 } from '@solana/wallet-adapter-base'
 import type { PublicKey, Transaction, TransactionVersion, VersionedTransaction } from '@solana/web3.js'
 import { getDerivationPath, getPublicKey, signTransaction } from './util'
@@ -23,7 +24,7 @@ export interface LedgerWalletAdapterConfig {
 
 export const LedgerWalletName = 'Ledger' as WalletName<'Ledger'>
 
-export class LedgerWalletAdapter extends BaseSignerWalletAdapter {
+export class LedgerWalletAdapter extends BaseSignerWalletAdapter<string> {
   name = LedgerWalletName
   url = 'https://ledger.com'
   icon =
@@ -121,20 +122,56 @@ export class LedgerWalletAdapter extends BaseSignerWalletAdapter {
     this.emit('disconnect')
   }
 
-  async signTransaction<T extends Transaction | VersionedTransaction>(transaction: T): Promise<T> {
+  // async signTransaction<T extends Transaction | VersionedTransaction>(transaction: T): Promise<T> {
+  //   try {
+  //     const transport = this._transport
+  //     const publicKey = this._publicKey
+  //     if (!transport || !publicKey) throw new WalletNotConnectedError()
+
+  //     try {
+  //       const signature = await signTransaction(transport, transaction, this._derivationPath)
+  //       transaction.addSignature(publicKey, signature)
+  //     } catch (error: any) {
+  //       throw new WalletSignTransactionError(error?.message, error)
+  //     }
+
+  //     return transaction
+  //   } catch (error: any) {
+  //     this.emit('error', error)
+  //     throw error
+  //   }
+  // }
+
+  override async signTransaction<
+    T extends TransactionOrVersionedTransaction<this['supportedTransactionVersions']>
+  >(transaction: T): Promise<T> {
+    // bridge to any to avoid cross-package web3 mismatch during the signing flow
+    const txAny = transaction as any
+    const signedAny = await this._signWithLedger(txAny) // your internal signing
+    return signedAny as T
+  }
+
+  override async signAllTransactions<
+    T extends TransactionOrVersionedTransaction<this['supportedTransactionVersions']>
+  >(transactions: T[]): Promise<T[]> {
+    const txsAny = transactions as any[]
+    const signedAny = await Promise.all(txsAny.map((t) => this._signWithLedger(t)))
+    return signedAny as T[]
+  }
+  private async _signWithLedger(tx: Transaction | VersionedTransaction | any) {
     try {
       const transport = this._transport
       const publicKey = this._publicKey
       if (!transport || !publicKey) throw new WalletNotConnectedError()
 
       try {
-        const signature = await signTransaction(transport, transaction, this._derivationPath)
-        transaction.addSignature(publicKey, signature)
+        const signature = await signTransaction(transport, tx, this._derivationPath)
+        tx.addSignature(publicKey, signature)
       } catch (error: any) {
         throw new WalletSignTransactionError(error?.message, error)
       }
 
-      return transaction
+      return tx
     } catch (error: any) {
       this.emit('error', error)
       throw error

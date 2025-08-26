@@ -13,6 +13,20 @@ import { cancelAllRetry } from '@/utils/common'
 import { sendWalletEvent } from '@/api/event'
 import { validateTxData, extendTxData } from '@/api/txService'
 import { parseUserAgent } from 'react-device-detect'
+import { Buffer } from 'buffer' // if Buffer isn't already globally available
+
+// 1) put this near the top of the file (if you haven't already)
+type AnyTx = Transaction | VersionedTransaction;
+// local, loose encoder that works regardless of which web3.js instance created the tx
+const txToBase64Loose = (tx: any): string => {
+  if (!tx || typeof tx.serialize !== 'function') throw new Error('Invalid transaction');
+  // v0 VersionedTransaction usually carries a numeric .version; legacy may not
+  const bytes =
+    typeof tx.version === 'number'
+      ? tx.serialize()
+      : tx.serialize({ requireAllSignatures: false, verifySignatures: false });
+  return Buffer.from(bytes).toString('base64');
+};
 
 const localFakePubKey = '_sherex_f_wallet_'
 export const WALLET_STORAGE_KEY = 'walletName'
@@ -34,21 +48,25 @@ function useInitConnection(props: SSRData) {
     return _publicKey
   }, [_publicKey])
 
-  const signAllTransactions = useMemo(
-    () =>
-      _signAllTransactions
-        ? async <T extends Transaction | VersionedTransaction>(propsTransactions: T[]) => {
+  const signAllTransactions = useMemo<
+    ((propsTransactions: any[]) => Promise<any[]>) | undefined
+   >(
+     () =>
+     _signAllTransactions
+       ? async (propsTransactions: any[]) => {
             const isV0Tx = useAppStore.getState().txVersion === TxVersion.V0
-            let transactions = [...propsTransactions]
-            let unsignedTxData = transactions.map(txToBase64)
+            // let transactions = [...propsTransactions]
+            // let unsignedTxData = (transactions as unknown[]).map(txToBase64Loose)
+            let transactions: any[] = [...propsTransactions]
+            let unsignedTxData = (transactions as unknown[]).map(txToBase64Loose)
             if (useAppStore.getState().wallet?.adapter.name?.toLowerCase() === 'walletconnect') {
               const { success, data: extendedTxData } = await extendTxData(unsignedTxData)
               if (success) {
                 const allTxBuf = extendedTxData.map((tx) => Buffer.from(tx, 'base64'))
                 transactions = allTxBuf.map((txBuf) =>
                   isV0Tx ? VersionedTransaction.deserialize(txBuf as unknown as Uint8Array) : Transaction.from(txBuf)
-                ) as T[]
-                unsignedTxData = transactions.map(txToBase64)
+                )
+                unsignedTxData = (transactions as unknown[]).map(txToBase64Loose)
               }
             }
 
@@ -57,16 +75,36 @@ function useInitConnection(props: SSRData) {
             const isAndroidCoinBase = deviceInfo.os.name === 'Android' && adapter?.name === 'Coinbase Wallet'
 
             const time = Date.now()
-            let allSignedTx: T[] = []
+            
+
+
+            // 3) inside your useMemo wrapper (replace the signing block)
+            let allSignedTx: any[] = [];
+
             if (isAndroidCoinBase) {
               for (const tx of transactions) {
-                const signed = await signTransaction!(tx)
-                allSignedTx.push(signed)
+                // avoid the cross-package web3.js type mismatch
+                const signed = await signTransaction!(tx as any);
+                allSignedTx.push(signed as any);
               }
             } else {
-              allSignedTx = await _signAllTransactions(transactions)
+              if (isV0Tx) {
+                // v0: VersionedTransaction[]
+                const signAllV0 = _signAllTransactions as unknown as (
+                  txs: VersionedTransaction[]
+                ) => Promise<VersionedTransaction[]>;
+                allSignedTx = await signAllV0(transactions as unknown as VersionedTransaction[])
+              } else {
+                // legacy: Transaction[]
+                const signAllLegacy = _signAllTransactions as unknown as (
+                  txs: Transaction[]
+                ) => Promise<Transaction[]>;
+                allSignedTx = await signAllLegacy(transactions as unknown as Transaction[])
+              }
             }
-            const allBase64Tx = allSignedTx.map(txToBase64)
+
+            // base64 encode using the loose encoder
+            const allBase64Tx = (allSignedTx as unknown[]).map(txToBase64Loose)
             const res = await validateTxData({
               preData: unsignedTxData,
               data: allBase64Tx,
@@ -143,7 +181,7 @@ function useInitConnection(props: SSRData) {
   useEffect(() => {
     if (!connection || connection.rpcEndpoint === defaultEndpoint) return
 
-    useAppStore.setState({ connection, signAllTransactions }, false, { type: 'useInitConnection' } as any)
+    useAppStore.setState({ connection: connection as any, signAllTransactions }, false, { type: 'useInitConnection' } as any)
     // raydium sdk initialization can be done with connection only, if url or rpc changed, re-init
     if (raydium && !isNeedReload) {
       raydium.setConnection(connection)
@@ -162,7 +200,11 @@ function useInitConnection(props: SSRData) {
     // if user connected wallet, update pubk
     if (raydium) {
       raydium.setOwner(publicKey || undefined)
-      raydium.setSignAllTransactions(signAllTransactions)
+      // bridge to Raydium’s expected type (avoids duplicate-web3 mismatch)
+      const sdkSignAll = signAllTransactions
+      ? ((txs: any[]) => signAllTransactions(txs)) // same runtime fn, just a typed adapter
+      : undefined
+      raydium.setSignAllTransactions(sdkSignAll as any)
     }
   }, [raydium, publicKey, signAllTransactions])
 

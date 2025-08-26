@@ -153,7 +153,7 @@ const TokenDetail = () => {
   const fetchImgUri = async () => {
     console.log("fetchImgUri ==>")
     if (raydium && raydium.connection && mint) {
-      const uri = await getTokenMetadataURL(raydium.connection, mint)
+      const uri = await getTokenMetadataURL(raydium.connection as any, mint)
       console.log("uri ==>", uri)
       setImgUri(uri)
     }

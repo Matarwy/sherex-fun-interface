@@ -13,7 +13,6 @@ import { encodeStr } from '@/utils/common'
 import {
   getPdaLaunchpadAuth,
   LaunchpadPoolInfo,
-  txToBase64,
   TxVersion,
   LaunchpadPoolInitParam,
   LaunchpadConfig,
@@ -459,7 +458,7 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
         cliffPeriod: LaunchpadPoolInitParam.cliffPeriod,
         unlockPeriod: LaunchpadPoolInitParam.unlockPeriod,
         // set your platform id, current platform: bonk
-        platformId: new PublicKey('FEkF8SrSckk5GkfbmtcCbuuifpTKkw6mrSNowwB8aQe3'),
+        platformId: useAppStore.getState().programIdConfig.LAUNCHPAD_PROGRAM,
         migrateType: 'amm', // or cpmm
         description: 'description',
       }
@@ -477,7 +476,7 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
         configInfo,
         mintBDecimals,
 
-        platformId: new PublicKey("FEkF8SrSckk5GkfbmtcCbuuifpTKkw6mrSNowwB8aQe3"),
+        platformId: useAppStore.getState().programIdConfig.LAUNCHPAD_PROGRAM,
 
         txVersion: TxVersion.V0,
         slippage: slippage || new BN(100), // Use the passed slippage or default to 1%
@@ -530,7 +529,7 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
         txStatusSubject.next({
           txId,
           ...callback,
-          signedTx: transaction,
+          signedTx: transaction as any,
           onConfirmed: () => {
             callback.onConfirmed?.()
             useTokenAccountStore.getState().fetchTokenAccountAct({})
@@ -865,7 +864,7 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
         publicKey.toBase58(),
         authProgramId.toBase58(),
         configId.toBase58(),
-        new PublicKey("FEkF8SrSckk5GkfbmtcCbuuifpTKkw6mrSNowwB8aQe3").toBase58(),
+        useAppStore.getState().programIdConfig.LAUNCHPAD_PROGRAM,
         poolId.toBase58(),
         userTokenVault.toBase58(),
         userWsolVault.toBase58(),
@@ -888,7 +887,7 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
         publicKey,
         authProgramId,
         configId,
-        new PublicKey("FEkF8SrSckk5GkfbmtcCbuuifpTKkw6mrSNowwB8aQe3"),
+        useAppStore.getState().programIdConfig.LAUNCHPAD_PROGRAM,
         poolId,
         userTokenVault,
         userWsolVault,
@@ -916,12 +915,13 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
       const tx = new VersionedTransaction(messageV0);
 
       // Sign with connected wallet
-      const signedTxs = await raydium.signAllTransactions!([tx])
+      const signAll = raydium.signAllTransactions as unknown as (txs: any[]) => Promise<any[]>
+      const signedTxs = await signAll([tx as any])
       const signedTx = signedTxs[0]
 
-      console.log("Simulating transaction...", await connection.simulateTransaction(signedTx))
+      console.log("Simulating transaction...", await connection.simulateTransaction(signedTx as any))
 
-      const signature = await connection.sendTransaction(signedTx, {
+      const signature = await connection.sendTransaction(signedTx as any, {
         skipPreflight: true,
       })
 
@@ -946,7 +946,7 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
       txStatusSubject.next({
         txId: signature,
         ...meta,
-        signedTx,
+        signedTx: signedTx as any,
         onSent,
         onError,
         onConfirmed: () => {
@@ -1060,7 +1060,7 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
         publicKey.toBase58(),
         authProgramId.toBase58(),
         configId.toBase58(),
-        new PublicKey("FEkF8SrSckk5GkfbmtcCbuuifpTKkw6mrSNowwB8aQe3"),
+        useAppStore.getState().programIdConfig.LAUNCHPAD_PROGRAM,
         poolId.toBase58(),
         userTokenVault.toBase58(),
         userWsolVault.toBase58(),
@@ -1083,7 +1083,7 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
         publicKey,
         authProgramId,
         configId,
-        new PublicKey("FEkF8SrSckk5GkfbmtcCbuuifpTKkw6mrSNowwB8aQe3"),
+        useAppStore.getState().programIdConfig.LAUNCHPAD_PROGRAM,
         poolId,
         userTokenVault,
         userWsolVault,
@@ -1109,11 +1109,12 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
       const tx = new VersionedTransaction(messageV0);
 
       // Sign with connected wallet
-      const signedTxs = await raydium.signAllTransactions!([tx])
+      const signAll = raydium.signAllTransactions as unknown as (txs: any[]) => Promise<any[]>
+      const signedTxs = await signAll([tx as any])
       const signedTx = signedTxs[0]
 
-      console.log("Simulating transaction...", await connection.simulateTransaction(signedTx))
-      const signature = await connection.sendTransaction(signedTx, {
+      console.log("Simulating transaction...", await connection.simulateTransaction(signedTx as any))
+      const signature = await connection.sendTransaction(signedTx as any, {
         skipPreflight: true,
       })
 
@@ -1137,7 +1138,7 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
       txStatusSubject.next({
         txId: signature,
         ...meta,
-        signedTx,
+        signedTx: signedTx as any,
         onSent,
         onError,
         onConfirmed: () => {

@@ -142,7 +142,7 @@ export const useSwapStore = createStore<SwapStore>(
         const swapTransactions = data || []
         const allTxBuf = swapTransactions.map((tx) => Buffer.from(tx.transaction, 'base64'))
         const allTx = allTxBuf.map((txBuf) => (isV0Tx ? VersionedTransaction.deserialize(txBuf as any) : Transaction.from(txBuf)))
-        console.log('simulate tx string:', allTx.map(txToBase64))
+        // console.log('simulate tx string:', allTx.map(txToBase64))
         const signedTxs = await signAllTransactions(allTx)
 
         // console.log('simulate tx string:', signedTxs.map(txToBase64))
@@ -315,10 +315,10 @@ export const useSwapStore = createStore<SwapStore>(
         multiExecute({
           sequentially: true,
           onTxUpdate: (data) => {
-            handleMultiTxRetry(data)
+            handleMultiTxRetry(data as any)
             handleMultiTxToast({
               toastId,
-              processedId: transformProcessData({ processedId, data }),
+              processedId: transformProcessData({ processedId, data }) as any,
               txLength,
               meta,
               handler,
@@ -358,7 +358,7 @@ export const useSwapStore = createStore<SwapStore>(
       return execute()
         .then(({ txId, signedTx }) => {
           onSent?.()
-          txStatusSubject.next({ txId, signedTx, ...meta, ...txProps })
+          txStatusSubject.next({ txId, signedTx: signedTx as any, ...meta, ...txProps })
           return txId
         })
         .catch((e) => {
@@ -374,7 +374,7 @@ export const useSwapStore = createStore<SwapStore>(
       const { execute } = await raydium.tradeV2.wrapWSol(new Decimal(amount).mul(10 ** SOL_INFO.decimals).toFixed(0))
       return execute()
         .then(({ txId, signedTx }) => {
-          txStatusSubject.next({ txId, signedTx })
+          txStatusSubject.next({ txId, signedTx: signedTx as any })
           return txId
         })
         .catch((e) => {
