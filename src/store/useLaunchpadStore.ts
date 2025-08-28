@@ -50,6 +50,7 @@ import {
   TOKEN_PROGRAM_ID,
 
 } from '@solana/spl-token'
+import { getPlatformId } from '@/utils/tx/getPlatformId'
 
 export const LAUNCHPAD_SLIPPAGE_KEY = '_sherex_lau_slp_'
 
@@ -882,46 +883,71 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
         shareATA
       )
 
-      const buyIx = buyExactInInstruction(
-        programId,
-        publicKey,
-        authProgramId,
-        configId,
-        new PublicKey("FEkF8SrSckk5GkfbmtcCbuuifpTKkw6mrSNowwB8aQe3"),
-        poolId,
-        userTokenVault,
-        userWsolVault,
-        vaultA,
-        vaultB,
-        mintA,
-        mintBKey,
-        TOKEN_PROGRAM_ID,
-        TOKEN_PROGRAM_ID,
-        platformVault,
-        creatorVault,
-        buyAmount,
-        minMintAAmountValue,
-        new BN(10000),
-        shareATA
-      )
-      instructions.push(buyIx)
+      // Try simulate with each platformId and pick the first that passes simulation
+      let platformIds: PublicKey[] = []
+      if (mintInfo.mint.endsWith("bonk")) platformIds.push(new PublicKey("FfYek5vEz23cMkWsdJwG2oa6EphsvXSHrGpdALN4g6W1"))
+      platformIds.push(new PublicKey("FEkF8SrSckk5GkfbmtcCbuuifpTKkw6mrSNowwB8aQe3"))
+      platformIds.push(new PublicKey("8pCtbn9iatQ8493mDQax4xfEUjhoVBpUWYVQoRU18333"))
 
-      const messageV0 = new TransactionMessage({
-        payerKey: publicKey,
-        recentBlockhash: blockhash.blockhash,
-        instructions: instructions
-      }).compileToV0Message();
+      const baseInstructions = [...instructions]
+      let selectedSignedTx: any | undefined
+      let selectedPlatformId: PublicKey | undefined
+      for (const pid of platformIds) {
+        try {
+          const tryInstructions = [...baseInstructions]
+          const tryBuyIx = buyExactInInstruction(
+            programId,
+            publicKey,
+            authProgramId,
+            configId,
+            pid,
+            poolId,
+            userTokenVault,
+            userWsolVault,
+            vaultA,
+            vaultB,
+            mintA,
+            mintBKey,
+            TOKEN_PROGRAM_ID,
+            TOKEN_PROGRAM_ID,
+            platformVault,
+            creatorVault,
+            buyAmount,
+            minMintAAmountValue,
+            new BN(10000),
+            shareATA
+          )
+          tryInstructions.push(tryBuyIx)
 
-      const tx = new VersionedTransaction(messageV0);
+          const messageV0Try = new TransactionMessage({
+            payerKey: publicKey,
+            recentBlockhash: blockhash.blockhash,
+            instructions: tryInstructions
+          }).compileToV0Message();
+          const txTry = new VersionedTransaction(messageV0Try);
 
-      // Sign with connected wallet
-      const signAll = raydium.signAllTransactions as unknown as (txs: any[]) => Promise<any[]>
-      const signedTxs = await signAll([tx as any])
-      const signedTx = signedTxs[0]
+          const signAllTry = raydium.signAllTransactions as unknown as (txs: any[]) => Promise<any[]>
+          const signedTxsTry = await signAllTry([txTry as any])
+          const signedTxTry = signedTxsTry[0]
 
-      console.log("Simulating transaction...", await connection.simulateTransaction(signedTx as any))
+          const simResult = await connection.simulateTransaction(signedTxTry as any)
+          console.log('Buy simulation result for platformId', pid.toBase58(), simResult.value.err)
+          if (!simResult.value.err) {
+            selectedSignedTx = signedTxTry
+            selectedPlatformId = pid
+            break
+          }
+        } catch (e) {
+          console.warn('Buy simulation failed for platformId', pid.toBase58(), e)
+        }
+      }
 
-      const signature = await connection.sendTransaction(signedTx as any, {
+      if (!selectedSignedTx) {
+        throw new Error('All platformIds failed simulation for buy')
+      }
+
+      console.log('Buy using platformId', selectedPlatformId!.toBase58())
+      const signature = await connection.sendTransaction(selectedSignedTx as any, {
         skipPreflight: true,
       })
 
@@ -946,7 +972,7 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
       txStatusSubject.next({
         txId: signature,
         ...meta,
-        signedTx: signedTx as any,
+        signedTx: selectedSignedTx as any,
         onSent,
         onError,
         onConfirmed: () => {
@@ -990,12 +1016,14 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
   }) => {
     const { raydium, connection, publicKey } = useAppStore.getState()
     if (!raydium || !connection || !publicKey) return ''
+
     try {
       const instructions: any[] = [
         ComputeBudgetProgram.setComputeUnitPrice({ microLamports: 100_000 }),
         ComputeBudgetProgram.setComputeUnitLimit({ units: 1000_000 })
       ]
       const mintA = new PublicKey(mintInfo.mint)
+
       const mintBKey = mintB || NATIVE_MINT
 
       const [
@@ -1023,21 +1051,6 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
       ]);
 
       createTokenAccountIx && instructions.push(createTokenAccountIx)
-
-      // const [userTokenVault, userWsolVault, blockhash] = await Promise.all([
-      //   getAssociatedTokenAddress(mintA, publicKey),
-      //   getAssociatedTokenAddress(NATIVE_MINT, publicKey),
-      //   connection.getLatestBlockhash()
-      // ]);
-      // const [createTokenAccountIx] = await Promise.all([
-      //   createAssociatedTokenAccountInstruction(
-      //     publicKey,
-      //     userTokenVault,
-      //     publicKey,
-      //     mintA
-      //   )
-      // ]);
-      // instructions.push(createTokenAccountIx)
 
       const authProgramId = getPdaLaunchpadAuth(programId).publicKey;
       const configId = getPdaLaunchpadConfigId(programId, NATIVE_MINT, 0, 0).publicKey;
@@ -1078,67 +1091,96 @@ export const useLaunchpadStore = createStore<LaunchpadState>((set, get) => ({
         new BN(10000).toString(),
         shareATA.toBase58(),
       )
-      const sellIx = sellExactInInstruction(
-        programId,
-        publicKey,
-        authProgramId,
-        configId,
-        new PublicKey("FEkF8SrSckk5GkfbmtcCbuuifpTKkw6mrSNowwB8aQe3"),
-        poolId,
-        userTokenVault,
-        userWsolVault,
-        vaultA,
-        vaultB,
-        mintA,
-        mintBKey,
-        TOKEN_PROGRAM_ID,
-        TOKEN_PROGRAM_ID,
-        getPdaPlatformVault(programId, poolInfo.platformId, mintBKey).publicKey,
-        getPdaCreatorVault(programId, poolInfo.creator, mintBKey).publicKey,
-        sellAmount,
-        minMintAAmountValue,
-        new BN(10000),
-        shareATA,
-      )
-      instructions.push(sellIx)
-      const messageV0 = new TransactionMessage({
-        payerKey: publicKey,
-        recentBlockhash: blockhash.blockhash,
-        instructions: instructions
-      }).compileToV0Message();
-      const tx = new VersionedTransaction(messageV0);
 
-      // Sign with connected wallet
-      const signAll = raydium.signAllTransactions as unknown as (txs: any[]) => Promise<any[]>
-      const signedTxs = await signAll([tx as any])
-      const signedTx = signedTxs[0]
 
-      console.log("Simulating transaction...", await connection.simulateTransaction(signedTx as any))
-      const signature = await connection.sendTransaction(signedTx as any, {
+      let platformIds: PublicKey[] = []
+      if (mintInfo.mint.endsWith("bonk")) platformIds.push(new PublicKey("FfYek5vEz23cMkWsdJwG2oa6EphsvXSHrGpdALN4g6W1"))
+      platformIds.push(new PublicKey("FEkF8SrSckk5GkfbmtcCbuuifpTKkw6mrSNowwB8aQe3"))
+      platformIds.push(new PublicKey("8pCtbn9iatQ8493mDQax4xfEUjhoVBpUWYVQoRU18333"))
+
+      const baseInstructions = [...instructions]
+      let selectedSignedTx: any | undefined
+      let selectedPlatformId: PublicKey | undefined
+      for (const pid of platformIds) {
+        try {
+          const tryInstructions = [...baseInstructions]
+          const trySellIx = sellExactInInstruction(
+            programId,
+            publicKey,
+            authProgramId,
+            configId,
+            pid,
+            poolId,
+            userTokenVault,
+            userWsolVault,
+            vaultA,
+            vaultB,
+            mintA,
+            mintBKey,
+            TOKEN_PROGRAM_ID,
+            TOKEN_PROGRAM_ID,
+            getPdaPlatformVault(programId, poolInfo.platformId, mintBKey).publicKey,
+            getPdaCreatorVault(programId, poolInfo.creator, mintBKey).publicKey,
+            sellAmount,
+            minMintAAmountValue,
+            new BN(10000),
+            shareATA,
+          )
+          tryInstructions.push(trySellIx)
+
+          const messageV0Try = new TransactionMessage({
+            payerKey: publicKey,
+            recentBlockhash: blockhash.blockhash,
+            instructions: tryInstructions
+          }).compileToV0Message();
+          const txTry = new VersionedTransaction(messageV0Try);
+
+          const signAllTry = raydium.signAllTransactions as unknown as (txs: any[]) => Promise<any[]>
+          const signedTxsTry = await signAllTry([txTry as any])
+          const signedTxTry = signedTxsTry[0]
+
+          const simResult = await connection.simulateTransaction(signedTxTry as any)
+          console.log('Simulation result for platformId', pid.toBase58(), simResult.value.err)
+          if (!simResult.value.err) {
+            selectedSignedTx = signedTxTry
+            selectedPlatformId = pid
+            break
+          }
+        } catch (e) {
+          console.warn('Simulation failed for platformId', pid.toBase58(), e)
+        }
+      }
+
+      if (!selectedSignedTx) {
+        throw new Error('All platformIds failed simulation')
+      }
+
+      console.log('Using platformId', selectedPlatformId!.toBase58())
+      const signature = await connection.sendTransaction(selectedSignedTx as any, {
         skipPreflight: true,
       })
 
       console.log("Transaction signature:", signature)
-             const meta = getTxMeta({
-         action: 'sell',
-         values: {
-           amountA: new Decimal(sellAmount.toString())
-             .div(10 ** Number(mintInfo.decimals))
-             .toDecimalPlaces(Number(mintInfo.decimals))
-             .toString(),
-           symbolA: mintInfo.symbol ?? encodeStr(mintInfo.mint, 5),
-           amountB: new Decimal((minMintAAmountValue).toString())
-             .div(10 ** mintBDecimals)
-             .toDecimalPlaces(mintBDecimals)
-             .toString(),
-           symbolB: symbolB ?? 'SOL'
-         }
-       })
+      const meta = getTxMeta({
+        action: 'sell',
+        values: {
+          amountA: new Decimal(sellAmount.toString())
+            .div(10 ** Number(mintInfo.decimals))
+            .toDecimalPlaces(Number(mintInfo.decimals))
+            .toString(),
+          symbolA: mintInfo.symbol ?? encodeStr(mintInfo.mint, 5),
+          amountB: new Decimal((minMintAAmountValue).toString())
+            .div(10 ** mintBDecimals)
+            .toDecimalPlaces(mintBDecimals)
+            .toString(),
+          symbolB: symbolB ?? 'SOL'
+        }
+      })
 
       txStatusSubject.next({
         txId: signature,
         ...meta,
-        signedTx: signedTx as any,
+        signedTx: selectedSignedTx as any,
         onSent,
         onError,
         onConfirmed: () => {
