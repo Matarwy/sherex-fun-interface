@@ -31,11 +31,14 @@ import { type Adapter, type WalletError } from '@solana/wallet-adapter-base'
 import { sendWalletEvent } from '@/api/event'
 import { useEvent } from '@/hooks/useEvent'
 import { LedgerWalletAdapter } from './Ledger/LedgerWalletAdapter'
+import CustomWalletModal from '@/components/SolWallet/CustomWalletModal'
 
-initialize()
+// Ensure Solflare is initialized (helps mobile deep-link flows)
+try { initialize() } catch {}
 
 const App: FC<PropsWithChildren<any>> = ({ children }) => {
   const [network] = useState<WalletAdapterNetwork>(defaultNetWork)
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false); 
   const rpcNodeUrl = useAppStore((s) => s.rpcNodeUrl)
   const wsNodeUrl = useAppStore((s) => s.wsNodeUrl)
   // const [endpoint] = useState<string>(defaultEndpoint)
@@ -66,10 +69,9 @@ const App: FC<PropsWithChildren<any>> = ({ children }) => {
     // buttonLogoUri: 'ADD OPTIONAL LOGO FOR WIDGET BUTTON HERE'
   })
 
-  const _walletConnect = useMemo(() => {
-    const connectWallet: WalletConnectWalletAdapter[] = []
+  const walletConnectAdapters = useMemo(() => {
     try {
-      connectWallet.push(
+      return [
         new WalletConnectWalletAdapter({
           network: network as WalletAdapterNetwork.Mainnet,
           options: {
@@ -82,11 +84,10 @@ const App: FC<PropsWithChildren<any>> = ({ children }) => {
             }
           }
         })
-      )
-    } catch (e) {
-      // console.error('WalletConnect error', e)
+      ]
+    } catch {
+      return []
     }
-    return connectWallet
   }, [network])
 
   const wallets = useMemo(
@@ -96,7 +97,7 @@ const App: FC<PropsWithChildren<any>> = ({ children }) => {
       new SlopeWalletAdapter({ endpoint }),
       new TorusWalletAdapter(),
       new LedgerWalletAdapter(),
-      ..._walletConnect,
+      ...walletConnectAdapters,
       new GlowWalletAdapter(),
       new TrustWalletAdapter(),
       new MathWalletAdapter({ endpoint }),
@@ -135,6 +136,10 @@ const App: FC<PropsWithChildren<any>> = ({ children }) => {
     <ConnectionProvider endpoint={endpoint} config={{ disableRetryOnRateLimit: true, wsEndpoint: wsNodeUrl }}>
       <WalletProvider wallets={wallets} onError={onWalletError} autoConnect>
         <WalletModalProvider>{children}</WalletModalProvider>
+        <CustomWalletModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+        />
       </WalletProvider>
     </ConnectionProvider>
   )
