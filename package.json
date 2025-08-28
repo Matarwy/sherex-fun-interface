@@ -34,7 +34,7 @@
     "type-check": "tsc --pretty --noEmit"
   },
   "resolutions": {
-    "@solana/spl-token": "^0.4.8",
+    "@solana/spl-token": "^0.4.9",
     "@solana/wallet-adapter-base": "^0.9.23",
     "@solana/web3.js": "^1.95.3",
     "@solana/buffer-layout": "^4.0.1",
@@ -42,7 +42,7 @@
     "bn.js": "^5.2.1"
   },
   "peerDependencies": {
-    "@solana/spl-token": "^0.4.8",
+    "@solana/spl-token": "^0.4.9",
     "@solana/web3.js": ">=1.95.3"
   },
   "dependencies": {
