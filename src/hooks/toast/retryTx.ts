@@ -3,7 +3,7 @@ import { parseUserAgent } from 'react-device-detect'
 import { retry, idToIntervalRecord, cancelRetry } from '@/utils/common'
 import { useAppStore } from '@/store'
 import axios from '@/api/axios'
-import { txToBase64 } from '@raydium-io/raydium-sdk-v2'
+// import { txToBase64 } from '@raydium-io/raydium-sdk-v2'
 
 const retryRecord = new Map<
   string,
@@ -11,6 +11,16 @@ const retryRecord = new Map<
     done: boolean
   }
 >()
+
+const txToBase64Loose = (tx: any): string => {
+  if (!tx || typeof tx.serialize !== 'function') throw new Error('Invalid transaction');
+  const bytes =
+    // VersionedTransaction typically has numeric .version
+    typeof tx.version === 'number'
+      ? tx.serialize()
+      : tx.serialize({ requireAllSignatures: false, verifySignatures: false });
+  return Buffer.from(bytes).toString('base64');
+};
 
 export default function retryTx({ tx, id }: { tx: Transaction | VersionedTransaction; id: string }) {
   const { connection, urlConfigs } = useAppStore.getState()
@@ -23,7 +33,7 @@ export default function retryTx({ tx, id }: { tx: Transaction | VersionedTransac
         .post(
           `${urlConfigs.SERVICE_1_BASE_HOST}/send-tx`,
           {
-            data: txToBase64(tx),
+            data: txToBase64Loose(tx as any),
             walletName: useAppStore.getState().wallet?.adapter.name || '',
             deviceType: deviceInfo.device.type || 'pc'
           },

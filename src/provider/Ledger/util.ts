@@ -1,10 +1,14 @@
 import type { default as Transport } from '@ledgerhq/hw-transport'
 import { StatusCodes, TransportStatusError } from '@ledgerhq/hw-transport'
-import { isVersionedTransaction } from '@solana/wallet-adapter-base'
+// import { isVersionedTransaction } from '@solana/wallet-adapter-base'
 import type { Transaction, VersionedTransaction } from '@solana/web3.js'
 import { PublicKey } from '@solana/web3.js'
 import { Buffer } from 'buffer'
 import './polyfill'
+
+function looksLikeVersioned(tx: any): tx is { version: number; message: { serialize: () => Uint8Array } } {
+  return typeof tx?.version === 'number' && tx?.message && typeof tx.message.serialize === 'function';
+}
 
 export function getDerivationPath(account?: number, change?: number): Buffer {
   const length = account !== undefined ? (change === undefined ? 3 : 4) : 2
@@ -58,7 +62,11 @@ export async function signTransaction(
   const paths = Buffer.alloc(1)
   paths.writeUInt8(1, 0)
 
-  const message = isVersionedTransaction(transaction) ? transaction.message.serialize() : transaction.serializeMessage()
+  const txAny = transaction as any;
+  const message = looksLikeVersioned(txAny)
+    ? txAny.message.serialize()
+    : txAny.serializeMessage();
+  // const message = isVersionedTransaction(transaction) ? transaction.message.serialize() : transaction.serializeMessage()
   const data = Buffer.concat([paths, derivationPath, message])
 
   return await send(transport, INS_SIGN_MESSAGE, P1_CONFIRM, data)

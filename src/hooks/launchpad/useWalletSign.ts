@@ -9,6 +9,7 @@ import base58 from 'bs58'
 import { useLaunchpadStore } from '@/store'
 import { isClient } from '@/utils/common'
 import { onboardingDialogSubject } from '@/components/Dialogs/OnboardingDialog'
+import { useConnection } from '@solana/wallet-adapter-react';
 
 interface RequestTokenRes {
   id: string
@@ -28,6 +29,7 @@ export default function useWalletSign() {
   const { signMessage, signTransaction, wallet, publicKey } = useWallet()
   const { setVisible } = useWalletModal()
   const authHost = useLaunchpadStore((s) => s.authHost)
+  const { connection } = useConnection();
 
   const ledgerStorageKey = `_sherex_ledger_${publicKey?.toBase58()}`
   const useLedger = wallet?.adapter.name === 'Ledger' || getStorageItem(ledgerStorageKey) === 'true'
@@ -103,7 +105,7 @@ export default function useWalletSign() {
     }
 
     try {
-      const msgDef = 'Sign in to raydium.io: '
+      const msgDef = 'Sign in to SherexFun: '
       const time = Math.floor(new Date().getTime() / 1000)
       const signInMsg = `${msgDef}${time}`
 
@@ -112,14 +114,17 @@ export default function useWalletSign() {
         signInTx.add(
           new TransactionInstruction({
             data: Buffer.from(signInMsg),
-            programId: new PublicKey('MemoSq4gqABAXKb96qnH8TysNcWxMyWCqXgDLGmfcHr'),
+            programId: new PublicKey(process.env.NEXT_PUBLIC_PLATFORM_ID || ''),
             keys: []
           })
         )
 
         signInTx.feePayer = publicKey
-        signInTx.recentBlockhash = PublicKey.default.toString()
-        const signedTx = await signTransaction!(signInTx)
+        const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('finalized');
+        signInTx.recentBlockhash = blockhash;
+        (signInTx as any).lastValidBlockHeight = lastValidBlockHeight;
+        const signTx = signTransaction as unknown as (tx: any) => Promise<any>;
+        const signedTx = await signTx(signInTx as any);
 
         const res: RequestTokenRes = await axios.post(authHost + '/request-token-ledger', {
           wallet: publicKey.toString(),

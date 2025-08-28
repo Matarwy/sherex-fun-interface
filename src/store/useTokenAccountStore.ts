@@ -318,11 +318,16 @@ export const useTokenAccountStore = createStore<TokenAccountStore>(
       }
     },
     migrateATAAct: async ({ migrateAccounts, ...txProps }) => {
-      const { connection, publicKey, signAllTransactions } = useAppStore.getState()
+      const { connection, publicKey, signAllTransactions, raydium } = useAppStore.getState()
       const tokenAccounts = get().tokenAccounts
       if (!connection || !publicKey || !signAllTransactions || !tokenAccounts.length) return
 
-      const txBuilder = new TxBuilder({ connection, cluster: 'mainnet', feePayer: publicKey, signAllTransactions })
+      const txBuilder = new TxBuilder({
+        connection: (raydium as any)?.connection ?? (connection as any),
+        cluster: 'mainnet',
+        feePayer: publicKey,
+        signAllTransactions: (signAllTransactions as any)
+      })
 
       migrateAccounts.forEach((tokenAcc) => {
         if (!tokenAcc.publicKey) return
@@ -357,7 +362,7 @@ export const useTokenAccountStore = createStore<TokenAccountStore>(
         .build()
         .execute()
         .then(({ txId, signedTx }) => {
-          txStatusSubject.next({ txId, signedTx })
+          txStatusSubject.next({ txId, signedTx: signedTx as any })
           txProps.onSent?.()
         })
         .catch((e) => {
