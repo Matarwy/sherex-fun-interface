@@ -7,7 +7,7 @@ import cn from "classnames";
 export const isPWA = (): boolean => {
   if (typeof window === 'undefined') return false;
   
-  let isInstalled: boolean = false;
+  let isInstalled = false;
   let standalone;
 
   if ("standalone" in window.navigator) {
@@ -73,7 +73,7 @@ const CustomWalletModal: React.FC<CustomWalletModalProps> = ({
     if (!url.searchParams.has("connectWallet")) return;
 
     const connectWallet = url.searchParams.get("connectWallet");
-    for (let wallet of wallets)
+    for (const wallet of wallets)
       if (wallet.adapter.name === connectWallet) {
         if (AUTOCONNECT_ATTEMPTED) break;
         AUTOCONNECT_ATTEMPTED = true;

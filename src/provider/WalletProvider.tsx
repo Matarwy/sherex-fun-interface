@@ -34,7 +34,11 @@ import { LedgerWalletAdapter } from './Ledger/LedgerWalletAdapter'
 import CustomWalletModal from '@/components/SolWallet/CustomWalletModal'
 
 // Ensure Solflare is initialized (helps mobile deep-link flows)
-try { initialize() } catch {}
+try { 
+  initialize(); 
+} catch {
+  // Silently handle initialization errors
+}
 
 const App: FC<PropsWithChildren<any>> = ({ children }) => {
   const [network] = useState<WalletAdapterNetwork>(defaultNetWork)
