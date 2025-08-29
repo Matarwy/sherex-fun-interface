@@ -14,9 +14,7 @@ import {
   Text,
   useBreakpointValue,
 } from "@chakra-ui/react";
-import { isPWA } from "@/utils/is-pwa";
-import { Icon } from "@iconify-icon/react";
-import cn from "classnames";
+
 declare global {
   interface Window {
     phantom?: any;
@@ -33,30 +31,27 @@ let AUTOCONNECT_ATTEMPTED = false;
 
 
 
+
 const CustomWalletModal: React.FC<CustomWalletModalProps> = ({
   isOpen,
   onClose,
 }) => {
   const { wallets, select } = useWallet();
-  const [isClient, setIsClient] = useState(false);
-  const [isPWAInstalled, setIsPWAInstalled] = useState(false);
-
-  // Ensure client-side only rendering
-  useEffect(() => {
-    setIsClient(true);
-    setIsPWAInstalled(isPWA());
-  }, []);
-
   console.log("🚀 ~ wallets:", wallets)
+  console.log("CustomWalletModal isOpen:", isOpen)
+
+  const [mounted, setMounted] = useState(false)
+  useEffect(() => setMounted(true), [])
+  const iconSize = useBreakpointValue({ base: 24, md: 28 }) || 24
 
   useEffect(() => {
-    if (typeof window === "undefined" || !window.location) return;
+    if (typeof window == "undefined" || !window.location) return;
 
     const url = new URL(window.location.href);
     if (!url.searchParams.has("connectWallet")) return;
 
     const connectWallet = url.searchParams.get("connectWallet");
-    for (const wallet of wallets)
+    for (let wallet of wallets)
       if (wallet.adapter.name === connectWallet) {
         if (AUTOCONNECT_ATTEMPTED) break;
         AUTOCONNECT_ATTEMPTED = true;
@@ -66,112 +61,67 @@ const CustomWalletModal: React.FC<CustomWalletModalProps> = ({
         break;
       }
   }, [
-    typeof window === "undefined" ? undefined : window.location.search,
+    typeof window == "undefined" ? undefined : window.location.search,
     wallets,
   ]);
 
   const hasWindowSolana =
-    typeof window !== "undefined" &&
-    (typeof window.solana !== "undefined" ||
-      typeof window.phantom !== "undefined" ||
-      typeof window.solflare !== "undefined");
+    typeof window != "undefined" &&
+    (typeof window.solana != "undefined" ||
+      typeof window.phantom != "undefined" ||
+      typeof window.solflare != "undefined");
 
   useEffect(() => {
     console.log(hasWindowSolana)
   }, [hasWindowSolana])
 
-  // Don't render anything until client-side
-  if (!isClient) {
-    return null;
-  }
-
+  const size = useBreakpointValue({ base: "full", md: "md" })
   return (
-    <div
-      className={`fixed inset-0 z-30 flex items-end justify-center transition-opacity duration-500 ${isOpen ? "" : "pointer-events-none"
-        }`}
-    >
-      <div
-        className={`fixed inset-0 bg-black transition-opacity bg-[#000000E5] duration-500 ${isOpen ? "opacity-75" : "opacity-0"
-          }`}
-        onClick={onClose}
-      />
-
-      <div
-        className={cn(
-          "flex flex-col gap-4",
-          "w-full",
-          "p-6",
-          {
-            "pb-8": isPWAInstalled,
-            "pb-6": !isPWAInstalled,
-          },
-          "rounded-t-2xl",
-          "bg-[#272727]",
-          "absolute",
-          "z-40",
-          {
-            "bottom-0": isOpen,
-            "-bottom-full": !isOpen,
-          },
-          "duration-500 ease-in-out"
-        )}
-      >
-        <div className="flex items-center justify-between h-[2rem] gap-4">
-          <p className="font-bold text-white text-[1.5rem] leading-[1.5625rem]">
-            Wallet connect
-          </p>
-          <button
-            className="flex items-center justify-center w-8 h-8 p-[6px] rounded-full bg-[#2FD3BA]"
-            onClick={onClose}
-          >
-            <Icon
-              icon="flowbite:close-circle-solid"
-              width="22"
-              height="22"
-              style={{ color: "#292929" }}
-            />
-          </button>
-        </div>
-
-        <div className="space-y-3">
-          {wallets.map((wallet) => (
-            <button
-              key={wallet.adapter.name}
-              onClick={() => {
-                let deepLinkBase = null;
-                if (!hasWindowSolana) {
-                  if (wallet.adapter.name === "Phantom")
-                    deepLinkBase = "https://phantom.app";
-                }
-                if (deepLinkBase) {
-                  const currentUrl = new URL(window.location.href);
-                  currentUrl.searchParams.append(
-                    "connectWallet",
-                    wallet.adapter.name,
-                  );
-
-                  const deepLink = new URL(
-                    "/ul/browse/" + encodeURIComponent(currentUrl.toString()),
-                    deepLinkBase,
-                  );
-                  deepLink.searchParams.append("ref", window.location.origin);
-                  window.open(deepLink.toString(), '_blank', 'noopener,noreferrer');
-                } else select(wallet.adapter.name);
-                onClose(); // Close the modal after selecting a wallet
-              }}
-              className="flex items-center border border-[#272727] w-full p-3 bg-[#272727] rounded-full hover:bg-[#4A4A4A] hover:border-[#2FD3BA]"
-            >
-              <WalletIcon wallet={wallet} className="w-6 h-6 mr-3" />
-              <span
-                className="font-bold text-[18px] leading-5"
+    <Modal isOpen={isOpen} onClose={onClose} isCentered size={size} motionPreset="slideInBottom">
+      <ModalOverlay bg="blackAlpha.700" />
+      <ModalContent bg="#272727" borderRadius={{ base: "2xl", md: "xl" }} pb={{ base: 6, md: 6 }}>
+        <ModalHeader color="white">Wallet connect</ModalHeader>
+        <ModalCloseButton color="#292929" bg="#2FD3BA" _hover={{ bg: "#29CBB2" }} borderRadius="full" />
+        <ModalBody>
+          <VStack spacing={3} align="stretch">
+            {mounted && wallets.map((wallet) => (
+              <Button
+                key={wallet.adapter.name}
+                onClick={() => {
+                  let deepLinkBase: string | null = null
+                  if (!hasWindowSolana) {
+                    if (wallet.adapter.name == "Phantom") deepLinkBase = "https://phantom.app"
+                  }
+                  if (deepLinkBase) {
+                    const currentUrl = new URL(window.location.href)
+                    currentUrl.searchParams.append("connectWallet", wallet.adapter.name)
+                    const deepLink = new URL("/ul/browse/" + encodeURIComponent(currentUrl.toString()), deepLinkBase)
+                    deepLink.searchParams.append("ref", window.location.origin)
+                    window.open(deepLink.toString(), '_blank', 'noopener,noreferrer')
+                  } else select(wallet.adapter.name)
+                  onClose()
+                }}
+                variant="outline"
+                justifyContent="flex-start"
+                borderColor="#272727"
+                bg="#272727"
+                _hover={{ bg: "#4A4A4A", borderColor: "#2FD3BA" }}
+                borderRadius="full"
+                py={3}
+                px={4}
               >
-                {wallet.adapter.name}
-              </span>
-            </button>
-          ))}
-        </div>
-      </div>
-    </div>
+                <HStack spacing={3} align="center">
+                  <WalletIcon wallet={wallet} style={{ width: iconSize, height: iconSize }} />
+                  <Text fontWeight="bold" fontSize="18px" lineHeight="5">
+                    {wallet.adapter.name}
+                  </Text>
+                </HStack>
+              </Button>
+            ))}
+          </VStack>
+        </ModalBody>
+      </ModalContent>
+    </Modal>
   );
 };
 

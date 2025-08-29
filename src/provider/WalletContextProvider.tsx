@@ -33,12 +33,7 @@ import { useEvent } from '@/hooks/useEvent'
 import { LedgerWalletAdapter } from './Ledger/LedgerWalletAdapter'
 import CustomWalletModal from '@/components/SolWallet/CustomWalletModal'
 
-// Ensure Solflare is initialized (helps mobile deep-link flows)
-try { 
-  initialize(); 
-} catch {
-  // Silently handle initialization errors
-}
+initialize()
 
 interface WalletProviderProps {
   isModalOpen: boolean;
@@ -50,11 +45,11 @@ const WalletContext = createContext<WalletProviderProps | undefined>(undefined);
 
 const WalletContextProvider: FC<PropsWithChildren<any>> = ({ children }) => {
   const [network] = useState<WalletAdapterNetwork>(defaultNetWork)
-  const [isModalOpen, setIsModalOpen] = useState<boolean>(false); 
   const rpcNodeUrl = useAppStore((s) => s.rpcNodeUrl)
   const wsNodeUrl = useAppStore((s) => s.wsNodeUrl)
   // const [endpoint] = useState<string>(defaultEndpoint)
   const [endpoint, setEndpoint] = useState<string>(rpcNodeUrl || defaultEndpoint)
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   registerMoonGateWallet({
     authMode: 'Ethereum',
     position: 'top-right'
@@ -80,9 +75,10 @@ const WalletContextProvider: FC<PropsWithChildren<any>> = ({ children }) => {
     // buttonLogoUri: 'ADD OPTIONAL LOGO FOR WIDGET BUTTON HERE'
   })
 
-  const walletConnectAdapters = useMemo(() => {
+  const _walletConnect = useMemo(() => {
+    const connectWallet: WalletConnectWalletAdapter[] = []
     try {
-      return [
+      connectWallet.push(
         new WalletConnectWalletAdapter({
           network: network as WalletAdapterNetwork.Mainnet,
           options: {
@@ -95,16 +91,32 @@ const WalletContextProvider: FC<PropsWithChildren<any>> = ({ children }) => {
             }
           }
         })
-      ]
-    } catch {
-      return []
+      )
+    } catch (e) {
+      // console.error('WalletConnect error', e)
     }
+    return connectWallet
   }, [network])
 
   const wallets = useMemo(
     () => [
       new PhantomWalletAdapter(),
       new SolflareWalletAdapter(),
+      // new SlopeWalletAdapter({ endpoint }),
+      // new TorusWalletAdapter(),
+      // new LedgerWalletAdapter(),
+      // ..._walletConnect,
+      // new GlowWalletAdapter(),
+      // new TrustWalletAdapter(),
+      // new MathWalletAdapter({ endpoint }),
+      // new TokenPocketWalletAdapter(),
+      // new CoinbaseWalletAdapter({ endpoint }),
+      // new SolongWalletAdapter({ endpoint }),
+      // new Coin98WalletAdapter({ endpoint }),
+      // new SafePalWalletAdapter({ endpoint }),
+      // new BitpieWalletAdapter({ endpoint }),
+      // new BitgetWalletAdapter({ endpoint }),
+      // new ExodusWalletAdapter({ endpoint }),
       // new TipLinkWalletAdapter({
       //   clientId: process.env.NEXT_PUBLIC_WALLET_TIP_WALLET_KEY ?? '',
       //   title: 'Queen Sherex',
