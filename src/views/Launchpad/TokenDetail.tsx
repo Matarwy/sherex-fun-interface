@@ -433,7 +433,7 @@ const TokenDetail = () => {
               <Flex alignItems="center" gap={1}>
                 <Image
                   src={imgUri ? imgUri : undefined}
-                  fallbackSrc={imgUri ? imgUri : undefined}
+                  fallbackSrc={mintInfo?.imgUrl}
                   borderRadius="50%"
                   width="20px"
                   height="20px"
@@ -489,7 +489,7 @@ const TokenDetail = () => {
             <Flex alignItems="center" gap={1}>
               <Image
                 src={imgUri ? imgUri : undefined}
-                fallbackSrc={imgUri ? imgUri : undefined}
+                fallbackSrc={mintInfo?.imgUrl}
                 width="28px"
                 height="28px"
                 borderRadius="50%"

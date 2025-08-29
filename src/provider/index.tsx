@@ -1,11 +1,11 @@
 import { ReactNode } from 'react'
 import { SWRConfig } from 'swr'
 import { skipRetryStatus } from '@/api/axios'
-import WalletProvider from './WalletProvider'
+import WalletContextProvider from './WalletContextProvider'
 import ThemeProvider from './ThemeProvider'
 import GlobalColorProvider from './GlobalColorProvider'
 
-export { WalletProvider, ThemeProvider, GlobalColorProvider }
+export { WalletContextProvider, ThemeProvider, GlobalColorProvider }
 
 const timeoutId: Record<string, number> = {}
 export const Providers = ({ children }: { children: ReactNode }) => {
@@ -19,13 +19,13 @@ export const Providers = ({ children }: { children: ReactNode }) => {
 
           // Retry after 5 seconds.
           timeoutId[key] && clearTimeout(timeoutId[key])
-          timeoutId[key] = window.setTimeout(() => revalidate({ retryCount: apiRetryCount }), is429 ? apiRetryCount * 1000 : 5000)
+          timeoutId[key] = setTimeout(() => revalidate({ retryCount: apiRetryCount }), is429 ? apiRetryCount * 1000 : 5000) as unknown as number
         }
       }}
     >
       <ThemeProvider>
         <GlobalColorProvider>
-          <WalletProvider>{children}</WalletProvider>
+          <WalletContextProvider>{children}</WalletContextProvider>
         </GlobalColorProvider>
       </ThemeProvider>
     </SWRConfig>

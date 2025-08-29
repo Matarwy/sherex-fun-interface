@@ -12,16 +12,26 @@ import { encodeStr } from '@/utils/common'
 import { useAppStore } from '@/store/useAppStore'
 import useResponsive from '@/hooks/useResponsive'
 import { WALLET_STORAGE_KEY } from '@/hooks/app/useInitConnection'
+import { useWalletProvider } from '@/provider/WalletContextProvider'
 
 export default function SolWallet() {
   const { wallets, select, disconnect, connected, connecting, wallet } = useWallet()
+  const { setIsModalOpen } = useWalletProvider();
   const publicKey = useAppStore((s) => s.publicKey)
   const { isMobile, isTablet } = useResponsive()
   const { setVisible, visible } = useWalletModal()
   const { isOpen: isWalletDrawerShown, onOpen, onClose } = useDisclosure()
 
   const handleClose = useCallback(() => setVisible(false), [setVisible])
-  const handleOpen = useCallback(() => setVisible(true), [setVisible])
+  // const handleOpen = useCallback(() => setVisible(true), [setVisible])
+  const handleOpen = useCallback(() => {
+    if (!connected && !connecting) {
+      console.log("wallet is connecting")
+      setIsModalOpen(true)
+    } else {
+      // isDisconnected.setTrue();
+    }
+  }, [connected, connecting, setIsModalOpen])
 
   const handleSelectWallet = useEvent((wallet: Wallet) => {
     select(wallet.adapter.name)
