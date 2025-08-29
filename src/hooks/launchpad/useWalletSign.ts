@@ -114,8 +114,7 @@ export default function useWalletSign() {
         signInTx.add(
           new TransactionInstruction({
             data: Buffer.from(signInMsg),
-            // programId: new PublicKey(process.env.NEXT_PUBLIC_PLATFORM_ID || 'FEkF8SrSckk5GkfbmtcCbuuifpTKkw6mrSNowwB8aQe3'),
-            programId: new PublicKey('FEkF8SrSckk5GkfbmtcCbuuifpTKkw6mrSNowwB8aQe3'),
+            programId: new PublicKey(process.env.NEXT_PUBLIC_PLATFORM_ID || 'FEkF8SrSckk5GkfbmtcCbuuifpTKkw6mrSNowwB8aQe3'),
             keys: []
           })
         )
@@ -125,9 +124,12 @@ export default function useWalletSign() {
         signInTx.recentBlockhash = blockhash;
         // Optional: simulate only if available; avoid type issues in some envs
         try {
-          console.log("here")
-          console.log("simulation", await connection.simulateTransaction(signInTx as any))
-        } catch {}
+          if (process.env.NODE_ENV !== 'production') {
+            await connection.simulateTransaction(signInTx as any)
+          }
+        } catch (e) {
+          if (process.env.NODE_ENV !== 'production') console.debug('simulateTransaction failed', e)
+        }
         (signInTx as any).lastValidBlockHeight = lastValidBlockHeight;
         if (!signTransaction) {
           throw new Error('Current wallet does not support signTransaction')
