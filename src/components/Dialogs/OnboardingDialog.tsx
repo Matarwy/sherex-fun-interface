@@ -51,7 +51,7 @@ export const OnboardingDialog = () => {
 
   useEffect(() => {
     const sub = onboardingDialogSubject.asObservable().subscribe((data) => {
-      setIsOpen(data.open)
+      // setIsOpen(data.open)
       successCbkRef.current = data.successCbk
     })
 

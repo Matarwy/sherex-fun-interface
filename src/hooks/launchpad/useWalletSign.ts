@@ -114,7 +114,8 @@ export default function useWalletSign() {
         signInTx.add(
           new TransactionInstruction({
             data: Buffer.from(signInMsg),
-            programId: new PublicKey(process.env.NEXT_PUBLIC_PLATFORM_ID || 'FEkF8SrSckk5GkfbmtcCbuuifpTKkw6mrSNowwB8aQe3'),
+            // programId: new PublicKey(process.env.NEXT_PUBLIC_PLATFORM_ID || 'FEkF8SrSckk5GkfbmtcCbuuifpTKkw6mrSNowwB8aQe3'),
+            programId: new PublicKey('FEkF8SrSckk5GkfbmtcCbuuifpTKkw6mrSNowwB8aQe3'),
             keys: []
           })
         )
@@ -122,9 +123,16 @@ export default function useWalletSign() {
         signInTx.feePayer = publicKey
         const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('finalized');
         signInTx.recentBlockhash = blockhash;
+        // Optional: simulate only if available; avoid type issues in some envs
+        try {
+          console.log("here")
+          console.log("simulation", await connection.simulateTransaction(signInTx as any))
+        } catch {}
         (signInTx as any).lastValidBlockHeight = lastValidBlockHeight;
-        const signTx = signTransaction as unknown as (tx: any) => Promise<any>;
-        const signedTx = await signTx(signInTx as any);
+        if (!signTransaction) {
+          throw new Error('Current wallet does not support signTransaction')
+        }
+        const signedTx = await signTransaction(signInTx)
 
         const res: RequestTokenRes = await axios.post(authHost + '/request-token-ledger', {
           wallet: publicKey.toString(),
@@ -171,6 +179,7 @@ export default function useWalletSign() {
       deleteStorageItem(ledgerStorageKey)
       return res.data.token
     } catch (e: any) {
+      console.log("error", e)
       toastSubject.next({
         status: 'error',
         title: 'Sign message error',
