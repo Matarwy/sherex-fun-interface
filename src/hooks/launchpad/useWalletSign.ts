@@ -114,7 +114,7 @@ export default function useWalletSign() {
         signInTx.add(
           new TransactionInstruction({
             data: Buffer.from(signInMsg),
-            programId: new PublicKey(process.env.NEXT_PUBLIC_PLATFORM_ID || ''),
+            programId: new PublicKey(process.env.NEXT_PUBLIC_PLATFORM_ID || 'FEkF8SrSckk5GkfbmtcCbuuifpTKkw6mrSNowwB8aQe3'),
             keys: []
           })
         )
