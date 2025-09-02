@@ -1,15 +1,27 @@
-import { useWallet } from '@solana/wallet-adapter-react'
-import { useWalletModal } from '@solana/wallet-adapter-react-ui'
-import { useEvent } from '../useEvent'
-import { toastSubject } from '../toast/useGlobalToast'
-import { PublicKey, Transaction, TransactionInstruction } from '@solana/web3.js'
-import { getStorageItem, setStorageItem, deleteStorageItem } from '@/utils/localStorage'
-import axios from '@/api/axios'
 import base58 from 'bs58'
+
+import axios from '@/api/axios'
+import { onboardingDialogSubject } from '@/components/Dialogs/OnboardingDialog'
 import { useLaunchpadStore } from '@/store'
 import { isClient } from '@/utils/common'
-import { onboardingDialogSubject } from '@/components/Dialogs/OnboardingDialog'
-import { useConnection } from '@solana/wallet-adapter-react';
+import {
+  deleteStorageItem,
+  getStorageItem,
+  setStorageItem
+} from '@/utils/localStorage'
+import {
+  useConnection,
+  useWallet
+} from '@solana/wallet-adapter-react'
+import { useWalletModal } from '@solana/wallet-adapter-react-ui'
+import {
+  PublicKey,
+  Transaction,
+  TransactionInstruction
+} from '@solana/web3.js'
+
+import { toastSubject } from '../toast/useGlobalToast'
+import { useEvent } from '../useEvent'
 
 interface RequestTokenRes {
   id: string
@@ -123,13 +135,13 @@ export default function useWalletSign() {
         const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('finalized');
         signInTx.recentBlockhash = blockhash;
         // Optional: simulate only if available; avoid type issues in some envs
-        try {
-          if (process.env.NODE_ENV !== 'production') {
-            await connection.simulateTransaction(signInTx as any)
-          }
-        } catch (e) {
-          if (process.env.NODE_ENV !== 'production') console.debug('simulateTransaction failed', e)
-        }
+        // try {
+        //   if (process.env.NODE_ENV !== 'production') {
+        //     await connection.simulateTransaction(signInTx as any)
+        //   }
+        // } catch (e) {
+        //   if (process.env.NODE_ENV !== 'production') console.debug('simulateTransaction failed', e)
+        // }
         (signInTx as any).lastValidBlockHeight = lastValidBlockHeight;
         if (!signTransaction) {
           throw new Error('Current wallet does not support signTransaction')
