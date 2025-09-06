@@ -1,7 +1,22 @@
-import { toastSubject } from '@/hooks/toast/useGlobalToast'
+import {
+  RefObject,
+  useEffect,
+  useImperativeHandle
+} from 'react'
+
 import Head from 'next/head'
-import { RefObject, useEffect, useImperativeHandle } from 'react'
-import { Box, SystemStyleObject } from '@chakra-ui/react'
+
+import { toastSubject } from '@/hooks/toast/useGlobalToast'
+import {
+  Box,
+  SystemStyleObject
+} from '@chakra-ui/react'
+
+declare global {
+  interface Window {
+    turnstile?: any
+  }
+}
 
 export type ActionRef = { validate: () => string | undefined }
 interface Props {
