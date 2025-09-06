@@ -307,10 +307,10 @@ export default function TradeBox({
       await sellAct({
         mintInfo,
         sellAmount: new BN(new Decimal(amount.amountIn || 0).mul(10 ** mintADecimal).toFixed(0)),
-        minAmountB: new BN(new Decimal(amount.amountOut || 0).mul(10 ** mintBDecimal).toFixed(0)),
+        minAmountB: new BN(new Decimal(amount.minAmountOut || 0).mul(10 ** mintBDecimal).toFixed(0)),
         mintB: configInfo.mintB,
         mintBDecimals: mintBInfo.decimals,
-        slippage: new BN((useSwapStore.getState().slippage * 10000).toFixed(0)),
+        slippage: new BN((slippage * 10000).toFixed(0)),
         shareFeeReceiver: wallet,
         configInfo: ToLaunchPadConfig(mintInfo.configInfo),
         platformFeeRate: new BN(mintInfo.platformInfo.feeRate),

@@ -310,7 +310,7 @@ const JustSendIt = () => {
         console.log('check token failed')
       }
     })
-    console.log('check token result', r)
+    // console.log('check token result', r)
     if (!r) return
     openDialog(
       DialogTypes.InitialBuy({
@@ -1999,3 +1999,14 @@ const FileAvatar = ({ file, name }: { file: File | null | undefined; name: strin
   const url = useObjectUrl(file)
   return <Avatar width={7} height={7} src={url || undefined} name={name || 'Token image'} />
 }
+
+// const initialState = {
+//   authHost: process.env.NEXT_PUBLIC_LAUNCH_AUTH_HOST || 'https://launch-auth-v1.raydium.io',
+//   commentHost: process.env.NEXT_PUBLIC_LAUNCH_COMMENT_HOST || 'https://launch-forum-v1.raydium.io',
+//   historyHost: process.env.NEXT_PUBLIC_LAUNCH_HISTORY_HOST || 'https://launch-history-v1.raydium.io',
+//   mintHost: process.env.NEXT_PUBLIC_LAUNCH_MINT_HOST || 'https://launch-mint-v1.raydium.io',
+//   // platformId: process.env.NEXT_PUBLIC_PLATFORM_ID || 'FwKALh5mEfqWVPU24e5VXavydtnwb1veUi4Z3ShiYb8g',
+//   platformId: process.env.NEXT_PUBLIC_PLATFORM_ID || 'FEkF8SrSckk5GkfbmtcCbuuifpTKkw6mrSNowwB8aQe3',
+//   slippage: 0.025,
+//   configInfo: new Map()
+// }

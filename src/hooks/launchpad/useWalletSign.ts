@@ -117,7 +117,7 @@ export default function useWalletSign() {
     }
 
     try {
-      const msgDef = 'Sign in to sherex.fun: '
+      const msgDef = 'Sign in to raydium.io: '
       const time = Math.floor(new Date().getTime() / 1000)
       const signInMsg = `${msgDef}${time}`
 
