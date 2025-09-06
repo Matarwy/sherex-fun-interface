@@ -16,7 +16,10 @@ import {
   Info as InfoIcon,
   X
 } from 'react-feather'
-import { Trans } from 'react-i18next'
+import {
+  Trans,
+  useTranslation
+} from 'react-i18next'
 
 import ConnectedButton from '@/components/ConnectedButton'
 import { CopyButton } from '@/components/CopyButton'
@@ -38,7 +41,6 @@ import useFetchRpcPoolData from '@/hooks/pool/amm/useFetchRpcPoolData'
 import { toastSubject } from '@/hooks/toast/useGlobalToast'
 import useTokenPrice from '@/hooks/token/useTokenPrice'
 import { useLocalStorage } from '@/hooks/useLocalStorage'
-import useResponsive from '@/hooks/useResponsive'
 import ChevronLeftIcon from '@/icons/misc/ChevronLeftIcon'
 import CommentIcon from '@/icons/misc/CommentIcon'
 import {
@@ -48,10 +50,8 @@ import {
 import { colors } from '@/theme/cssVariables/colors'
 import { formatCurrency } from '@/utils/numberish/formatter'
 import ToPublicKey from '@/utils/publicKey'
-import {
-  getTokenMetadataURL,
-  wsolToSolToken
-} from '@/utils/token'
+import { wsolToSolToken } from '@/utils/token'
+import { getImgProxyUrl } from '@/utils/url'
 import {
   Box,
   Button,
@@ -97,15 +97,13 @@ type TabItem<T = Tab> = {
 }
 
 const TokenDetail = () => {
-  const [imgUri, setImgUri] = useState<string | undefined>(undefined)
   const { checkToken } = useCheckToken()
   const router = useRouter()
-  const { isMobile, isDesktopSmall, isDesktopMedium, isDesktopLarge } = useResponsive()
+  const { t } = useTranslation()
   const openDialog = useDialogsStore((s) => s.openDialog)
   const programId = useAppStore((s) => s.programIdConfig.LAUNCHPAD_PROGRAM)
   const publicKey = useAppStore((s) => s.publicKey)
   const connected = useAppStore((s) => s.connected)
-  const { raydium } = useAppStore((s) => ({ raydium: s.raydium }))
   const { mint: id, fromCreate } = router.query
   const referrerQuery = useReferrerQuery('?')
 
@@ -138,8 +136,6 @@ const TokenDetail = () => {
     }
   }, [id])
 
-  console.log("mint ==>", mint)
-
   const { data: mintData, mutate, isEmptyResult } = useMintInfo({ mints: [mint] })
   const mintInfo = mintData.find((m) => m.mint === mint)
   const poolId = mintInfo?.poolId
@@ -149,18 +145,12 @@ const TokenDetail = () => {
     mintInfo.description = mintInfo.description || meta.description
   }
 
-  const getStaticProps = () => {
-    return {
-      props: { title: meta ? meta.name : "" }
-    }
-  }
-
   const { colorMode } = useColorMode()
   const isLight = colorMode === 'light'
 
   const [isFeeDistributionBannerShown, setIsFeeDistributionBannerShown] = useLocalStorage({
     key: LocalStorageKey.IsFeeDistributionBannerShown,
-    defaultValue: true
+    defaultValue: false
   })
 
   const needCheckMint = fromCreate === 'true' && isEmptyResult
@@ -182,22 +172,6 @@ const TokenDetail = () => {
     }, 2000)
     return () => window.clearTimeout(id)
   }, [isEmptyResult, mutate])
-
-  useEffect(() => {
-    console.log("hey", raydium)
-    if (raydium && raydium.connection && mint) {
-      fetchImgUri()
-    }
-  }, [raydium, mint])
-
-  const fetchImgUri = async () => {
-    console.log("fetchImgUri ==>")
-    if (raydium && raydium.connection && mint) {
-      const uri = await getTokenMetadataURL(raydium.connection as any, mint)
-      console.log("uri ==>", uri)
-      setImgUri(uri)
-    }
-  }
 
   const {
     data: poolInfo,
@@ -236,10 +210,10 @@ const TokenDetail = () => {
   const marketCap =
     poolInfo && mintInfo && mintB && data[mintB]
       ? getMarketCapData({
-        poolInfo,
-        mintInfo,
-        mintBPrice: new Decimal(data[mintB].value)
-      })
+          poolInfo,
+          mintInfo,
+          mintBPrice: new Decimal(data[mintB].value)
+        })
       : undefined
 
   const creator = mintInfo?.creator
@@ -253,7 +227,7 @@ const TokenDetail = () => {
 
   const defaultTab = useMemo(() => (isMobile ? Tab.Info : Tab.Comments), [])
   const [value, setValue] = useState(defaultTab)
-  const commentRef = useRef<CommentAction>({ loadNewComments: () => { } })
+  const commentRef = useRef<CommentAction>({ loadNewComments: () => {} })
 
   const panelItems = useMemo(() => {
     const baseItems = [
@@ -275,7 +249,7 @@ const TokenDetail = () => {
     ]
 
     if (isMobile) {
-      baseItems.push({
+      baseItems.unshift({
         content: (
           <>
             <Info
@@ -313,7 +287,7 @@ const TokenDetail = () => {
                   openDialog(DialogTypes.AddComment({ poolId: poolId!, onUploadSuccess: commentRef.current.loadNewComments }))
                 }}
               >
-                <CommentIcon color={colors.textLink} />
+                <CommentIcon />
               </Button>
               <Button
                 minWidth="15rem"
@@ -409,10 +383,10 @@ const TokenDetail = () => {
     >
       <GridItem gridArea="back" display={['none', 'initial', 'initial']}>
         <Flex alignItems="center" gap={1}>
-          <Link as={NextLink} href={`/${referrerQuery}`} display="contents" shallow color={colors.lightPurple}>
+          <Link as={NextLink} href={`/launchpad${referrerQuery}`} display="contents" shallow color={colors.lightPurple}>
             <ChevronLeftIcon />
             <Text fontWeight="500" fontSize="xl">
-              Back
+              {/* {t('common.back')} */} Back
             </Text>
           </Link>
           {!isFeeDistributionBannerShown ? (
@@ -424,11 +398,11 @@ const TokenDetail = () => {
                   bgGradient={
                     isLight
                       ? 'linear-gradient(245.22deg, #DA2EEF 7.97%, #2B6AFF 49.17%, #39D0D8 92.1%)'
-                      : 'linear-gradient(245.22deg,rgb(239, 107, 46) 7.97%,rgb(255, 251, 43) 49.17%, rgb(239, 107, 46) 92.1%)'
+                      : 'linear-gradient(245.22deg, #FF2FC8 7.97%, #FFB12B 49.17%, #D3D839 92.1%)'
                   }
                   bgClip="text"
                 >
-                  Rewards are LIVE for traders AND creators! Check X account for updates!
+                  Rewards are LIVE for traders AND creators! Check ‘Rewards’ tab and X account for updates!
                 </Text>
               </Flex>
               <X width="22px" height="22px" color="#4F53F3" cursor="pointer" onClick={() => setIsFeeDistributionBannerShown(true)} />
@@ -472,7 +446,7 @@ const TokenDetail = () => {
             >
               <Flex alignItems="center" gap={1}>
                 <Image
-                  src={imgUri ? imgUri : undefined}
+                  src={mintInfo ? getImgProxyUrl(mintInfo.imgUrl, 20) : undefined}
                   fallbackSrc={mintInfo?.imgUrl}
                   borderRadius="50%"
                   width="20px"
@@ -486,10 +460,10 @@ const TokenDetail = () => {
                 </Text>
               </Flex>
               <Flex alignItems="center" gap={1}>
-                <Link as={NextLink} href={`/${referrerQuery}`} display="contents" shallow color={colors.lightPurple}>
+                <Link as={NextLink} href={`/launchpad${referrerQuery}`} display="contents" shallow color={colors.lightPurple}>
                   <ChevronLeftIcon width="12px" height="12px" />
                   <Text fontWeight="500" fontSize="xs">
-                    Back
+                    {/* {t('common.back')} */} Back
                   </Text>
                 </Link>
               </Flex>
@@ -521,14 +495,14 @@ const TokenDetail = () => {
             sx={
               isLight
                 ? {
-                  border: '1px solid #ffdebf80'
-                }
+                    border: '1px solid #BFD2FF80'
+                  }
                 : {}
             }
           >
             <Flex alignItems="center" gap={1}>
               <Image
-                src={imgUri ? imgUri : undefined}
+                src={mintInfo ? getImgProxyUrl(mintInfo.imgUrl, 28) : undefined}
                 fallbackSrc={mintInfo?.imgUrl}
                 width="28px"
                 height="28px"
@@ -570,18 +544,18 @@ const TokenDetail = () => {
         sx={
           isMobile
             ? {
-              '.chakra-tabs ': {
-                borderRadius: '4px'
-              },
-              button: {
-                px: 3
+                '.chakra-tabs ': {
+                  borderRadius: '4px'
+                },
+                button: {
+                  px: 3
+                }
               }
-            }
             : isLight
-              ? {
-                border: '1px solid #ffdebf80'
+            ? {
+                border: '1px solid #BFD2FF80'
               }
-              : {}
+            : {}
         }
       >
         {isMobile ? (
@@ -591,7 +565,7 @@ const TokenDetail = () => {
               bgGradient={
                 isLight
                   ? 'linear-gradient(245.22deg, #DA2EEF 7.97%, #2B6AFF 49.17%, #39D0D8 92.1%)'
-                  : 'linear-gradient(245.22deg,rgb(239, 107, 46) 7.97%,rgb(255, 251, 43) 49.17%, rgb(239, 107, 46) 92.1%)'
+                  : 'linear-gradient(245.22deg, #FF2FC8 7.97%, #FFB12B 49.17%, #D3D839 92.1%)'
               }
               bgClip="text"
             >
@@ -618,12 +592,12 @@ const TokenDetail = () => {
                 background={
                   isLight
                     ? 'linear-gradient(245.22deg, #DA2EEF 7.97%, #2B6AFF 49.17%, #39D0D8 92.1%)'
-                    : 'linear-gradient(245.22deg,rgb(239, 107, 46) 7.97%,rgb(255, 251, 43) 49.17%, rgb(239, 107, 46) 92.1%)'
+                    : 'linear-gradient(245.22deg, #FF2FC8 7.97%, #FFB12B 49.17%, #D3D839 92.1%)'
                 }
                 _hover={{
                   background: isLight
                     ? 'linear-gradient(245.22deg, #DA2EEF 7.97%, #2B6AFF 49.17%, #39D0D8 92.1%)'
-                    : 'linear-gradient(245.22deg,rgb(239, 107, 46) 7.97%,rgb(255, 251, 43) 49.17%, rgb(239, 107, 46) 92.1%)'
+                    : 'linear-gradient(245.22deg, #FF2FC8 7.97%, #FFB12B 49.17%, #D3D839 92.1%)'
                 }}
               >
                 Share
@@ -648,7 +622,7 @@ const TokenDetail = () => {
                   openDialog(DialogTypes.AddComment({ poolId: poolId!, onUploadSuccess: commentRef.current.loadNewComments }))
                 }}
               >
-                Add Comment
+                {/* {t('launchpad.add_comment')} */} Add Comment
               </Button>
             ) : null
           }
@@ -663,7 +637,7 @@ const TokenDetail = () => {
                   openDialog(DialogTypes.AddComment({ poolId: poolId!, onUploadSuccess: commentRef.current.loadNewComments }))
                 }}
               >
-                Add Comment
+                {/* {t('launchpad.add_comment')} */} Add Comment
               </Button>
             ) : null
           }
@@ -686,7 +660,7 @@ const TokenDetail = () => {
               bgGradient={
                 isLight
                   ? 'linear-gradient(245.22deg, #DA2EEF 7.97%, #2B6AFF 49.17%, #39D0D8 92.1%)'
-                  : 'linear-gradient(245.22deg,rgb(239, 107, 46) 7.97%,rgb(255, 251, 43) 49.17%, rgb(239, 107, 46) 92.1%)'
+                  : 'linear-gradient(245.22deg, #FF2FC8 7.97%, #FFB12B 49.17%, #D3D839 92.1%)'
               }
               bgClip="text"
             >
@@ -713,12 +687,12 @@ const TokenDetail = () => {
                 background={
                   isLight
                     ? 'linear-gradient(245.22deg, #DA2EEF 7.97%, #2B6AFF 49.17%, #39D0D8 92.1%)'
-                    : 'linear-gradient(245.22deg,rgb(239, 107, 46) 7.97%,rgb(255, 251, 43) 49.17%, rgb(239, 107, 46) 92.1%)'
+                    : 'linear-gradient(245.22deg, #FF2FC8 7.97%, #FFB12B 49.17%, #D3D839 92.1%)'
                 }
                 _hover={{
                   background: isLight
                     ? 'linear-gradient(245.22deg, #DA2EEF 7.97%, #2B6AFF 49.17%, #39D0D8 92.1%)'
-                    : 'linear-gradient(245.22deg,rgb(239, 107, 46) 7.97%,rgb(255, 251, 43) 49.17%, rgb(239, 107, 46) 92.1%)'
+                    : 'linear-gradient(245.22deg, #FF2FC8 7.97%, #FFB12B 49.17%, #D3D839 92.1%)'
                 }}
               >
                 Share
@@ -734,7 +708,6 @@ const TokenDetail = () => {
             mintBPrice={mintB && data[mintB] ? new Decimal(data[mintB].value).toNumber() : undefined}
             isLanded={isLanded}
             refreshMintInfo={mutate}
-            imgUri={imgUri}
           />
         </Grid>
       </GridItem>
