@@ -1,37 +1,42 @@
 import { useCallback } from 'react'
-import { Box, Button, HStack, Text, Image, useDisclosure } from '@chakra-ui/react'
-import { Wallet, useWallet } from '@solana/wallet-adapter-react'
-import { useWalletModal } from '@solana/wallet-adapter-react-ui'
+
+import { useTranslation } from 'react-i18next'
+
+import { WALLET_STORAGE_KEY } from '@/hooks/app/useInitConnection'
 import { useEvent } from '@/hooks/useEvent'
-import WalletRecentTransactionBoard from '../WalletRecentTransactionBoard'
-import SelectWalletModal from './SelectWalletModal'
+import useResponsive from '@/hooks/useResponsive'
 import ChevronDownIcon from '@/icons/misc/ChevronDownIcon'
 import MoneyWalletIcon from '@/icons/misc/MoneyWalletIcon'
+import { useAppStore } from '@/store/useAppStore'
 import { colors } from '@/theme/cssVariables'
 import { encodeStr } from '@/utils/common'
-import { useAppStore } from '@/store/useAppStore'
-import useResponsive from '@/hooks/useResponsive'
-import { WALLET_STORAGE_KEY } from '@/hooks/app/useInitConnection'
-import { useWalletProvider } from '@/provider/WalletContextProvider'
+import {
+  Box,
+  Button,
+  HStack,
+  Image,
+  Text,
+  useDisclosure
+} from '@chakra-ui/react'
+import {
+  useWallet,
+  Wallet
+} from '@solana/wallet-adapter-react'
+import { useWalletModal } from '@solana/wallet-adapter-react-ui'
+
+import WalletRecentTransactionBoard from '../WalletRecentTransactionBoard'
+import SelectWalletModal from './SelectWalletModal'
 
 export default function SolWallet() {
   const { wallets, select, disconnect, connected, connecting, wallet } = useWallet()
-  const { setIsModalOpen } = useWalletProvider();
+  const { t } = useTranslation()
   const publicKey = useAppStore((s) => s.publicKey)
   const { isMobile, isTablet } = useResponsive()
   const { setVisible, visible } = useWalletModal()
   const { isOpen: isWalletDrawerShown, onOpen, onClose } = useDisclosure()
 
   const handleClose = useCallback(() => setVisible(false), [setVisible])
-  // const handleOpen = useCallback(() => setVisible(true), [setVisible])
-  const handleOpen = useCallback(() => {
-    if (!connected && !connecting) {
-      console.log("wallet is connecting")
-      setIsModalOpen(true)
-    } else {
-      // isDisconnected.setTrue();
-    }
-  }, [connected, connecting, setIsModalOpen])
+  const handleOpen = useCallback(() => setVisible(true), [setVisible])
 
   const handleSelectWallet = useEvent((wallet: Wallet) => {
     select(wallet.adapter.name)
@@ -55,20 +60,19 @@ export default function SolWallet() {
         <HStack
           cursor="pointer"
           onClick={onOpen}
-          py={['5px', '8px']}
+          py="5px"
           px={['5px', '8px']}
           backgroundColor={colors.backgroundLight}
-          borderRadius="xl"
+          borderRadius="full"
           overflow="hidden"
         >
           {wallet && (
             <Box flex="none" rounded="full" overflow="hidden">
-              <Image src={wallet.adapter.icon} width={['28px', '32px']} height={['28px', '32px']} />
+              <Image src={wallet.adapter.icon} width={['28px', '40px']} height={['28px', '40px']} />
             </Box>
           )}
           <Text fontSize="sm">
             {isMobile || isTablet ? publicKey?.toBase58().substring(0, 3) + '...' : encodeStr(publicKey?.toBase58(), 4)}
-            {/* {encodeStr(publicKey?.toBase58(), 4)} */}
           </Text>
           <Box flex={'none'}>
             <ChevronDownIcon width={12} height={12} />

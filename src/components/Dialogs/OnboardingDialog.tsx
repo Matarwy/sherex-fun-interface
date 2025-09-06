@@ -1,32 +1,38 @@
 import {
-  Checkbox,
-  Stepper,
-  Step,
-  StepIndicator,
-  StepTitle,
-  StepDescription,
-  StepSeparator,
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
-  Button,
-  Grid,
-  Text,
-  Flex,
-  useSteps,
-  useColorMode
-} from '@chakra-ui/react'
-import { colors } from '@/theme/cssVariables'
-import { useAppStore } from '@/store'
-import { useWalletModal } from '@solana/wallet-adapter-react-ui'
-import { useEvent } from '@/hooks/useEvent'
-import useWalletSign from '@/hooks/launchpad/useWalletSign'
-import { useEffect, useState, useRef } from 'react'
-import { toastSubject } from '@/hooks/toast/useGlobalToast'
+  useEffect,
+  useRef,
+  useState
+} from 'react'
+
 import { Subject } from 'rxjs'
+
+import useWalletSign from '@/hooks/launchpad/useWalletSign'
+import { toastSubject } from '@/hooks/toast/useGlobalToast'
+import { useEvent } from '@/hooks/useEvent'
+import { useAppStore } from '@/store'
+import { colors } from '@/theme/cssVariables'
+import {
+  Button,
+  Checkbox,
+  Flex,
+  Grid,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalOverlay,
+  Step,
+  StepDescription,
+  StepIndicator,
+  Stepper,
+  StepSeparator,
+  StepTitle,
+  Text,
+  useColorMode,
+  useSteps
+} from '@chakra-ui/react'
+import { useWalletModal } from '@solana/wallet-adapter-react-ui'
 
 export const onboardingDialogSubject = new Subject<{ open: boolean; successCbk?: () => void }>()
 
@@ -51,7 +57,7 @@ export const OnboardingDialog = () => {
 
   useEffect(() => {
     const sub = onboardingDialogSubject.asObservable().subscribe((data) => {
-      // setIsOpen(data.open)
+      setIsOpen(data.open)
       successCbkRef.current = data.successCbk
     })
 

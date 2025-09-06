@@ -1,12 +1,15 @@
-import { Connection } from '@solana/web3.js'
-import { CpmmPoolInfoLayout } from '@raydium-io/raydium-sdk-v2'
+import BN from 'bn.js'
+import useSWR from 'swr'
+import { shallow } from 'zustand/shallow'
+
 import { useAppStore } from '@/store'
 import { MINUTE_MILLISECONDS } from '@/utils/date'
-import useSWR from 'swr'
-import shallow from 'zustand/shallow'
-import BN from 'bn.js'
-import { PublicKey } from '@solana/web3.js'
+import { CpmmPoolInfoLayout } from '@raydium-io/raydium-sdk-v2'
 import { AccountLayout } from '@solana/spl-token'
+import {
+  Connection,
+  PublicKey
+} from '@solana/web3.js'
 
 interface Props {
   poolId?: string

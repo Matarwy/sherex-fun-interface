@@ -1,12 +1,23 @@
+import {
+  getStorageItem,
+  setStorageItem
+} from '@/utils/localStorage'
+import logMessage from '@/utils/log'
+import {
+  ApiV3Token,
+  JupTokenType,
+  TokenInfo
+} from '@raydium-io/raydium-sdk-v2'
+import {
+  MintLayout,
+  RawMint
+} from '@solana/spl-token'
 import { PublicKey } from '@solana/web3.js'
-import { MintLayout, RawMint } from '@solana/spl-token'
-import { TokenInfo, JupTokenType, ApiV3Token } from '@raydium-io/raydium-sdk-v2'
+
 import createStore from './createStore'
 import { useAppStore } from './useAppStore'
-import { getStorageItem, setStorageItem } from '@/utils/localStorage'
-import logMessage from '@/utils/log'
-import { getTokenMetadataURL } from '@/utils/token'
-export const EXTRA_TOKEN_KEY = '_sherex_cus_t_'
+
+export const EXTRA_TOKEN_KEY = '_r_cus_t_'
 
 export interface TokenPrice {
   value: number
@@ -124,15 +135,7 @@ export const useTokenStore = createStore<TokenStore>(
           })
           .map((t) => {
             if (t.type === 'jupiter') {
-              // const newInfo = { ...t, logoURI: t.logoURI ? `https://wsrv.nl/?fit=cover&w=48&h=48&url=${t.logoURI}` : t.logoURI }
-              // tokenMap.set(t.address, newInfo)
-              // return newInfo
-
-              // const uri: any = await getTokenMetadataURL
-              
-              
-              // (raydium.connection, t.address)
-              const newInfo = { ...t, logoURI: t.logoURI ? "uri" : t.logoURI }
+              const newInfo = { ...t, logoURI: t.logoURI ? `https://wsrv.nl/?fit=cover&w=48&h=48&url=${t.logoURI}` : t.logoURI }
               tokenMap.set(t.address, newInfo)
               return newInfo
             }
@@ -216,7 +219,7 @@ export const useTokenStore = createStore<TokenStore>(
       logMessage('rpc: get token info')
       const accountData = await connection.getAccountInfo(new PublicKey(mint), { commitment: useAppStore.getState().commitment })
       if (!accountData || accountData.data.length !== MintLayout.span) return
-      const tokenInfo = MintLayout.decode(accountData.data)
+      const tokenInfo = MintLayout.decode(Uint8Array.from(accountData.data))
       cachedTokenInfo.set(mint.toString(), tokenInfo)
       return tokenInfo
     },

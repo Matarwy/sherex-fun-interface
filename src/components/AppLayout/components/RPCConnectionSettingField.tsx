@@ -1,13 +1,27 @@
+import {
+  KeyboardEvent,
+  useEffect,
+  useState
+} from 'react'
+
+import { shallow } from 'zustand/shallow'
+
+import { useEvent } from '@/hooks/useEvent'
+import { useAppStore } from '@/store'
 import { colors } from '@/theme/cssVariables'
-import { Flex, Input, InputGroup, InputRightElement, useDisclosure, Spinner } from '@chakra-ui/react'
-import { useEffect, useState, KeyboardEvent } from 'react'
-import shallow from 'zustand/shallow'
+import { isValidUrl } from '@/utils/url'
+import {
+  Flex,
+  Input,
+  InputGroup,
+  InputRightElement,
+  Spinner,
+  useDisclosure
+} from '@chakra-ui/react'
+
 import Button from '../../Button'
 import { SettingField } from './SettingField'
 import { SettingFieldToggleButton } from './SettingFieldToggleButton'
-import { useAppStore } from '@/store'
-import { useEvent } from '@/hooks/useEvent'
-import { isValidUrl } from '@/utils/url'
 
 export function RPCConnectionSettingField() {
   const [isMobile, rpcs, rpcNodeUrl, setRpcUrlAct] = useAppStore((s) => [s.isMobile, s.rpcs, s.rpcNodeUrl, s.setRpcUrlAct], shallow)

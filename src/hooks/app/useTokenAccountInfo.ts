@@ -1,6 +1,11 @@
 import { useEffect } from 'react'
-import shallow from 'zustand/shallow'
-import { useAppStore, useTokenAccountStore } from '@/store'
+
+import { shallow } from 'zustand/shallow'
+
+import {
+  useAppStore,
+  useTokenAccountStore
+} from '@/store'
 import { isDocumentVisible } from '@/utils/common'
 
 const accountChangeCbk: (() => void)[] = []

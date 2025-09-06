@@ -1,50 +1,86 @@
+import {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from 'react'
+
+import dayjs from 'dayjs'
+import Decimal from 'decimal.js'
+import { Trans } from 'react-i18next'
+import { shallow } from 'zustand/shallow'
+
 import ConnectedButton from '@/components/ConnectedButton'
 import { QuestionToolTip } from '@/components/QuestionToolTip'
-import TokenInput, { DEFAULT_SOL_RESERVER, InputActionRef } from '@/components/TokenInput'
+import TokenInput, {
+  DEFAULT_SOL_RESERVER,
+  InputActionRef
+} from '@/components/TokenInput'
+import Tooltip from '@/components/Tooltip'
+import useTokenInfo from '@/hooks/token/useTokenInfo'
 import { useEvent } from '@/hooks/useEvent'
 import { useHover } from '@/hooks/useHover'
-import { useAppStore, useTokenAccountStore, useTokenStore } from '@/store'
+import CircleInfo from '@/icons/misc/CircleInfo'
+import QuestionCircleIcon from '@/icons/misc/QuestionCircleIcon'
+import SwapButtonOneTurnIcon from '@/icons/misc/SwapButtonOneTurnIcon'
+import SwapButtonTwoTurnIcon from '@/icons/misc/SwapButtonTwoTurnIcon'
+import WarningIcon from '@/icons/misc/WarningIcon'
+import RaydiumLogo from '@/icons/RaydiumLogo'
+import {
+  useAppStore,
+  useTokenAccountStore,
+  useTokenStore
+} from '@/store'
+import { SHEREX } from '@/store/configs/constants'
 import { colors } from '@/theme/cssVariables'
+import { debounce } from '@/utils/functionMethods'
+import {
+  formatCurrency,
+  formatToRawLocaleStr
+} from '@/utils/numberish/formatter'
+import ToPublicKey, { isValidPublicKey } from '@/utils/publicKey'
+import {
+  setUrlQuery,
+  useRouteQuery
+} from '@/utils/routeTools'
+import {
+  getMintPriority,
+  getMintSymbol,
+  isSolWSol,
+  mintToUrl,
+  urlToMint
+} from '@/utils/token'
 import {
   Box,
   Button,
+  CircularProgress,
   Collapse,
   Flex,
   HStack,
   SimpleGrid,
   Text,
-  useDisclosure,
-  CircularProgress,
-  Tooltip as ChakraTip
+  Tooltip as ChakraTip,
+  useDisclosure
 } from '@chakra-ui/react'
-import { ApiV3Token, RAYMint, SOL_INFO, TokenInfo, TransferFeeDataBaseType } from '@raydium-io/raydium-sdk-v2'
-import { PublicKey } from '@solana/web3.js'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import shallow from 'zustand/shallow'
-import CircleInfo from '@/icons/misc/CircleInfo'
-import { getSwapPairCache, setSwapPairCache } from '../util'
-import { urlToMint, mintToUrl, isSolWSol, getMintPriority, getMintSymbol } from '@/utils/token'
-import { SwapInfoBoard } from './SwapInfoBoard'
-import SwapButtonTwoTurnIcon from '@/icons/misc/SwapButtonTwoTurnIcon'
-import SwapButtonOneTurnIcon from '@/icons/misc/SwapButtonOneTurnIcon'
-import useSwap from '../useSwap'
-import { ApiSwapV1OutSuccess } from '../type'
-import { useSwapStore } from '../useSwapStore'
-import Decimal from 'decimal.js'
-import HighRiskAlert from './HighRiskAlert'
-import { useRouteQuery, setUrlQuery } from '@/utils/routeTools'
-import WarningIcon from '@/icons/misc/WarningIcon'
-import dayjs from 'dayjs'
+import {
+  ApiV3Token,
+  SOL_INFO,
+  TokenInfo,
+  TransferFeeDataBaseType
+} from '@raydium-io/raydium-sdk-v2'
 import { NATIVE_MINT } from '@solana/spl-token'
-import { Trans } from 'react-i18next'
-import { formatCurrency, formatToRawLocaleStr } from '@/utils/numberish/formatter'
-import ToPublicKey, { isValidPublicKey } from '@/utils/publicKey'
-import useTokenInfo from '@/hooks/token/useTokenInfo'
-import { debounce } from '@/utils/functionMethods'
-import QuestionCircleIcon from '@/icons/misc/QuestionCircleIcon'
-import Tooltip from '@/components/Tooltip'
-import RaydiumLogo from '@/icons/RaydiumLogo'
-import { SHEREX } from '@/store/configs/constants'
+import { PublicKey } from '@solana/web3.js'
+
+import { ApiSwapV1OutSuccess } from '../type'
+import useSwap from '../useSwap'
+import { useSwapStore } from '../useSwapStore'
+import {
+  getSwapPairCache,
+  setSwapPairCache
+} from '../util'
+import HighRiskAlert from './HighRiskAlert'
+import { SwapInfoBoard } from './SwapInfoBoard'
 
 export function SwapPanel({
   onInputMintChange,

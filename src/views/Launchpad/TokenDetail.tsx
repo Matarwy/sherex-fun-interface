@@ -1,46 +1,86 @@
-import React, { memo, useState, useMemo, useCallback, ReactNode, useRef, useEffect } from 'react'
+import React, {
+  memo,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from 'react'
+
+import Decimal from 'decimal.js'
+import NextLink from 'next/link'
 import { useRouter } from 'next/router'
-import { Box, Grid, GridItem, Flex, Text, Button, Avatar, Link, useColorMode, useToast, Image } from '@chakra-ui/react'
+import { isMobile } from 'react-device-detect'
+import {
+  Info as InfoIcon,
+  X
+} from 'react-feather'
 import { Trans } from 'react-i18next'
-import { colors } from '@/theme/cssVariables/colors'
+
+import ConnectedButton from '@/components/ConnectedButton'
+import { CopyButton } from '@/components/CopyButton'
+import Tabs from '@/components/Tabs'
+import {
+  addPoolListener,
+  removePoolListener
+} from '@/components/TradingView/streaming'
 import TVChart from '@/components/TradingView/TVChart'
+import { DialogTypes } from '@/constants/dialogs'
+import { LocalStorageKey } from '@/constants/localStorage'
+import useCheckToken from '@/hooks/launchpad/useCheckToken'
+import useMeta from '@/hooks/launchpad/useMeta'
+import useMintInfo from '@/hooks/launchpad/useMintInfo'
+import usePoolRpcInfo, { getMarketCapData } from '@/hooks/launchpad/usePoolRpcInfo'
+import { ToLaunchPadConfig } from '@/hooks/launchpad/utils'
+import useFetchCpmmRpcPoolData from '@/hooks/pool/amm/useFetchCpmmRpcPoolData'
+import useFetchRpcPoolData from '@/hooks/pool/amm/useFetchRpcPoolData'
+import { toastSubject } from '@/hooks/toast/useGlobalToast'
+import useTokenPrice from '@/hooks/token/useTokenPrice'
+import { useLocalStorage } from '@/hooks/useLocalStorage'
+import useResponsive from '@/hooks/useResponsive'
 import ChevronLeftIcon from '@/icons/misc/ChevronLeftIcon'
 import CommentIcon from '@/icons/misc/CommentIcon'
-import Tabs from '@/components/Tabs'
-import { launchpadShareRate, useAppStore, useDialogsStore } from '@/store'
-import { DialogTypes } from '@/constants/dialogs'
-import TradeBox from './components/TradeBox'
-import Info from './components/Info'
-import Comments, { CommentAction } from './components/Comments'
-import Transactions from './components/Transactions'
-import Holders from './components/Holders'
-import ConnectedButton from '@/components/ConnectedButton'
-import useCheckToken from '@/hooks/launchpad/useCheckToken'
-import { getATAAddress, getPdaLaunchpadVaultId, LaunchpadPoolInfo, Curve } from '@raydium-io/raydium-sdk-v2'
-import { PublicKey } from '@solana/web3.js'
-import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
-import usePoolRpcInfo, { getMarketCapData } from '@/hooks/launchpad/usePoolRpcInfo'
-import ToPublicKey from '@/utils/publicKey'
-import { X, Info as InfoIcon } from 'react-feather'
-import useMintInfo from '@/hooks/launchpad/useMintInfo'
+import {
+  useAppStore,
+  useDialogsStore
+} from '@/store'
+import { colors } from '@/theme/cssVariables/colors'
 import { formatCurrency } from '@/utils/numberish/formatter'
-import useTokenPrice from '@/hooks/token/useTokenPrice'
-import Decimal from 'decimal.js'
-import { createTimeDiff, useReferrerQuery } from './utils'
-import { addPoolListener, removePoolListener } from '@/components/TradingView/streaming'
-import NextLink from 'next/link'
-import { getTokenMetadataURL, wsolToSolToken } from '@/utils/token'
-import { ToLaunchPadConfig } from '@/hooks/launchpad/utils'
-import { CopyButton } from '@/components/CopyButton'
-import { useLocalStorage } from '@/hooks/useLocalStorage'
-import { LocalStorageKey } from '@/constants/localStorage'
-import { toastSubject } from '@/hooks/toast/useGlobalToast'
-import { getImgProxyUrl } from '@/utils/url'
-import { isMobile } from 'react-device-detect'
-import useFetchRpcPoolData from '@/hooks/pool/amm/useFetchRpcPoolData'
-import useFetchCpmmRpcPoolData from '@/hooks/pool/amm/useFetchCpmmRpcPoolData'
-import useMeta from '@/hooks/launchpad/useMeta'
-import useResponsive from '@/hooks/useResponsive'
+import ToPublicKey from '@/utils/publicKey'
+import {
+  getTokenMetadataURL,
+  wsolToSolToken
+} from '@/utils/token'
+import {
+  Box,
+  Button,
+  Flex,
+  Grid,
+  GridItem,
+  Image,
+  Link,
+  Text,
+  useColorMode,
+  useToast
+} from '@chakra-ui/react'
+import {
+  getATAAddress,
+  getPdaLaunchpadVaultId,
+  LaunchpadPoolInfo
+} from '@raydium-io/raydium-sdk-v2'
+import { TOKEN_PROGRAM_ID } from '@solana/spl-token'
+import { PublicKey } from '@solana/web3.js'
+
+import Comments, { CommentAction } from './components/Comments'
+import Holders from './components/Holders'
+import Info from './components/Info'
+import TradeBox from './components/TradeBox'
+import Transactions from './components/Transactions'
+import {
+  createTimeDiff,
+  useReferrerQuery
+} from './utils'
 
 enum Tab {
   Comments = 'Comments',
@@ -120,7 +160,7 @@ const TokenDetail = () => {
 
   const [isFeeDistributionBannerShown, setIsFeeDistributionBannerShown] = useLocalStorage({
     key: LocalStorageKey.IsFeeDistributionBannerShown,
-    defaultValue: false
+    defaultValue: true
   })
 
   const needCheckMint = fromCreate === 'true' && isEmptyResult

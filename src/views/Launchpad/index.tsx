@@ -1,49 +1,65 @@
 import {
+  ChangeEvent,
+  useCallback,
+  useRef,
+  useState
+} from 'react'
+
+import Link from 'next/link'
+import { X } from 'react-feather'
+
+import { DropdownSelectMenu } from '@/components/DropdownSelectMenu'
+import { LocalStorageKey } from '@/constants/localStorage'
+import { MintSortField } from '@/hooks/launchpad/useMintList'
+import useTopMintList from '@/hooks/launchpad/useTopMintList'
+import { useDisclosure } from '@/hooks/useDelayDisclosure'
+import { useEvent } from '@/hooks/useEvent'
+import { useLocalStorage } from '@/hooks/useLocalStorage'
+import useResponsive from '@/hooks/useResponsive'
+import { useStateWithUrl } from '@/hooks/useStateWithUrl'
+import MoreListControllers from '@/icons/misc/MoreListControllers'
+import RefreshIcon from '@/icons/misc/RefreshIcon'
+import SearchIcon from '@/icons/misc/SearchIcon'
+import UserIcon from '@/icons/misc/UserIcon'
+import { useAppStore } from '@/store'
+import { colors } from '@/theme/cssVariables/colors'
+import { formatCurrency } from '@/utils/numberish/formatter'
+import { useRouteQuery } from '@/utils/routeTools'
+import {
   Box,
   Button,
   Collapse,
   Flex,
-  Text,
-  Grid,
   FormControl,
   FormLabel,
-  Switch,
+  Grid,
   Skeleton,
+  Switch,
+  Text,
   useBreakpointValue,
   useColorMode,
   useOutsideClick
 } from '@chakra-ui/react'
-import Link from 'next/link'
-import { colors } from '@/theme/cssVariables/colors'
-import { CoinList, CoinListActionRef } from './CoinList'
+
+import {
+  CoinList,
+  CoinListActionRef
+} from './CoinList'
+import { AnimatedCardStack } from './components/AnimatedCardStack'
 import { MetasList } from './components/MetasList'
-import { SearchInput, OnSearchChangeData } from './components/SearchInput'
+import {
+  OnSearchChangeData,
+  SearchInput
+} from './components/SearchInput'
+import { TopListCard } from './components/TopListCard'
+import { TopMobileCarousel } from './components/TopMobileCarousel'
 // import { SearchInput, OnSearchChangeData } from './components/SherexSearchInput'
 import { TopSpotCard } from './components/TopSpotCard'
-import { DropdownSelectMenu } from '@/components/DropdownSelectMenu'
-import RefreshIcon from '@/icons/misc/RefreshIcon'
-import UserIcon from '@/icons/misc/UserIcon'
-import SearchIcon from '@/icons/misc/SearchIcon'
-import { MintSortField } from '@/hooks/launchpad/useMintList'
-import { useRef, useState, ChangeEvent, useCallback } from 'react'
-import { useRouteQuery } from '@/utils/routeTools'
-import { useDisclosure } from '@/hooks/useDelayDisclosure'
-import useTopMintList from '@/hooks/launchpad/useTopMintList'
-import { TopListCard } from './components/TopListCard'
-import { AnimatedCardStack } from './components/AnimatedCardStack'
-import { createTimeDiff, useReferrerQuery } from './utils'
-import { formatCurrency } from '@/utils/numberish/formatter'
-import MoreListControllers from '@/icons/misc/MoreListControllers'
-import { useStateWithUrl } from '@/hooks/useStateWithUrl'
-import useResponsive from '@/hooks/useResponsive'
-import { useEvent } from '@/hooks/useEvent'
 import { MintInfo } from './type'
-import { useAppStore } from '@/store'
-import { X } from 'react-feather'
-import { useLocalStorage } from '@/hooks/useLocalStorage'
-import { LocalStorageKey } from '@/constants/localStorage'
-import PlatformButton from './components/PlatformButton'
-import { TopMobileCarousel } from './components/TopMobileCarousel'
+import {
+  createTimeDiff,
+  useReferrerQuery
+} from './utils'
 
 const DropdownItems = [
   { label: 'Featured', value: MintSortField.Featured },
@@ -106,12 +122,12 @@ export default function Launchpad() {
   const { isMobile, isDesktopSmall, isDesktopMedium, isDesktopLarge } = useResponsive()
   const [isFeeDistributionBannerShown, setIsFeeDistributionBannerShown] = useLocalStorage({
     key: LocalStorageKey.IsFeeDistributionBannerShown,
-    defaultValue: false
+    defaultValue: true
   })
 
   const [isReferBannerShown, setIsReferBannerShown] = useLocalStorage({
     key: LocalStorageKey.IsReferBannerShown,
-    defaultValue: false
+    defaultValue: true
   })
 
   const handleClickRefresh = () => {

@@ -1,37 +1,58 @@
-import { useEffect, useMemo, useState, useRef } from 'react'
 import {
-  Modal,
-  ModalOverlay,
-  ModalContent,
-  ModalCloseButton,
-  ModalBody,
-  ModalFooter,
-  Button,
-  Grid,
-  Text,
-  Flex,
-  useColorMode
-} from '@chakra-ui/react'
-import { NumericFormat } from 'react-number-format'
-import { DialogProps, InitialBuyDialogProps } from '@/constants/dialogs'
-import { colors } from '@/theme/cssVariables'
-import { detectedSeparator, trimTrailZero } from '@/utils/numberish/formatter'
-import { useDisclosure } from '@/hooks/useDelayDisclosure'
-import { useLaunchpadStore } from '@/store'
-import shallow from 'zustand/shallow'
-import { LaunchpadPoolInfo, Curve, LaunchpadPoolInitParam } from '@raydium-io/raydium-sdk-v2'
-import { Keypair } from '@solana/web3.js'
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from 'react'
+
 import BN from 'bn.js'
 import Decimal from 'decimal.js'
-import { useEvent } from '@/hooks/useEvent'
-import { toastSubject } from '@/hooks/toast/useGlobalToast'
 import { useRouter } from 'next/router'
-import useCheckToken from '@/hooks/launchpad/useCheckToken'
+import { NumericFormat } from 'react-number-format'
+import { shallow } from 'zustand/shallow'
+
 import Turnstile, { ActionRef } from '@/components/Turnstile'
-import { useLaunchPadShareInfo, useReferrerQuery } from '@/views/Launchpad/utils'
-import { ToLaunchPadConfig } from '@/hooks/launchpad/utils'
+import {
+  DialogProps,
+  InitialBuyDialogProps
+} from '@/constants/dialogs'
+import useCheckToken from '@/hooks/launchpad/useCheckToken'
 import { usePlatformInfo } from '@/hooks/launchpad/usePlatformInfo'
+import { ToLaunchPadConfig } from '@/hooks/launchpad/utils'
+import { toastSubject } from '@/hooks/toast/useGlobalToast'
+import { useDisclosure } from '@/hooks/useDelayDisclosure'
+import { useEvent } from '@/hooks/useEvent'
+import { useLaunchpadStore } from '@/store'
+import { colors } from '@/theme/cssVariables'
 import { uploadFile } from '@/utils/file/upload'
+import {
+  detectedSeparator,
+  trimTrailZero
+} from '@/utils/numberish/formatter'
+import {
+  useLaunchPadShareInfo,
+  useReferrerQuery
+} from '@/views/Launchpad/utils'
+import {
+  Button,
+  Flex,
+  Grid,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalOverlay,
+  Text,
+  useColorMode
+} from '@chakra-ui/react'
+import {
+  Curve,
+  LaunchpadPoolInfo,
+  LaunchpadPoolInitParam
+} from '@raydium-io/raydium-sdk-v2'
+import { Keypair } from '@solana/web3.js'
+
 // import { useWallet } from '@solana/wallet-adapter-react'
 
 export const InitialBuyDialog = ({ setIsOpen, configInfo, ...mintData }: DialogProps<InitialBuyDialogProps>) => {

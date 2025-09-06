@@ -1,68 +1,92 @@
-import { useState, useMemo, useEffect, memo, ReactNode, useCallback } from 'react'
+import {
+  memo,
+  ReactNode,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState
+} from 'react'
+
+import { BN } from 'bn.js'
+import Decimal from 'decimal.js'
+import { Formik } from 'formik'
+import NextLink from 'next/link'
+import {
+  HelpCircle,
+  Info,
+  X
+} from 'react-feather'
+import { useTranslation } from 'react-i18next'
+import * as yup from 'yup'
+
+import { DropdownSelectMenu } from '@/components/DropdownSelectMenu'
+import ImageUploader from '@/components/ImageUploader'
+import Tabs from '@/components/Tabs'
+import { DialogTypes } from '@/constants/dialogs'
+import { LocalStorageKey } from '@/constants/localStorage'
+import useConfigs, { ConfigApiData } from '@/hooks/launchpad/useConfigs'
+import { usePlatformInfo } from '@/hooks/launchpad/usePlatformInfo'
+import useWalletSign from '@/hooks/launchpad/useWalletSign'
+import { ToLaunchPadConfig } from '@/hooks/launchpad/utils'
+import { toastSubject } from '@/hooks/toast/useGlobalToast'
+import { useDisclosure } from '@/hooks/useDelayDisclosure'
+import { useLocalStorage } from '@/hooks/useLocalStorage'
+import { useObjectUrl } from '@/hooks/useObjectUrl'
+import useResponsive from '@/hooks/useResponsive'
+import ChevronDownIcon from '@/icons/misc/ChevronDownIcon'
+import ChevronLeftIcon from '@/icons/misc/ChevronLeftIcon'
+import ChevronUpIcon from '@/icons/misc/ChevronUpIcon'
+import CurvePreviewIcon from '@/icons/misc/CurvePreviewIcon'
+import EditIcon from '@/icons/misc/EditIcon'
+import EraserIcon from '@/icons/misc/EraserIcon'
+import LabIcon from '@/icons/misc/LabIcon'
+import RocketIcon from '@/icons/misc/RocketIcon'
+import { useDialogsStore } from '@/store'
+import { colors } from '@/theme/cssVariables/colors'
+import { encodeStr } from '@/utils/common'
+import {
+  DAY_SECONDS,
+  MONTH_SECONDS,
+  WEEK_SECONDS,
+  YEAR_SECONDS
+} from '@/utils/date'
+import {
+  detectedSeparator,
+  formatCurrency
+} from '@/utils/numberish/formatter'
+import { wSolToSolString } from '@/utils/token'
 import {
   Avatar,
   Box,
+  Button,
   Divider,
+  Flex,
   Grid,
   GridItem,
   Input,
   InputGroup,
   InputRightAddon,
-  Flex,
-  Button,
-  Switch,
-  Text,
-  Textarea,
-  Tooltip,
   Link,
   NumberInput,
   NumberInputField,
+  Switch,
   SystemStyleObject,
+  Text,
+  Textarea,
+  Tooltip,
   useColorMode
 } from '@chakra-ui/react'
-import ChevronLeftIcon from '@/icons/misc/ChevronLeftIcon'
-import ChevronDownIcon from '@/icons/misc/ChevronDownIcon'
-import ChevronUpIcon from '@/icons/misc/ChevronUpIcon'
-import RocketIcon from '@/icons/misc/RocketIcon'
-import LabIcon from '@/icons/misc/LabIcon'
-import EditIcon from '@/icons/misc/EditIcon'
-import EraserIcon from '@/icons/misc/EraserIcon'
-import CurvePreviewIcon from '@/icons/misc/CurvePreviewIcon'
-import { colors } from '@/theme/cssVariables/colors'
-import ImageUploader from '@/components/ImageUploader'
-import { useAppStore, useDialogsStore } from '@/store'
-import { DialogTypes } from '@/constants/dialogs'
-import { Formik } from 'formik'
-import * as yup from 'yup'
-import { HelpCircle, Info, X } from 'react-feather'
-import useWalletSign from '@/hooks/launchpad/useWalletSign'
-import NextLink from 'next/link'
-import { toastSubject } from '@/hooks/toast/useGlobalToast'
-import { useReferrerQuery } from './utils'
-import { DropdownSelectMenu } from '@/components/DropdownSelectMenu'
-import useConfigs, { ConfigApiData } from '@/hooks/launchpad/useConfigs'
-import { usePlatformInfo } from '@/hooks/launchpad/usePlatformInfo'
-import { LaunchpadPoolInitParam, FEE_RATE_DENOMINATOR_VALUE, Curve, TxVersion, DEV_LAUNCHPAD_PROGRAM, Raydium } from '@raydium-io/raydium-sdk-v2'
-import { encodeStr } from '@/utils/common'
-import Tabs from '@/components/Tabs'
+import {
+  Curve,
+  FEE_RATE_DENOMINATOR_VALUE,
+  LaunchpadPoolInitParam
+} from '@raydium-io/raydium-sdk-v2'
+
 import { CurveAreaChart } from './components/Charts/CurveAreaChart'
-import { wSolToSolString } from '@/utils/token'
-import Decimal from 'decimal.js'
-import { detectedSeparator, formatCurrency } from '@/utils/numberish/formatter'
-import { DAY_SECONDS, MONTH_SECONDS, WEEK_SECONDS, YEAR_SECONDS } from '@/utils/date'
-import { ToLaunchPadConfig } from '@/hooks/launchpad/utils'
-import { useObjectUrl } from '@/hooks/useObjectUrl'
-import { BN } from 'bn.js'
 import CompleteInfoModel from './components/CompleteInfoModel'
-import { useDisclosure } from '@/hooks/useDelayDisclosure'
-import useResponsive from '@/hooks/useResponsive'
-import { useLocalStorage } from '@/hooks/useLocalStorage'
-import { LocalStorageKey } from '@/constants/localStorage'
-import  i18n  from '@/i18n'
-import { Connection, Keypair, PublicKey } from '@solana/web3.js'
+import { useReferrerQuery } from './utils'
+
 const supplyList = ['100000000', '1000000000', '10000000000']
-
-
 interface CreateMintFormValue {
   name: string
   description?: string
@@ -107,8 +131,8 @@ enum CreateTokenSteps {
 }
 
 export default function TokenCreate() {
+  const { t } = useTranslation()
   const [value, setValue] = useState(Tab.JustSendIt)
-  const { raydium, txVersion } = useAppStore((s) => ({ raydium: s.raydium, txVersion: s.txVersion }))
   const referrerQuery = useReferrerQuery('?')
   const { colorMode } = useColorMode()
   const isLight = colorMode === 'light'
@@ -117,13 +141,10 @@ export default function TokenCreate() {
     defaultValue: true
   })
 
-  // Handle raydium loading gracefully without blocking the page
-
-
   const panelItems = useMemo(() => {
     return [
       {
-        content: raydium ? <JustSendIt /> : <Flex justifyContent="center" p={8}><Text>Loading...</Text></Flex>,
+        content: <JustSendIt />,
         label: (
           <Flex alignItems="center" gap={1}>
             <Text>JustSendIt</Text>
@@ -133,7 +154,7 @@ export default function TokenCreate() {
         value: Tab.JustSendIt
       },
       {
-        content: raydium ? <LaunchLabForm /> : <Flex justifyContent="center" p={8}><Text>Loading...</Text></Flex>,
+        content: <LaunchLabForm />,
         label: (
           <Flex alignItems="center" gap={1}>
             <Text>Advanced</Text>
@@ -143,8 +164,7 @@ export default function TokenCreate() {
         value: Tab.LaunchLab
       }
     ]
-  }, [value, raydium])
-
+  }, [value])
 
   return (
     <Grid
@@ -170,11 +190,11 @@ export default function TokenCreate() {
                   bgGradient={
                     isLight
                       ? 'linear-gradient(245.22deg, #DA2EEF 7.97%, #2B6AFF 49.17%, #39D0D8 92.1%)'
-                      : 'linear-gradient(245.22deg,rgb(239, 107, 46) 7.97%,rgb(255, 251, 43) 49.17%, rgb(239, 107, 46) 92.1%)'
+                      : 'linear-gradient(245.22deg, #FF2FC8 7.97%, #FFB12B 49.17%, #D3D839 92.1%)'
                   }
                   bgClip="text"
                 >
-                  Launch tokens, earn rewards! Check X account for updates!
+                  Launch tokens, earn rewards! Check ‘Rewards’ tab and X account for updates!
                 </Text>
               </Flex>
               <X width="22px" height="22px" color="#4F53F3" cursor="pointer" onClick={() => setIsLaunchTokenBannerShown(false)} />
@@ -182,26 +202,19 @@ export default function TokenCreate() {
           </Box>
         )}
         <Flex alignItems="center" gap={1} opacity={0.5}>
-          <Link as={NextLink} href={`/${referrerQuery}`} display="contents" shallow color={colors.lightPurple}>
+          <Link as={NextLink} href={`/launchpad${referrerQuery}`} display="contents" shallow color={colors.lightPurple}>
             <ChevronLeftIcon />
             <Text fontWeight="500" fontSize="xl">
-              {'Back'}{/* {i18n.t('common.back')} */}
+              Back
             </Text>
           </Link>
         </Flex>
       </GridItem>
       <GridItem area="panel">
-        <Flex justifyContent="center" alignItems="center" gap={2} mb={7}>
-          <Text color={colors.lightPurple} fontSize="xl" fontWeight="medium" textAlign="center">
-            Launch New
-          </Text>
-          {!raydium && (
-            <Text color={colors.textSecondary} fontSize="sm">
-              (Loading SDK...)
-            </Text>
-          )}
-        </Flex>
-        <Flex background="#22D1F833" alignItems="center" px={4} py="10px" gap={2} borderRadius="8px" mt={6}>
+        <Text color={colors.lightPurple} fontSize="xl" fontWeight="medium" textAlign="center" mb={7}>
+          Create Token
+        </Text>
+        {/* <Flex background="#22D1F833" alignItems="center" px={4} py="10px" gap={2} borderRadius="8px" mt={6}>
       <Box>
         <Info width="18px" height="18px" color={colors.textLaunchpadLink} />
       </Box>
@@ -212,14 +225,14 @@ export default function TokenCreate() {
         </Text>{' '}
         when your coin completes its bonding curve
       </Text>
-    </Flex>
+    </Flex> */}
         <TabContent
           value={value}
           onValueChange={setValue}
           items={panelItems}
           sx={{
             '.chakra-tabs__tab-indicator': {
-              background: value === Tab.JustSendIt ? '#22D1F8' : 'linear-gradient(245.22deg,rgb(239, 107, 46) 7.97%,rgb(255, 251, 43) 49.17%, rgb(239, 107, 46) 92.1%)'
+              background: value === Tab.JustSendIt ? '#22D1F8' : 'linear-gradient(245.22deg, #FF2FC8 7.97%, #FFB12B 49.17%, #D3D839 92.1%)'
             }
           }}
         />
@@ -229,6 +242,7 @@ export default function TokenCreate() {
 }
 
 const JustSendIt = () => {
+  const { t } = useTranslation()
   const openDialog = useDialogsStore((s) => s.openDialog)
   const { checkToken, getTokenFromStorage } = useWalletSign()
   const isSignIn = !!getTokenFromStorage()
@@ -266,8 +280,12 @@ const JustSendIt = () => {
     setIsExpanded(!isExpanded)
   }
 
+
   const handleCreateMint = async (values: CreateMintFormValue) => {
-    console.log('post create', values)
+    // console.log('post create', values)
+    // console.log('configInfo', configInfo)
+    // console.log('migrateType', migrateType)
+    // console.log('isPostMigrationFeeShare', isPostMigrationFeeShare)
     if (!configInfo) {
       toastSubject.next({
         status: 'warning',
@@ -287,8 +305,12 @@ const JustSendIt = () => {
             migrateType
           })
         )
+      },
+      errorCbk: () => {
+        console.log('check token failed')
       }
     })
+    console.log('check token result', r)
     if (!r) return
     openDialog(
       DialogTypes.InitialBuy({

@@ -1,11 +1,23 @@
+import {
+  forwardRef,
+  LegacyRef,
+  PropsWithChildren,
+  useCallback
+} from 'react'
+
+import { useTranslation } from 'react-i18next'
+
 import { useAppStore } from '@/store'
-import { Button, ButtonProps } from '@chakra-ui/react'
+import {
+  Button,
+  ButtonProps
+} from '@chakra-ui/react'
 import { useWalletModal } from '@solana/wallet-adapter-react-ui'
-import { LegacyRef, PropsWithChildren, forwardRef, useCallback } from 'react'
 
 type Props = PropsWithChildren<ButtonProps>
 
 export default forwardRef(function ConnectedButton({ children, onClick, isDisabled, ...props }: Props, ref: LegacyRef<HTMLButtonElement>) {
+  const { t } = useTranslation()
   const connected = useAppStore((s) => s.connected)
   const { setVisible } = useWalletModal()
   const handleClick = useCallback(() => setVisible(true), [setVisible])

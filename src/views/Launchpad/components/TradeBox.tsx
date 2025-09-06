@@ -1,44 +1,70 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react'
-import { Box, Flex, Button, Text, useColorMode, CircularProgress } from '@chakra-ui/react'
-import { NumericFormat } from 'react-number-format'
-import { 
-  ApiV3Token
-  
-} from '@raydium-io/raydium-sdk-v2'
-import { colors } from '@/theme/cssVariables/colors'
-import { detectedSeparator, formatCurrency, trimTrailZero } from '@/utils/numberish/formatter'
-import { SegmentedButton, OrderSide } from '@/components/SegmentedButton'
-import { SlippageAdjuster } from './SlippageAdjuster'
-import { SlippageAdjuster as SwapSlippageAdjuster } from '@/components/SlippageAdjuster'
-import TokenAvatar from '@/components/TokenAvatar'
-import { useEvent } from '@/hooks/useEvent'
-import { Curve } from '@raydium-io/raydium-sdk-v2'
-import { LaunchpadConfigInfo, LaunchpadPoolInfo } from '@/hooks/launchpad/usePoolRpcInfo'
+import React, {
+  useEffect,
+  useMemo,
+  useRef,
+  useState
+} from 'react'
+
 import BN from 'bn.js'
 import Decimal from 'decimal.js'
-import { useLaunchpadStore, useTokenAccountStore } from '@/store'
-import { useSwapStore, SWAP_SLIPPAGE_KEY } from '@/views/Swap/useSwapStore'
-import shallow from 'zustand/shallow'
-import { useDisclosure } from '@/hooks/useDelayDisclosure'
-import { MintInfo } from '../type'
-import { DEFAULT_SOL_RESERVER } from '@/components/TokenInput'
-import { toastSubject } from '@/hooks/toast/useGlobalToast'
-import useCheckToken from '@/hooks/launchpad/useCheckToken'
-import useSwap from '@/hooks/swap/useSwap'
-import { ApiSwapV1OutSuccess } from '@/hooks/swap/type'
-import {
-  NATIVE_MINT, 
-  TOKEN_PROGRAM_ID,
+import { NumericFormat } from 'react-number-format'
+import { shallow } from 'zustand/shallow'
 
-} from '@solana/spl-token'
-import BalanceWalletIcon from '@/icons/misc/BalanceWalletIcon'
-import IntervalCircle, { IntervalCircleHandler } from '@/components/IntervalCircle'
 import ConnectedButton from '@/components/ConnectedButton'
-import { isSolWSol } from '@/utils/token'
-import { useLaunchPadShareInfo } from '../utils'
+import IntervalCircle, { IntervalCircleHandler } from '@/components/IntervalCircle'
+import {
+  OrderSide,
+  SegmentedButton
+} from '@/components/SegmentedButton'
+import { SlippageAdjuster as SwapSlippageAdjuster } from '@/components/SlippageAdjuster'
+import TokenAvatar from '@/components/TokenAvatar'
+import { DEFAULT_SOL_RESERVER } from '@/components/TokenInput'
+import useCheckToken from '@/hooks/launchpad/useCheckToken'
+import {
+  LaunchpadConfigInfo,
+  LaunchpadPoolInfo
+} from '@/hooks/launchpad/usePoolRpcInfo'
 import { ToLaunchPadConfig } from '@/hooks/launchpad/utils'
+import { ApiSwapV1OutSuccess } from '@/hooks/swap/type'
+import useSwap from '@/hooks/swap/useSwap'
+import { toastSubject } from '@/hooks/toast/useGlobalToast'
+import { useDisclosure } from '@/hooks/useDelayDisclosure'
+import { useEvent } from '@/hooks/useEvent'
+import BalanceWalletIcon from '@/icons/misc/BalanceWalletIcon'
+import {
+  useLaunchpadStore,
+  useTokenAccountStore
+} from '@/store'
+import { colors } from '@/theme/cssVariables/colors'
+import {
+  detectedSeparator,
+  formatCurrency,
+  trimTrailZero
+} from '@/utils/numberish/formatter'
+import { isSolWSol } from '@/utils/token'
+import { useSwapStore } from '@/views/Swap/useSwapStore'
+import {
+  Box,
+  Button,
+  CircularProgress,
+  Flex,
+  Text,
+  useColorMode
+} from '@chakra-ui/react'
+import {
+  ApiV3Token,
+  Curve
+} from '@raydium-io/raydium-sdk-v2'
+import {
+  NATIVE_MINT,
+  TOKEN_PROGRAM_ID
+} from '@solana/spl-token'
 import { useWallet } from '@solana/wallet-adapter-react'
-import { Keypair, TransactionInstruction, TransactionMessage, VersionedTransaction, SystemProgram, PublicKey } from '@solana/web3.js'
+import { Keypair } from '@solana/web3.js'
+
+import { MintInfo } from '../type'
+import { useLaunchPadShareInfo } from '../utils'
+import { SlippageAdjuster } from './SlippageAdjuster'
 
 export default function TradeBox({
   poolInfo,

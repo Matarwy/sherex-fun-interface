@@ -1,15 +1,26 @@
-import { useEffect, useMemo } from 'react'
-import { ApiV3PoolInfoStandardItem, FetchPoolParams } from '@raydium-io/raydium-sdk-v2'
-import useSWR, { KeyedMutator } from 'swr'
-import shallow from 'zustand/shallow'
-import { AxiosResponse } from 'axios'
-import axios from '@/api/axios'
-import { isValidPublicKey } from '@/utils/publicKey'
-import { MINUTE_MILLISECONDS } from '@/utils/date'
+import {
+  useEffect,
+  useMemo
+} from 'react'
 
-import { FormattedPoolInfoStandardItem } from './type'
+import useSWR, { KeyedMutator } from 'swr'
+import { shallow } from 'zustand/shallow'
+
+import axios from '@/api/axios'
 import { useAppStore } from '@/store'
-import { formatPoolData, poolInfoCache, formatAprData } from './formatter'
+import { MINUTE_MILLISECONDS } from '@/utils/date'
+import { isValidPublicKey } from '@/utils/publicKey'
+import {
+  ApiV3PoolInfoStandardItem,
+  FetchPoolParams
+} from '@raydium-io/raydium-sdk-v2'
+
+import {
+  formatAprData,
+  formatPoolData,
+  poolInfoCache
+} from './formatter'
+import { FormattedPoolInfoStandardItem } from './type'
 
 const fetcher = async ([url]: [url: string]) => {
   const [host, query = ''] = url.split('?')

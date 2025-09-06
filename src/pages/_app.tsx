@@ -1,21 +1,24 @@
-import type { AppProps } from 'next/app'
-import Script from 'next/script';
-import Head from 'next/head'
-import dynamic from 'next/dynamic'
-import { useRouter } from 'next/router'
-import { useEffect, useMemo } from 'react'
-import Decimal from 'decimal.js'
-
-
 import '@/components/Toast/toast.css'
 import 'react-day-picker/dist/style.css'
-import { GoogleAnalytics } from '@next/third-parties/google'
-import { OnboardingDialog } from '@/components/Dialogs/OnboardingDialog'
+
+import {
+  useEffect,
+  useMemo
+} from 'react'
+
+import Decimal from 'decimal.js'
+import type { AppProps } from 'next/app'
+import dynamic from 'next/dynamic'
+import Head from 'next/head'
+import { useRouter } from 'next/router'
+import Script from 'next/script'
+import { shallow } from 'zustand/shallow'
+
 import { DialogManager } from '@/components/DialogManager'
-import { useDisclosure } from '@chakra-ui/react'
+import { OnboardingDialog } from '@/components/Dialogs/OnboardingDialog'
 import { useAppStore } from '@/store'
-import shallow from 'zustand/shallow'
-import { setStorageItem } from '@/utils/localStorage';
+import { setStorageItem } from '@/utils/localStorage'
+import { useDisclosure } from '@chakra-ui/react'
 
 const DynamicProviders = dynamic(() => import('@/provider').then((mod) => mod.Providers))
 const DynamicContent = dynamic(() => import('@/components/Content'))

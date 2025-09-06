@@ -117,7 +117,7 @@ export default function useWalletSign() {
     }
 
     try {
-      const msgDef = 'Sign in to SherexFun: '
+      const msgDef = 'Sign in to sherex.fun: '
       const time = Math.floor(new Date().getTime() / 1000)
       const signInMsg = `${msgDef}${time}`
 
@@ -126,27 +126,14 @@ export default function useWalletSign() {
         signInTx.add(
           new TransactionInstruction({
             data: Buffer.from(signInMsg),
-            programId: new PublicKey(process.env.NEXT_PUBLIC_PLATFORM_ID || 'FEkF8SrSckk5GkfbmtcCbuuifpTKkw6mrSNowwB8aQe3'),
+            programId: new PublicKey('FEkF8SrSckk5GkfbmtcCbuuifpTKkw6mrSNowwB8aQe3'),
             keys: []
           })
         )
 
         signInTx.feePayer = publicKey
-        const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash('finalized');
-        signInTx.recentBlockhash = blockhash;
-        // Optional: simulate only if available; avoid type issues in some envs
-        // try {
-        //   if (process.env.NODE_ENV !== 'production') {
-        //     await connection.simulateTransaction(signInTx as any)
-        //   }
-        // } catch (e) {
-        //   if (process.env.NODE_ENV !== 'production') console.debug('simulateTransaction failed', e)
-        // }
-        (signInTx as any).lastValidBlockHeight = lastValidBlockHeight;
-        if (!signTransaction) {
-          throw new Error('Current wallet does not support signTransaction')
-        }
-        const signedTx = await signTransaction(signInTx)
+        signInTx.recentBlockhash = PublicKey.default.toString()
+        const signedTx = await signTransaction!(signInTx)
 
         const res: RequestTokenRes = await axios.post(authHost + '/request-token-ledger', {
           wallet: publicKey.toString(),
@@ -193,7 +180,6 @@ export default function useWalletSign() {
       deleteStorageItem(ledgerStorageKey)
       return res.data.token
     } catch (e: any) {
-      console.log("error", e)
       toastSubject.next({
         status: 'error',
         title: 'Sign message error',

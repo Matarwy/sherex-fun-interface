@@ -1,17 +1,18 @@
-import ChevronRightIcon from '@/icons/misc/ChevronRightIcon'
-// import TealCircleCheckBadge from '@/icons/misc/TealCircleCheckBadge'
-import WalletSelectEggIcon from '@/icons/misc/WalletSelectEggIcon'
-import WalletSelectWalletIcon from '@/icons/misc/WalletSelectWalletIcon'
+import {
+  useCallback,
+  useState
+} from 'react'
+
+import DesktopIcon from '@/icons/misc/DesktopIcon'
+import ExternalLink from '@/icons/misc/ExternalLink'
 // import AvalancheNetworkIcon from '@/icons/networks/AvalancheNetworkIcon'
 // import BinanceNetworkIcon from '@/icons/networks/BinanceNetworkIcon'
 // import EthereumNetworkIcon from '@/icons/networks/EthereumNetworkIcon'
 // import PolygonNetworkIcon from '@/icons/networks/PolygonNetworkIcon'
 // import SolanaNetworkIcon from '@/icons/networks/SolanaNetworkIcon'
 import MobileIcon from '@/icons/misc/MobileIcon'
-import DesktopIcon from '@/icons/misc/DesktopIcon'
-import MoonPayIconWithText from '@/icons/misc/MoonPayIconWithText'
-import { QuestionToolTip } from '@/components/QuestionToolTip'
-import ExternalLink from '@/icons/misc/ExternalLink'
+import WalletSelectWalletIcon from '@/icons/misc/WalletSelectWalletIcon'
+import { useAppStore } from '@/store'
 import { colors } from '@/theme/cssVariables'
 import {
   Box,
@@ -21,6 +22,7 @@ import {
   HStack,
   Image,
   Link,
+  ListItem,
   Modal,
   ModalBody,
   ModalCloseButton,
@@ -31,14 +33,10 @@ import {
   Switch,
   Text,
   UnorderedList,
-  ListItem,
   useColorMode
 } from '@chakra-ui/react'
 import { WalletReadyState } from '@solana/wallet-adapter-base'
 import { Wallet } from '@solana/wallet-adapter-react'
-import { useState, useCallback } from 'react'
-import NextLink from 'next/link'
-import { useAppStore } from '@/store'
 
 interface Props {
   wallets: Wallet[]
@@ -159,7 +157,7 @@ export default function SelectWalletModal({ wallets, isOpen, onSelectWallet, onC
               </Box> */}
               {/* <Box mb={6}>
               <Text fontSize={['sm', 'md']} color={colors.textPrimary} fontWeight={500} mb={4}>
-                {t('wallet_connect_panel.choose_network')}
+                wallet_connect_panel.choose_network')}
               </Text>
               <HStack gap={['unset', 8]} justifyContent={['space-between', 'unset']}>
                 {networks.map((network) => (
